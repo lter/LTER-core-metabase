@@ -51,11 +51,11 @@ Options:
 |--|--|--|--|
 | -t | type  |  |
 | -db | db name | bon_data_pkgs |  
-| -host | hostname | rdb2  |  
+| -host | hostname | rdb2  |  This is my host, you'll have your own of course |
 | -u | username |  |  
 | -p | pw | |  
 | -o | output directory|  |  
-| -dp | path to driver | ./driver.jar |
-\ -s | schema | mb2eml_r |
+| -dp | path to driver | ./postgresql-9.3-1103.jdbc3.jar |
+\ -s | schema | mb2eml_r | schemaSpy runs on one schema at a time. the LTER core MB database is expected to have 3 |
 | -noads |  | | maybe no adverts? 
 | -renderer | | :quartz |  needed to create dot files with graphviz. not sure why.
