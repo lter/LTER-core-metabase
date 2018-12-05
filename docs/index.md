@@ -5,6 +5,8 @@ LTER_core-metabase is a relational database model (Postgres), based on the GCE L
 For the history, see wiki:
 https://github.com/lter/LTER-core-metabase/wiki/Metabase-history
 
+To build your own view of the database, try [SchemaSpy](ERD/how_to_schemaSpy).
+
 ## Order To Populate Tables
 
 Populate parent tables first. Here is one example; your workflow may vary depending on the nature of the dataset you are describing.
