@@ -12,11 +12,15 @@
     1. load sample data (optional)
 
 
-## Preconditions
-This guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally.
+## Details
+### Preconditions:  
+This guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally. There are no instructions on installing postgreSQL here.
 
-1. Talk to your DB administrator; set up these roles
-  - db_owner: ALL privileldges: e.g., CREATE schemas, tables, views, triggers, etc. Runs backups, grants priviledges. INSERT, UPDATE, DELETE content
+### Talk to your DB administrator
+ask that these roles be set up
+ll
+
+  - db_owner (the owner of this database, not necessarily the owner of the database server) ALL privileldges: e.g., CREATE schemas, tables, views, triggers, etc. Runs backups, grants priviledges. INSERT, UPDATE, DELETE content
   - read_write_user: (optional) Intermediate priviledges, UPDATE, INSERT content, typicallly with a script (no DELETE)
   - read_only_user: SELECT only, for export 
   
