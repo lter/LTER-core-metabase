@@ -8,7 +8,7 @@
 3. your tasks, as the DB owner - run scripts in this order
     1. create tables 
     1. set perms 
-    1. load controlled content 
+    1. load controlled content (recommended)
     1. load sample datasets (optional)
 
 
@@ -21,24 +21,30 @@ This Guide assumes you have postgreSQL installed, either on a remote server (e.g
 1. Other reference material is available elsewhere in this repository.  
 
 ### Steps
-#### Talk to your DB administrator
+#### 1. Talk to your DB administrator
 you will need users with these roles set up
 
-  - db_owner (the owner of this database, not necessarily the owner of the database server) ALL privileldges: e.g., CREATE schemas, tables, views, triggers, etc. Runs backups, grants priviledges. INSERT, UPDATE, DELETE content
-  - read_write_user: (optional) Intermediate priviledges, UPDATE, INSERT content, typicallly with a script (no DELETE)
-  - read_only_user: SELECT only, for export 
+
+| Role | description  |  SQL priviledges |
+|--|--|--|
+| db_owner | the owner of this database (not necessarily the owner of the database server). Creates/deletes schemas, tables, views, triggers, etc. Runs backups, grants priviledges | ALL  |
+| read_write_user | Intermediate user, updates row-level content, typicallly with a script | UPDATE, INSERT (no DELETE) |
+| read_only_user | export, e.g, bia script to create EML, or display on a website | SELECT  |
 
 
-#### Customize these sql scripts - edit tokens to account names
+#### 2. Customize these sql scripts - edit tokens to account names
 
 - 0_create_db.sql 
 - 1_create_schemas_tables.sql
 - 2_set_perms.sql
 
-#### Run scripts in this order:
+#### 3. Run scripts in this order:
 1. 1_create_schemas_tables.sql 
 1. 2_set_perms.sql 
 1. 3_load_controlled_content.sql (recommended)
 1. 4_load_sample_sbc_datasets.sql (optional)
     
-                         
+             
+             
+             
+             
