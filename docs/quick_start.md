@@ -36,9 +36,9 @@ you will need users with these roles set up
 - 2_set_perms.sql
 
 #### Run scripts in this order:
-    1. 1_create_schemas_tables.sql 
-    1. 2_set_perms.sql 
-    1. 3_load_controlled_content.sql (recommended)
-    1. 4_load_sample_sbc_datasets.sql (optional)
+1. 1_create_schemas_tables.sql 
+1. 2_set_perms.sql 
+1. 3_load_controlled_content.sql (recommended)
+1. 4_load_sample_sbc_datasets.sql (optional)
     
                          
