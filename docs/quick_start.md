@@ -26,10 +26,12 @@ you will need users with these roles set up
 
 
 | Role | description | recommendation |  SQL priviledges |
-|--|--|--|
+|--|--|--|--|
 | db_owner | the owner of this database (not necessarily the owner of the database server). Creates/deletes schemas, tables, views, triggers, etc. Runs backups, grants priviledges.  |  The DB ownder should be a person who aready knows posgreSQL and has an acct. Transfer ownership of this DB to that acct.  | ALL  |
 | read_write_user | Intermediate user, updates row-level content, typicallly with a script | create a new acct named "read_write_user" | UPDATE, INSERT (no DELETE) |
 | read_only_user | export, e.g, via script to create EML, or display on a website | create a new acct named "read_only_user" | SELECT  |
+
+
 
 
 #### 2. Customize these sql scripts - edit tokens to account names
