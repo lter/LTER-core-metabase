@@ -2,9 +2,10 @@
 
 ## Outline
 1. install pg (if needed)
-2. set up roles (your DB admin)
-3. run scripts in this order 
-    1. create db 
+2.  your DB admin's tasks
+    1. set up roles/accts
+    1. create db (make you the owner)
+3. your tasks, as the DB owner - run scripts in this order
     1. create tables 
     1. set perms 
     1. load controlled content 
