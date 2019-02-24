@@ -34,7 +34,7 @@ You will need PostgreSQL accounts to fill these roles.
 #### 2. Customize all sql scripts - edit tokens for db_owner account name
 It should be obvious that you cannot run these SQL scripts directly from the clone; first they must reference existing accounts, and you will have to set these values. We recommend that you have scripts for this, since DB extensions that appear in this repository will use the account-tokens, and you'll have to reset those for every script. 
 
-E.g., `sed '/%db_owner%/gastil/g git-clone/0_create_db.sql > local/create_db.sql`
+E.g., at a minimum, you could `sed 's/%db_owner%/gastil/g' git-clone/0_create_db.sql > local/create_db.sql`
 
 
 #### 3. DB Administrator: create the local database
