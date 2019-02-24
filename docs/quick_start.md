@@ -32,15 +32,15 @@ You will need PostgreSQL accounts to fill these roles.
 | read_only_user | export, e.g, via script to create EML, or display on a website | create a new acct named "read_only_user" | SELECT  |
 
 #### 2. Customize all sql scripts - edit tokens for db_owner account name
+It should be obvious that you cannot run these SQL scripts directly from the clone; first they must reference existing accounts, and you will have to set these values. We recommend that you have scripts for this, since DB extensions that appear in this repository will use the account-tokens, and you'll have to reset those for every script. 
 
-- 0_create_db.sql 
-- 1_create_schemas_tables.sql
-- 2_set_perms.sql
+E.g., `sed '/%db_owner%/gastil/g` git-clone/0_create_db.sql > local/create_db.sql`
 
-#### 3. DB Administrator: create database
+
+#### 3. DB Administrator: create the local database
 - 0_create_db.sql
 
-#### 4. DB owner: run scripts in this order:
+#### 4. DB owner: run local scripts in this order:
 - 1_create_schemas_tables.sql 
 - 2_set_perms.sql 
 - 3_load_controlled_content.sql (recommended)
