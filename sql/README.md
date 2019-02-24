@@ -19,9 +19,10 @@ Dir contains the install scripts for LTER-core-metabase. See Quick Start guide.
        1. EML unit dictionary (as used by MCR, SBC LTER)
      
 - **4_load_sample_sbc_datasets.sql** 
-  - populates 23 tables with 3 sample SBC LTER datasets. examples' identifiers all start with 99xxx so they can be easily detected.
+  - populates 23 tables with 3 sample SBC LTER datasets (lter_metabase). examples' identifiers all start with 99xxx so they can be easily detected.
   - additional keywordThesauri and keywords used by SBC LTER (see below)
-  - Recommendation on using examples: TO DO
+  - populates 2 tables in pkg_mgmt (pkg_state and pkg_sort)  
+  - Recommendation on using examples: see quick-start
 
 
 **Notes on keywords and thesauri:**
