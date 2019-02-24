@@ -28,7 +28,7 @@ You will need PostgreSQL accounts to fill these roles.
 | Role | Description | Recommendation |  SQL priviledges |
 |--|--|--|--|
 | db_owner | the owner of this database (not necessarily the owner/admin of the database server). Creates/deletes schemas, tables, views, triggers, etc. Runs backups, grants priviledges.  |  The DB owner should be a person who aready knows posgreSQL, so most likely, an existing account. The create_db script transfers ownership to the owner acct.  | ALL (DB-level)  |
-| read_write_user | Optional intermediate user, updates row-level content, typicallly with a script. You may not need this role until you have scripts/forms for adding content. | create a new acct named "read_write_user" | UPDATE, INSERT (no DELETE) |
+| read_write_user | Optional intermediate user. Updates row-level content, typicallly with a script. You may not need this role until you have scripts/forms for adding content. | create a new acct named "read_write_user" | UPDATE, INSERT (no DELETE) |
 | read_only_user | export, e.g, via script to create EML, or display on a website | create a new acct named "read_only_user" | SELECT  |
 
 #### 2. Customize all sql scripts - edit tokens for db_owner account name
