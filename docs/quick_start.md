@@ -13,12 +13,12 @@
 
 
 ## Details
-### Preconditions:  
-This Guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally. You will also need a mechanism to get content into the database. This could be done with a destop GUI like DBeaver, or by loading text tables from the command line (e.g., psql), or an SQL pane in a GUI. 
+### Preconditions  
+This Guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally. You (and/or your adminstrator) will also need a mechanism to run SQL commands. This could be done from the command line (e.g., psql), or an SQL pane in a GUI. 
 
-### Caveats:
-1. There are no instructions here for installing postgreSQL. 
-1. Other reference material is available elsewhere in this repository.  
+### Caveats
+1. There are no instructions here for installing or adminstering postgreSQL. 
+1. Other material about LTER-core-metabase is available elsewhere in this repository, e.g, table-population order (for loading your own content).  
 
 ### Steps
 #### 1. Talk to your DB administrator
@@ -31,9 +31,6 @@ You will need PostgreSQL accounts to fill these roles.
 | read_write_user | Optional intermediate user, updates row-level content, typicallly with a script. You may not need this role until you have scripts/forms for adding content. | create a new acct named "read_write_user" | UPDATE, INSERT (no DELETE) |
 | read_only_user | export, e.g, via script to create EML, or display on a website | create a new acct named "read_only_user" | SELECT  |
 
-
-
-
 #### 2. Customize all sql scripts - edit tokens for db_owner account name
 
 - 0_create_db.sql 
@@ -41,15 +38,14 @@ You will need PostgreSQL accounts to fill these roles.
 - 2_set_perms.sql
 
 #### 3. DB Administrator: create database
-0. 0_create_db.sql
+- 0_create_db.sql
 
 #### 4. DB owner: run scripts in this order:
-1. 1_create_schemas_tables.sql 
-1. 2_set_perms.sql 
-1. 3_load_controlled_content.sql (recommended)
-1. 4_load_sample_sbc_datasets.sql (optional)
+- 1_create_schemas_tables.sql 
+- 2_set_perms.sql 
+- 3_load_controlled_content.sql (recommended)
+- 4_load_sample_sbc_datasets.sql (optional)
     
-             
-             
+       
              
              
