@@ -15,14 +15,14 @@ Dir contains the install scripts for LTER-core-metabase. See Quick Start guide.
     1. file type descriptions
     1. etc.
   - keywordThesaurus - names and descriptions for 8 thesauri (sets of keywords)
-   1. Darwin Core Terms
-   1. Ecological Archives
-   1. Essential Biodiversity Variables
-   1. Global Change Master Directory (GCMD) v6.0.0.0.0	
-   1. Knowledge Network for Biocomplexity (Parent project for EML)
-   1. NBII Biocomplexity
-   1. LTER Controlled Vocabulary v1
-   1. LTER Core Research Areas
+    1. Darwin Core Terms
+    1. Ecological Archives
+    1. Essential Biodiversity Variables
+    1. Global Change Master Directory (GCMD) v6.0.0.0.0	
+    1. Knowledge Network for Biocomplexity (Parent project for EML)
+    1. NBII Biocomplexity
+    1. LTER Controlled Vocabulary v1
+    1. LTER Core Research Areas
   - keywords *only for*
     1. from LTER Controlled vocabulary and 
     1. LTER Core Research Areas 
