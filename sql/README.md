@@ -17,33 +17,14 @@ Dir contains the install scripts for LTER-core-metabase. See  [Quick Start guide
        1. structural EML terms (e.g., measurementScale, storage type)
        1. common file type descriptionss
        1. EML unit dictionary (as used by MCR, SBC LTER)
+       1. keywordThesaurus - names and descriptions for 8 commonly used thesauri (sets of keywords)
+       1. LTER Controlled vocabulary and LTER Core Research Areas
      
 - **4_load_sample_sbc_datasets.sql** 
   - populates 23 tables with 3 sample SBC LTER datasets (lter_metabase). examples' identifiers all start with 99xxx so they can be easily detected.
   - additional keywordThesauri and keywords used by SBC LTER (see below)
   - populates 2 tables in pkg_mgmt (pkg_state and pkg_sort)  
-  - Recommendation on using examples: see [Quick Start guide](../docs/quick_start.md)
-
-
-**Notes on keywords and thesauri:**
-tables for keywords and thesaruri are populated by both "controlled content" and as examples.
-Controlled content includes 
-
- 1. keywordThesaurus - names and descriptions for 8 commonly used thesauri (sets of keywords)
-    1. Darwin Core Terms
-    1. Ecological Archives
-    1. Essential Biodiversity Variables
-    1. Global Change Master Directory (GCMD) v6.0.0.0.0	
-    1. Knowledge Network for Biocomplexity (Parent project for EML)
-    1. NBII Biocomplexity
-    1. LTER Controlled Vocabulary v1
-    1. LTER Core Research Areas
- 1. keywords *only for*
-    1.  LTER Controlled vocabulary and 
-    1. LTER Core Research Areas 
-        
-SBC LTER examples include two additional thesauri used only by SBC LTER, and keywords used by 
-SBC for the 6 other thesauri.
+  - Recommendation on [using examples](../docs/example_info.md)
 
         
         
