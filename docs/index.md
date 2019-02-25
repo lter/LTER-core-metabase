@@ -7,6 +7,10 @@ https://github.com/lter/LTER-core-metabase/wiki/Metabase-history
 
 To build your own view of the database, try [SchemaSpy](ERD/how_to_schemaSpy).
 
+Temporary spot with schemaSpy documentation: 
+(http://sbc.lternet.edu/external/InformationManagement/LTER_IMC/tmp_lter_core_metabase/schemaSpy_docs/)
+
+
 ## Order To Populate Tables
 
 Populate parent tables first. Here is one example; your workflow may vary depending on the nature of the dataset you are describing.
