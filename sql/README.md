@@ -1,5 +1,5 @@
 # README.md
-Dir contains the install scripts for LTER-core-metabase. See [../docs/quick_start.md](Quick Start guide). 
+Dir contains the install scripts for LTER-core-metabase. See  [Quick Start guide](../docs/quick_start.md). 
 
 - **0_create_db.sql**
   - creates database named lter_core_metabase
@@ -22,7 +22,7 @@ Dir contains the install scripts for LTER-core-metabase. See [../docs/quick_star
   - populates 23 tables with 3 sample SBC LTER datasets (lter_metabase). examples' identifiers all start with 99xxx so they can be easily detected.
   - additional keywordThesauri and keywords used by SBC LTER (see below)
   - populates 2 tables in pkg_mgmt (pkg_state and pkg_sort)  
-  - Recommendation on using examples: see [../docs/quick_start.md](Quick Start guide)
+  - Recommendation on using examples: see [Quick Start guide](../docs/quick_start.md)
 
 
 **Notes on keywords and thesauri:**
