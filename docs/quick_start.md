@@ -16,6 +16,8 @@
 ### Preconditions  
 This Guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally. You (and/or your adminstrator) will also need a mechanism to run SQL commands. This could be done from the command line (e.g., psql), or an SQL pane in a GUI. 
 
+Since these SQL scripts were based on a backup (or "dump"), the version of posgtreSQL is in the top of each file. 
+
 ### Caveats
 1. There are no instructions here for installing or adminstering postgreSQL. 
 1. Other material about LTER-core-metabase is available elsewhere in this repository, e.g, table-population order (for loading your own content).  
