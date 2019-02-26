@@ -785,7 +785,7 @@ ALTER TABLE mb2eml_r.vw_eml_datasetmethod OWNER TO %db_owner%;
 --
 
 CREATE VIEW mb2eml_r.vw_eml_entities AS
-SELECT e."DataSetID" AS datasetid, e."SortOrder" AS entity_position, e."EntityType" AS entitytype, e."EntityName" AS entityname, e."EntityDescription" AS entitydescription, pg_catalog.concat(e."Urlhead", e."Subpath") AS urlpath, e."FileName" AS filename, e."EntityRecords" AS entityrecords, k."FileFormat" AS fileformat, k."EML_FormatType" AS formattype, k."RecordDelimiter" AS recorddelimiter, k."NumHeaderLines" AS headerlines, k."NumFooterLines" AS footerlines, k."FieldDelimiter" AS fielddlimiter, k."externallyDefinedFormat_formatName" AS formatname, k."QuoteCharacter" AS quotecharacter FROM (lter_metabase."DataSetEntities" e LEFT JOIN lter_metabase."FileTypeList" k ON (((e."FileType")::text = (k."FileType")::text))) ORDER BY e."DataSetID", e."SortOrder";
+SELECT e."DataSetID" AS datasetid, e."SortOrder" AS entity_position, e."EntityType" AS entitytype, e."EntityName" AS entityname, e."EntityDescription" AS entitydescription, pg_catalog.concat(e."Urlhead", e."Subpath") AS urlpath, e."FileName" AS filename, e."EntityRecords" AS entityrecords, k."FileFormat" AS fileformat, k."EML_FormatType" AS formattype, k."RecordDelimiter" AS recorddelimiter, k."NumHeaderLines" AS headerlines, k."NumFooterLines" AS footerlines, k."FieldDelimiter" AS fielddlimiter, k."externallyDefinedFormat_formatName" AS formatname, k."QuoteCharacter" AS quotecharacter, k."CollapseDelimiters" AS collapsedelimiter  FROM (lter_metabase."DataSetEntities" e LEFT JOIN lter_metabase."FileTypeList" k ON (((e."FileType")::text = (k."FileType")::text))) ORDER BY e."DataSetID", e."SortOrder";
 
 
 ALTER TABLE mb2eml_r.vw_eml_entities OWNER TO %db_owner%;
