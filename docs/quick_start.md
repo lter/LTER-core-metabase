@@ -14,7 +14,7 @@
 
 ## Details
 ### Preconditions  
-This Guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally. It assumes you understand basic rDB concepts and their implementation in posgreSQL. You (and/or your adminstrator) will also need a mechanism to run SQL commands. This could be done from the command line (e.g., psql), or an SQL pane in a GUI. 
+This Guide assumes you have postgreSQL installed, either on a remote server (e.g., institutional), or locally. It assumes you (the "database owner") understand basic rDB concepts and their implementation in posgreSQL. You (and your adminstrator) will also need a mechanism to run SQL commands. This could be done from the command line (e.g., psql), or an SQL pane in a GUI. 
 
 Since these SQL scripts were based on a backup (or "dump"), the version of posgtreSQL is in the top of each file. 
 
