@@ -6,4 +6,6 @@ This project is in early alpha stages and the initial database is still under de
 For info about the history, see wiki:
 https://github.com/lter/LTER-core-metabase/wiki/Metabase-history
 
+For help installing the SQL scripts, see [docs/quick_start.md](docs/quick_start.md)
+
 For user documentation, see the [docs](https://lter.github.io/LTER-core-metabase/).
