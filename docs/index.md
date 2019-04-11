@@ -15,7 +15,7 @@ Temporary spot with schemaSpy documentation:
 
 Populate parent tables first. Here is one example; your workflow may vary depending on the nature of the dataset you are describing.
 
-1. People
+1. People, SiteList
 2. Keywords
 3. DataSet
 4. DataSetKeywords and DataSetPersonnel
