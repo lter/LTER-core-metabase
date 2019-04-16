@@ -807,8 +807,8 @@ COPY lter_metabase."DataSetAttributes" ("DataSetID", "EntitySortOrder", "ColumnP
 99021	3	1	Site	Site	Site	code for sampling location	string	nominalEnum	\N	\N	\N	\N	\N	\N	-99999	no information available	\N	\N
 99021	3	2	plant_ID	plant_ID	Plant ID	Identifier for tagged plant	string	nominalText	\N	\N	any text	\N	\N	\N	-99999	no information available	\N	\N
 99021	3	3	date	date	Date	Date of collection	string	dateTime	YYYY-MM-DD	1	\N	\N	\N	\N	-99999	no information available	\N	\N
-99021	3	4	total_fronds	total_fronds	Total Fronds	Total number of fronds &gt;1 m in length on the plant. Includes both tagged fronds remaining from previous sampling and new fronds	integer	ratio	\N	\N	\N	number	1	integer	-99999	not available, or not collected	100000	100000
-99021	3	5	new_fronds	new_fronds	New Fronds	Number of untagged fronds &gt; 1 m in length on the plant. Assumes that these fronds were either initiated during the previous sampling interval. A value of zero means that no new fronds were counted	integer	ratio	\N	\N	\N	number	1	integer	-99999	not available, or not collected	100000	100000
+99021	3	4	total_fronds	total_fronds	Total Fronds	Total number of fronds greater than 1 m in length on the plant. Includes both tagged fronds remaining from previous sampling and new fronds	integer	ratio	\N	\N	\N	number	1	integer	-99999	not available, or not collected	100000	100000
+99021	3	5	new_fronds	new_fronds	New Fronds	Number of untagged fronds greater than 1 m in length on the plant. Assumes that these fronds were either initiated during the previous sampling interval. A value of zero means that no new fronds were counted	integer	ratio	\N	\N	\N	number	1	integer	-99999	not available, or not collected	100000	100000
 99024	1	1	CONSEC_	CONSEC_	Sample number	Sample number	integer	nominalText	\N	\N	integer as text	\N	\N	\N	\N	\N	\N	\N
 99024	1	2	YEAR	YEAR	Year	Calendar year of data collection	integer	dateTime	YYYY	1	\N	\N	\N	\N	-99999	value not recorded or not available	\N	\N
 99024	1	3	MONTH	MONTH	Month	Calendar month of data collection	integer	dateTime	MM	1	\N	\N	\N	\N	-99999	value not recorded or not available	\N	\N
