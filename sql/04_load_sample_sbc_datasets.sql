@@ -910,113 +910,6 @@ COPY lter_metabase."DataSetTemporal" ("DataSetID", "EntitySortOrder", "BeginDate
 \.
 
 
---
--- TOC entry 3177 (class 0 OID 130249)
--- Dependencies: 181
--- Data for Name: DataSetKeywords; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."DataSetKeywords" ("DataSetID", "Keyword", "ThesaurusID") FROM stdin;
-99013	Carpinteria	sbclter_place
-99013	temperature	lter_cv
-99013	Water Temperature	gcmd6
-99013	Santa Barbara Coastal	lter_cv
-99013	LTER	lter_cv
-99013	Ocean_biogeochemistry	sbclter
-99013	Arroyo Burro	sbclter_place
-99013	Santa Cruz Island, Diablo	sbclter_place
-99013	Bullito	sbclter_place
-99013	Santa Cruz Island, Twin Harbor West	sbclter_place
-99013	Arroyo Quemado	sbclter_place
-99013	Isla Vista	sbclter_place
-99013	Arroyo Hondo	sbclter_place
-99013	Naples	sbclter_place
-99013	Mohawk	sbclter_place
-99013	Goleta Bay	sbclter_place
-99013	Temperature	knb
-99013	Marine	knb
-99021	seasonality	lter_cv
-99021	Ecosystem Processes	sbclter
-99021	Santa Barbara Coastal	lter_cv
-99021	net primary production	ea
-99021	growth	lter_cv
-99021	Fronds	nbii
-99021	populations	lter_cv_cra
-99021	Primary production	nbii
-99021	long term ecological research	lter_cv
-99021	standing crop	ea
-99021	Biogeochemistry	sbclter
-99021	Carbon	gcmd6
-99021	Arroyo Burro Reef	sbclter_place
-99021	LTER	lter_cv
-99021	biomass	lter_cv
-99021	algae	gcmd6
-99021	marine algae	ea
-99021	Biomass	gcmd6
-99021	growth rate	ea
-99021	Nearshore Ocean	sbclter
-99021	Mohawk Reef	sbclter_place
-99021	Kelp Forest	sbclter
-99021	Macrocystis pyrifera	none
-99021	mass	lter_cv
-99021	Marine Plants	gcmd6
-99021	Mass (property)	nbii
-99021	carbon	lter_cv
-99021	Dominant Species	gcmd6
-99021	Community Structure	sbclter
-99021	productivity	lter_cv
-99021	primary production	lter_cv_cra
-99021	standing crop	lter_cv
-99021	giant kelp	ea
-99021	Arroyo Quemado Reef	sbclter_place
-99021	Reef	sbclter
-99024	LTER	lter_cv
-99024	net primary production	none
-99024	Marine Plants	gcmd6
-99024	growth rate	none
-99024	marine algae	ea
-99024	Santa Barbara Coastal	lter_cv
-99024	giant kelp	none
-99024	algae	lter_cv
-99024	carbon	lter_cv
-99024	Dominant Species	gcmd6
-99024	Macrocystis pyrifera	none
-99024	standing crop	lter_cv
-99024	biomass	lter_cv
-99024	primary production	lter_cv_cra
-99054	canopy	lter_cv
-99054	Santa Catalina Island	sbclter_place
-99054	Biomass	nbii
-99054	wet weight	none
-99054	Landsat	none
-99054	Ventura County	sbclter_place
-99054	populations	lter_cv_cra
-99054	Kelp Forest	sbclter
-99054	Santa Barbara Channel Islands	sbclter_place
-99054	Santa Barbara Coastal	lter_cv
-99054	San Clemente Island	sbclter_place
-99054	remote sensing	none
-99054	Los Angeles County	sbclter_place
-99054	Orange County	sbclter_place
-99054	kelp biomass	none
-99054	Biomass Dynamics	gcmd6
-99054	San Miguel Island	sbclter_place
-99054	satellite	none
-99054	LTER	lter_cv
-99054	nearshore ocean	sbclter
-99054	remote sensing	sbclter
-99054	Santa Rosa Island	sbclter_place
-99054	kelp canopy	none
-99054	Santa Barbara Island	sbclter_place
-99054	Santa Cruz Island	sbclter_place
-99054	San Diego County	sbclter_place
-99054	Santa Barbara County	sbclter_place
-99054	Biomass	gcmd6
-99054	Anacapa Island	sbclter_place
-99054	biomass	lter_cv
-99054	San Nicolas Island	sbclter_place
-\.
-
 
 --
 -- TOC entry 3178 (class 0 OID 130256)
@@ -2070,6 +1963,114 @@ invasive species	none	theme
 phenology	none	theme
 habitat affinity	none	theme
 allometry	none	theme
+\.
+
+
+--
+-- TOC entry 3177 (class 0 OID 130249)
+-- Dependencies: 181
+-- Data for Name: DataSetKeywords; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."DataSetKeywords" ("DataSetID", "Keyword", "ThesaurusID") FROM stdin;
+99013	Carpinteria	sbclter_place
+99013	temperature	lter_cv
+99013	Water Temperature	gcmd6
+99013	Santa Barbara Coastal	lter_cv
+99013	LTER	lter_cv
+99013	Ocean_biogeochemistry	sbclter
+99013	Arroyo Burro	sbclter_place
+99013	Santa Cruz Island, Diablo	sbclter_place
+99013	Bullito	sbclter_place
+99013	Santa Cruz Island, Twin Harbor West	sbclter_place
+99013	Arroyo Quemado	sbclter_place
+99013	Isla Vista	sbclter_place
+99013	Arroyo Hondo	sbclter_place
+99013	Naples	sbclter_place
+99013	Mohawk	sbclter_place
+99013	Goleta Bay	sbclter_place
+99013	Temperature	knb
+99013	Marine	knb
+99021	seasonality	lter_cv
+99021	Ecosystem Processes	sbclter
+99021	Santa Barbara Coastal	lter_cv
+99021	net primary production	ea
+99021	growth	lter_cv
+99021	Fronds	nbii
+99021	populations	lter_cv_cra
+99021	Primary production	nbii
+99021	long term ecological research	lter_cv
+99021	standing crop	ea
+99021	Biogeochemistry	sbclter
+99021	Carbon	gcmd6
+99021	Arroyo Burro Reef	sbclter_place
+99021	LTER	lter_cv
+99021	biomass	lter_cv
+99021	algae	gcmd6
+99021	marine algae	ea
+99021	Biomass	gcmd6
+99021	growth rate	ea
+99021	Nearshore Ocean	sbclter
+99021	Mohawk Reef	sbclter_place
+99021	Kelp Forest	sbclter
+99021	Macrocystis pyrifera	none
+99021	mass	lter_cv
+99021	Marine Plants	gcmd6
+99021	Mass (property)	nbii
+99021	carbon	lter_cv
+99021	Dominant Species	gcmd6
+99021	Community Structure	sbclter
+99021	productivity	lter_cv
+99021	primary production	lter_cv_cra
+99021	standing crop	lter_cv
+99021	giant kelp	ea
+99021	Arroyo Quemado Reef	sbclter_place
+99021	Reef	sbclter
+99024	LTER	lter_cv
+99024	net primary production	none
+99024	Marine Plants	gcmd6
+99024	growth rate	none
+99024	marine algae	ea
+99024	Santa Barbara Coastal	lter_cv
+99024	giant kelp	none
+99024	algae	lter_cv
+99024	carbon	lter_cv
+99024	Dominant Species	gcmd6
+99024	Macrocystis pyrifera	none
+99024	standing crop	lter_cv
+99024	biomass	lter_cv
+99024	primary production	lter_cv_cra
+99054	canopy	lter_cv
+99054	Santa Catalina Island	sbclter_place
+99054	Biomass	nbii
+99054	wet weight	none
+99054	Landsat	none
+99054	Ventura County	sbclter_place
+99054	populations	lter_cv_cra
+99054	Kelp Forest	sbclter
+99054	Santa Barbara Channel Islands	sbclter_place
+99054	Santa Barbara Coastal	lter_cv
+99054	San Clemente Island	sbclter_place
+99054	remote sensing	none
+99054	Los Angeles County	sbclter_place
+99054	Orange County	sbclter_place
+99054	kelp biomass	none
+99054	Biomass Dynamics	gcmd6
+99054	San Miguel Island	sbclter_place
+99054	satellite	none
+99054	LTER	lter_cv
+99054	nearshore ocean	sbclter
+99054	remote sensing	sbclter
+99054	Santa Rosa Island	sbclter_place
+99054	kelp canopy	none
+99054	Santa Barbara Island	sbclter_place
+99054	Santa Cruz Island	sbclter_place
+99054	San Diego County	sbclter_place
+99054	Santa Barbara County	sbclter_place
+99054	Biomass	gcmd6
+99054	Anacapa Island	sbclter_place
+99054	biomass	lter_cv
+99054	San Nicolas Island	sbclter_place
 \.
 
 
