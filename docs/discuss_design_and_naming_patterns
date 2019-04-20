@@ -46,6 +46,30 @@ The GCE_Metabase names follow these patterns:
         ... and many more
       So in the GCE naming pattern, knowing it is an xref table is dependent on knowing the data model itself, what things are many-to-many with what other things. No clue from the table name directly (such as _xref).
       
-        
- 
+============================
+
+(di, ei, ai) as a design pattern
+
+  Things go into EML at three levels, dataset level, entity level, and attribute level. 
+  Non-repeated elements are one-to-one with their level. 
+  Repeated (but not reused) elements are one-to-many at their level.
+  Reused repeated elements are many-to-many at their level. 
+  
+  By repeated I mean you can have more than one of them, repeatable elements in EML.
+    Examples:
+      multiple keywords at dataset level
+      multiple missing value codes at attribute level
+      
+  Soon with EML 2.2 we will have semantic annotation at three levels: dataset, entity, and attribute and of course those are repeatable.
+  
+So, to indicate the level, the primary key (PK) will have one to three columns just for the level. Then, whatever it is being listed for that level will have its own ID.
+Example:
+  (di,ei,ai,codeID) a four-column primary key for the many-to-many xref table for missing value codes.
+  
+We should decide whether we are going to universally use strings or numbers for di, ei, and ai. Already di is a number. In some places ei is the number EntitySortOrder. In other places it is EntityName. I prefer EntitySort Order.
+In some places AttributeName is used, in other places ColumnPosition. These are alternate keys. That is, these are 1-to-1 for a given dataset. I prefer the numeric. 
+I can definitely see wanting the AttributeName anywhere that a human needs to see at a glance which column. 
+But this manual editing of database tables as if they were spreadsheets is not our long term plan. That is just a temporary stop-gap til we have a programmatic interface.
+
+  
     
