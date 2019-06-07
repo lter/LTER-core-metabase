@@ -1,9 +1,9 @@
 # LTER-core-metabase
-Last updated: June 6th, 2019
+Last updated: June 7th, 2019
 
 ## Orientation
 
-LTER-core-metabase is a PostgreSQL-based relational database model designed for the management of ecological metadata. This metadata database model is based on usage patterns by sites in the U.S. Long Term Ecological Research (LTER) Network. See [Metabase history]() for more on the project's development history.
+LTER-core-metabase is a PostgreSQL-based relational database model designed for the management of ecological metadata. This metadata database model is based on usage patterns by sites in the U.S. Long Term Ecological Research (LTER) Network. See [Metabase history](docs/history.md) for more on the project's development history.
 
 LTER-core-metabase is also oriented towards production of Ecological Metadata Language (EML) documents. This project is tightly coupled with the [`MetaEgress`](https://github.com/BLE-LTER/MetaEgress) R package: use `MetaEgress` to quickly and easily export EML documents from an installed and populated instance of LTER-core-metabase.
 
@@ -11,12 +11,20 @@ This project is in early alpha stages and the database design is still under dev
 
 ## Features
 
+Quick [visualization of schema](http://sbc.lternet.edu/external/InformationManagement/LTER_IMC/tmp_lter_core_metabase/schemaSpy_docs/lter_metabase/relationships.html). Note that this is outdated as of June 7th 2019.
+
 - Perfect for metadata management in LTER sites
   - Designed for earth, environmental, and ecological sciences metadata
   - Reuse information across datasets and projects
   - Database constraints for more compliant and better quality metadata
 - Companion R package `MetaEgress` to create EML docs quickly and easily
 - (coming) support for EML 2.2
+
+## Known limitations
+
+- The database design records revision history to the dataset. However, it is only designed to describe the most recent version of the dataset. In other words, updating metadata means updating rows, not adding them.
+
+- The database can store geographic information in rectangles or points, but not polygons of arbitrary shape.  If required, you can archive a shapefile or other geospatial dataset as an `otherEntity` along the other data entities in the data package.
  
 ## Installation
 
