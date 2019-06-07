@@ -34,9 +34,10 @@ When describing a new version of a dataset for which a previous version was alre
 
 
 ## Confused what goes where?
+TODO 
 
 ### Project information
-
+now we gotta talk boilerplate
 
 ## Known wonkinesses and workarounds
 
