@@ -22,9 +22,9 @@ Quick [visualization of schema](http://sbc.lternet.edu/external/InformationManag
 
 ## Known limitations
 
-- The database design records revision history to the dataset. However, it is only designed to describe the most recent version of the dataset. In other words, updating metadata means updating rows, not adding them.
+- LTER-core-metabase design records revision history to the dataset. However, it is only designed to describe the most recent version of the dataset. In other words, updating metadata means overwriting rows, not adding them.
 
-- The database can store geographic information in rectangles or points, but not polygons of arbitrary shape.  If required, you can archive a shapefile or other geospatial dataset as an `otherEntity` along the other data entities in the data package.
+- LTER-core-metabase can store geographic information in rectangles or points, but not polygons of arbitrary shape.  If required, you can archive a shapefile or other geospatial dataset as an `otherEntity` along the other data entities in the data package.
  
 ## Installation
 
@@ -32,6 +32,8 @@ Quick [visualization of schema](http://sbc.lternet.edu/external/InformationManag
 - [`MetaEgress`](https://github.com/BLE-LTER/MetaEgress)
 
 ## Usage
+
+A number of LTER sites use DBeaver, a GUI-based database manager, to view, populate, and update data in LTER-core-metabase. We have written a [guide on using DBeaver for common metabase tasks](docs/dbeaver.md).
 
 - [Collect metadata from investigators]()
 - [Populate LTER-core-metabase](docs/populate.md)

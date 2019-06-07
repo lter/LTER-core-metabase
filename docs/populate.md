@@ -4,39 +4,56 @@ Last updated: June 7th 2019
 
 See [installation here](docs/quick_start.md).
 
-## First round after installation
+This guide walks you through populating LTER-core-metabase, and addresses frequently encountered problems.
 
-### Source information
+## What to do with each schema
 
-Can be many things. 
+The overall database design contains these schemas. They are designed for separate purposes and are loosely self-contained within each of those tasks. 
 
-## General order of population
+- `lter_metabase`: contains tables with metadata for EML document generation. You might choose to only populate this schema. TODO: this is true only if An's inplementation of maintenance tracker is accepted. As of now, two tiny pieces of information still come from `pkg_mgmt`: the pkg ID and revision number.
 
-EML tables + MeasurementScaleDomains + FileTypeList first. Can run CV SQL script, or targetted export from another instance of metabase. Except for EMLUnitDictionary because EMLUnitTypes is needed. Except for EMLAttributeCodeDefinition because that's dataset-specific.
+- `mb2eml_r`: contains views for use in exporting to EML docs via `MetaEgress`. Views are auto-generated and updated whenever the parent tables are updated. 
 
-KeywordThesaurus, then Keywords, then DataSetKeywords.
+- `pkg_mgmt`: intended for internal metadata management by LTER information managers. 
 
-People, then PeopleID, then DataSet, then DataSetPersonnel
+#### Schema `lter_metabase`
 
-DataSetEntities
+Generally, you will only need to populate controlled-vocabulary parent tables (tables starting with EML) once at the beginning. You might need to update site-specific parent tables (tables ending with List) periodically. You will need to update dataset-specific tables (the rest) with every new dataset or new revision to old datasets.
 
-SiteList, then DataSetSites.
-ProtocolList, then DataSetMethods
+#### Schema `pkg_mgmt`
 
-DataSetTemporal
+TODO
 
-DataSetAttributes, then EMLAttributeCodeDefinition.
-
-pkg_mgmt.pkg_state, too, at some point.
-
-Before submission, update submission date and package ID.
-
-## How to update packages
+## How to update datasets
 
 When describing a new version of a dataset for which a previous version was already described in the database, you overwrite existing values with updated values. In other words, you only store the metadata for the updated/new version. You won't be able to generate EML for the old data and old metadata (unless you change everything back to the old version in your database tables).
 
-1. Increment the version number. Note, you don't add an new row for the new version in the **pkg_state** table.
-2. Update the published date in **pkg_state**.
-3. Update the file name in **DataSetEntities** if it has changed.
+1. Update corresponding tables with new metadata. E.g. add a new row in **DataSetAttribute** if there's a new column in data, but update the old row if the column name has changed.
+2. Increment the version number. Note, you don't add a new row for the new version in the **pkg_state** table.
+3. Update the published date in **pkg_state**.
+
 
 ## Confused what goes where?
+
+### Project information
+
+
+## Known wonkinesses and workarounds
+
+#### Issues specific to DBeaver
+
+The pilcrow/paragraph symbol/backwards P. Not sure how these materialize in DBeaver but they do. If present, exported metadata doesn't look any different, but if present in "filename" type columns, files cannot be located. Cannot be deleted by itself, so re-enter the whole field. 
+
+Blanks in DBeaver are NOT the same as NULLs. Be careful when copying and pasting. Constraints/conditions that require NULLs will not work correctly. If pasting whole columns from Excel, need to right-click/Edit/Set to NULL in DBeaver manually.
+
+#### General issues
+
+Remove all hyperlinks in Word before set_TextType().
+
+Note that the m-dash (longer) is not valid in numeric fields, as opposed to the n-dash (short) which denotes negative numbers. Not sure how these materialize but they do. 
+
+Any attribute/column with defined codes/categories need to be either nominalEnum or ordinalEnum in MeasurementScaleDomainID. Either of those will be converted into "EnumeratedDomain" in VIEW. If an attribute is not "EnumeratedDomain" then even if there are code-defintion pairs listed for it, the EML::set_attributes() function in EML R package will not import them into EML doc. 
+
+DSAttributes is tricky. The many constraints necessitate completing it in one go -- and this is made tricky by the strange behavior of the Advanced Paste function in DBeaver. 
+Therefore need to structure Excel template exactly like metabase? Not too hard with this sheet -- mostly no redundant columns.
+
