@@ -40,7 +40,7 @@ set LOG_FILE=backup_log_%timestamp%.txt
 call ./backup.bat 1> %LOG_DIRECTORY%\%LOG_FILE% 2>&1
 ```
 
-A file called backup.bat to actually do the backup:
+A file called backup.bat to actually do the backup
 
 ```batch
 :: this script uses PostgreSQL's pg_dump command to back up BLE metabase in specified folder
