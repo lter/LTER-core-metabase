@@ -796,7 +796,7 @@ ALTER TABLE mb2eml_r.vw_eml_entities OWNER TO %db_owner%;
 --
 
 CREATE VIEW mb2eml_r.vw_eml_geographiccoverage AS
-SELECT d."DataSetID" AS datasetid, d."EntitySortOrder" AS entity_position, d."GeoCoverageSortOrder" AS geocoverage_sort_order, d."SiteCode" AS id, (((s."SiteName")::text || ': '::text) || (s."SiteDesc")::text) AS geographicdescription, s."NBoundLat" AS northboundingcoordinate, s."SBoundLat" AS southboundingcoordinate, s."EBoundLon" AS eastboundingcoordinate, s."WBoundLon" AS westboundingcoordinate, s."AltitudeMin" AS altitudeminimum, s."AltitudeMax" AS altitudemaximum, s.unit AS altitudeunits FROM (lter_metabase."DataSetSites" d LEFT JOIN lter_metabase."SiteList" s ON (((d."SiteCode")::text = (s."SiteCode")::text))) ORDER BY d."DataSetID", d."GeoCoverageSortOrder", d."SiteCode";
+SELECT d."DataSetID" AS datasetid, d."EntitySortOrder" AS entity_position, d."GeoCoverageSortOrder" AS geocoverage_sort_order, d."SiteCode" AS id, ((s."SiteName")::text || COALESCE(': '::text || (s."SiteDesc")::text, '')) AS geographicdescription, s."NBoundLat" AS northboundingcoordinate, s."SBoundLat" AS southboundingcoordinate, s."EBoundLon" AS eastboundingcoordinate, s."WBoundLon" AS westboundingcoordinate, s."AltitudeMin" AS altitudeminimum, s."AltitudeMax" AS altitudemaximum, s.unit AS altitudeunits FROM (lter_metabase."DataSetSites" d LEFT JOIN lter_metabase."SiteList" s ON (((d."SiteCode")::text = (s."SiteCode")::text))) ORDER BY d."DataSetID", d."GeoCoverageSortOrder", d."SiteCode";
 
 
 ALTER TABLE mb2eml_r.vw_eml_geographiccoverage OWNER TO %db_owner%;
