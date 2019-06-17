@@ -34,9 +34,10 @@ When describing a new version of a dataset for which a previous version was alre
 
 
 ## Confused what goes where?
+TODO 
 
 ### Project information
-
+boilerplate
 
 ## Known wonkinesses and workarounds
 
@@ -48,12 +49,8 @@ Blanks in DBeaver are NOT the same as NULLs. Be careful when copying and pasting
 
 #### General issues
 
-Remove all hyperlinks in Word before set_TextType().
+Remove all hyperlinks in Word documents linked to in abstracts and methods documents.
 
-Note that the m-dash (longer) is not valid in numeric fields, as opposed to the n-dash (short) which denotes negative numbers. Not sure how these materialize but they do. 
+Note that the m-dash (long) is not valid in numeric fields, as opposed to the n-dash (short) which denotes negative numbers. Not sure how these materialize but they do. 
 
 Any attribute/column with defined codes/categories need to be either nominalEnum or ordinalEnum in MeasurementScaleDomainID. Either of those will be converted into "EnumeratedDomain" in VIEW. If an attribute is not "EnumeratedDomain" then even if there are code-defintion pairs listed for it, the EML::set_attributes() function in EML R package will not import them into EML doc. 
-
-DSAttributes is tricky. The many constraints necessitate completing it in one go -- and this is made tricky by the strange behavior of the Advanced Paste function in DBeaver. 
-Therefore need to structure Excel template exactly like metabase? Not too hard with this sheet -- mostly no redundant columns.
-
