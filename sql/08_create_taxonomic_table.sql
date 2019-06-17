@@ -1,10 +1,10 @@
 -- Note: FIRST: edit %db_owner% to the account name of the DB owner 
 
 CREATE TABLE lter_metabase."TaxaList" (
-	"TaxonID" character varying(50) NOT NULL;
-	"TaxonomicAuthority" character varying(50) NOT NULL;
-	"TaxonName" character varying(200);
-	"TaxonRank" character varying(50);
+	"TaxonID" character varying(50) NOT NULL,
+	"TaxonomicAuthority" character varying(50) NOT NULL,
+	"TaxonName" character varying(200),
+	"TaxonRank" character varying(50)
 );
 
 ALTER TABLE ONLY lter_metabase."TaxaList"
@@ -12,9 +12,9 @@ ALTER TABLE ONLY lter_metabase."TaxaList"
 	PRIMARY KEY ("TaxonID", "TaxonomicAuthority");
 
 CREATE TABLE lter_metabase."DataSetTaxa" (
-	"DataSetID" integer NOT NULL;
-	"TaxonID" character varying(50) NOT NULL;
-	"TaxonomicAuthority" character varying(50) NOT NULL;
+	"DataSetID" integer NOT NULL,
+	"TaxonID" character varying(50) NOT NULL,
+	"TaxonomicAuthority" character varying(50) NOT NULL
 );
 
 ALTER TABLE ONLY lter_metabase."DataSetTaxa"
@@ -41,7 +41,7 @@ CREATE OR REPLACE VIEW mb2eml_r.vw_eml_taxonomy AS
 	l."TaxonRank" as taxonrank 
 	FROM lter_metabase."DataSetTaxa" d 
 	JOIN lter_metabase."TaxaList" l 
-	ON (((d."TaxonID")::text = (l."TaxonID")::text))) AND (((d."TaxonomicAuthority")::text = (l."TaxonomicAuthority")::text))) 
+	ON (((d."TaxonID")::text = (l."TaxonID")::text)) AND (((d."TaxonomicAuthority")::text = (l."TaxonomicAuthority")::text)) 
 	ORDER BY d."DataSetID";
 	
 ALTER TABLE lter_metabase."TaxaList" OWNER TO %db_owner%;
