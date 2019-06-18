@@ -3,8 +3,10 @@
 CREATE TABLE lter_metabase."TaxaList" (
 	"TaxonID" character varying(50) NOT NULL,
 	"TaxonomicAuthority" character varying(50) NOT NULL,
-	"TaxonName" character varying(200),
-	"TaxonRank" character varying(50)
+	"TaxonRankName" character varying(50),
+	"TaxonRankValue" character varying(200),
+	"CommonName" character varying(200),
+	"LocalID" character varying(50)
 );
 
 ALTER TABLE ONLY lter_metabase."TaxaList"
@@ -36,9 +38,10 @@ ALTER TABLE ONLY lter_metabase."DataSetTaxa"
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_taxonomy AS
 	SELECT d."DataSetID" as datasetid, 
 	d."TaxonID" as taxonid, 
-	d."TaxonomicAuthority" as taxonomicauthority, 
-	l."TaxonName" as taxonname, 
-	l."TaxonRank" as taxonrank 
+	d."TaxonomicAuthority" as taxonid_provider, 
+	l."TaxonRankName" as taxonrankname, 
+	l."TaxonRankValue" as taxonrankvalue,
+	l."CommonName" as commonname 
 	FROM lter_metabase."DataSetTaxa" d 
 	JOIN lter_metabase."TaxaList" l 
 	ON (((d."TaxonID")::text = (l."TaxonID")::text)) AND (((d."TaxonomicAuthority")::text = (l."TaxonomicAuthority")::text)) 
@@ -64,6 +67,6 @@ ALTER TABLE mb2eml_r.vw_eml_taxonomy OWNER TO %db_owner%;
 
 REVOKE ALL ON TABLE mb2eml_r.vw_eml_taxonomy FROM PUBLIC;
 REVOKE ALL ON TABLE mb2eml_r.vw_eml_taxonomy FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_taxonomy TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_taxonomy TO read_write_user;
 GRANT ALL ON TABLE mb2eml_r.vw_eml_taxonomy TO %db_owner%;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_taxonomy TO read_only_user;
