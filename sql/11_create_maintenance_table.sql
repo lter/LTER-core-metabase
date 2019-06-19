@@ -1,10 +1,10 @@
 -- Note: FIRST: edit %db_owner% to the account name of the DB owner 
 
 CREATE TABLE pkg_mgmt.cv_maint_freq(
-	eml_maint_freq character varying(50)
+	eml_maintenance_frequency character varying(50)
 )
 
-COPY pkg_mgmt.cv_maint_freq (eml_maint_freq) FROM stdin;
+COPY pkg_mgmt.cv_maint_freq (eml_maintenance_frequency) FROM stdin;
 annually
 asNeeded
 biannually
@@ -19,93 +19,83 @@ otherMaintenancePeriod
 \.
 
 ALTER TABLE lter_metabase."DataSet"
-	ADD COLUMN "ShortName" character varying(50),
-	ADD COLUMN "PackageNumber" integer,
+	ADD COLUMN "ShortName" character varying(200),
 	ADD COLUMN "UpdateFrequency" character varying(50),
-	ADD COLUMN "MaintenanceDescription" character varying(1024);
+	ADD COLUMN "MaintenanceDescription" character varying(500);
+	
+alter table lter_metabase."DataSet"
+	RENAME COLUMN "Accession" TO "Revision";
+	
+alter table lter_metabase."DataSet"
+	ALTER COLUMN "Revision" TYPE int4 USING "Revision"::int4;
 	
 ALTER TABLE lter_metabase."DataSet"
 	ADD CONSTRAINT "FK_DataSet_UpdateFrequency"
 	FOREIGN KEY ("UpdateFrequency")
-	REFERENCES pkg_mgmt.cv_maint_freq(eml_maint_freq)
+	REFERENCES pkg_mgmt.cv_maint_freq(eml_maintenance_frequency)
 	ON UPDATE CASCADE;
 	
-ALTER TABLE lter_metabase."PackageNumber"
-	ADD CONSTRAINT "UQ_DataSet_PackageNumber"
-	UNIQUE ("PackageNumber");
-	
 COMMENT ON COLUMN lter_metabase."DataSet"."ShortName" IS 'Goes into /dataset/shortName.';
-	
-COMMENT ON COLUMN lter_metabase."DataSet"."PackageNumber" IS 'Goes into /eml/packageID.';
 	
 COMMENT ON COLUMN lter_metabase."DataSet"."UpdateFrequency" IS 'Use controlled vocabulary in pkg_mgmt.cv_maint_freq. goes into /dataset/maintenance/maintenanceUpdateFrequency. ';
 
 COMMENT ON COLUMN lter_metabase."DataSet"."MaintenanceDescription" IS 'Freeform text meant to go into /dataset/maintenance/description/.';
 	
 
-CREATE TABLE lter_metabase."DataSetMaintenance"(
+CREATE TABLE pkg_mgmt.maintenance_changehistory(
 	"DataSetID" integer NOT NULL,
-	"RevisionNumber" integer NOT NULL,
-	"RevisionNotes" character varying(1024),
-	"ChangeScope" character varying(50),
-	"ChangeDate" date NOT NULL,
+	revision_number integer NOT NULL,
+	revision_notes character varying(1024),
+	change_scope character varying(50),
+	change_date date NOT NULL,
 	"NameID" character varying(20) NOT NULL
 );
 
-COMMENT ON COLUMN lter_metabase."DataSetMaintenance"."ChangeScope" IS 'Goes into/dataset/maintenance/changeHistory/changeScope/. E.g.: data, metadata, or data and metadata.';
+COMMENT ON COLUMN pkg_mgmt.maintenance_changehistory.change_scope IS 'Goes into/dataset/maintenance/changeHistory/changeScope/. E.g.: data, metadata, or data and metadata.';
 
-ALTER TABLE lter_metabase."DataSetMaintenance"
-	ADD CONSTRAINT "FK_DataSetMaintenance_DataSetID"
+ALTER TABLE pkg_mgmt.maintenance_changehistory
+	ADD CONSTRAINT "FK_maintenance_changehistory_DataSetID"
 	FOREIGN KEY ("DataSetID") 
 	REFERENCES lter_metabase."DataSet"("DataSetID")
 	ON UPDATE CASCADE;
 
-ALTER TABLE lter_metabase."DataSetMaintenance" 
-	ADD CONSTRAINT "FK_DataSetMaintenance_NameID" 
+ALTER TABLE pkg_mgmt.maintenance_changehistory
+	ADD CONSTRAINT "FK_maintenance_changehistory_NameID" 
 	FOREIGN KEY ("NameID") 
 	REFERENCES lter_metabase."People"("NameID")
 	ON UPDATE CASCADE;
 
-ALTER TABLE lter_metabase."DataSetMaintenance"
-	ADD CONSTRAINT "PK_DataSetMaintenance"
-	PRIMARY KEY ("DataSetID", "RevisionNumber");
-
-
--- add foreign key to pkg_mgmt.pkg_state
-ALTER TABLE pkg_mgmt.pkg_state
-	ADD CONSTRAINT "FK_pkg_state_RevisionNumber"
-	FOREIGN KEY ("DataSetID", rev)
-	REFERENCES lter_metabase."DataSetMaintenance"("DataSetID", "RevisionNumber")
-	ON UPDATE CASCADE;
+ALTER TABLE pkg_mgmt.maintenance_changehistory
+	ADD CONSTRAINT "PK_maintenance_changehistory"
+	PRIMARY KEY ("DataSetID", revision_number);
 	
--- alter dataset view to (1) drop revision number since that information is exposed via vw_eml_maintenance, (2) get ShortName and packageNumber from DataSet, and (3) drop pubdate since that is exposed via vw_eml_maintenance 
+-- alter dataset view
+
+DROP VIEW mb2eml_r.vw_eml_dataset;
+
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset AS
 	SELECT d."DataSetID" AS datasetid, 
-	d."PackageNumber" AS alternatedid, 
-	d."PackageNumber" AS edinum, 
+	d."Revision" as revision_number,
 	d."Title" AS title, 
 	d."Abstract" AS abstract, 
-	-- k.data_receipt_date AS projdate, 
-	-- k.update_date_catalog AS pubdate, 
-	d."ShortName" AS shortname 
+	d."ShortName" AS shortname,
+	d."UpdateFrequency" as update_frequency,
+	d."MaintenanceDescription" as maintenance_desc 
 	FROM lter_metabase."DataSet" d 
 	ORDER BY d."DataSetID";
 
-
-
-CREATE OR REPLACE VIEW mb2eml_r.vw_eml_maintenance AS
-	SELECT d."DataSetID" AS datasetid, 
-		d."RevisionNumber" AS revision_number,  
-		d."RevisionNotes" as revision_notes,
-		d."ChangeScope" as change_scope,
-		d."ChangeDate" as revision_date,
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_changehistory AS
+	SELECT m."DataSetID" AS datasetid, 
+		m.revision_number,  
+		m.revision_notes,
+		m.change_scope,
+		m.change_date,
 		(p."GivenName")::text AS givenname, 
 		p."MiddleName" AS givenname2, 
-		p."SurName" AS surname,
-FROM (lter_metabase."DataSetMaintenance" d 
-LEFT JOIN lter_metabase."People" p 
-ON (((d."NameID")::text = (p."NameID")::text))) 
-ORDER BY d."DataSetID", d."RevisionNumber";
+		p."SurName" AS surname
+	FROM (pkg_mgmt.maintenance_changehistory m 
+		LEFT JOIN lter_metabase."People" p ON (((m."NameID")::text = (p."NameID")::text))) 
+	ORDER BY m."DataSetID", m.revision_number;
 
 
 ALTER TABLE pkg_mgmt.cv_maint_freq OWNER TO %db_owner%;
@@ -116,18 +106,26 @@ GRANT SELECT,INSERT,UPDATE ON TABLE pkg_mgmt.cv_maint_freq TO read_write_user;
 GRANT SELECT ON TABLE pkg_mgmt.cv_maint_freq TO read_only_user;
 GRANT ALL ON TABLE pkg_mgmt.cv_maint_freq TO %db_owner%;
 
-ALTER TABLE lter_metabase."DataSetMaintenance" OWNER TO %db_owner%;
+ALTER TABLE pkg_mgmt.maintenance_changehistory OWNER TO %db_owner%;
 
-REVOKE ALL ON TABLE lter_metabase."DataSetMaintenance" FROM PUBLIC;
-REVOKE ALL ON TABLE lter_metabase."DataSetMaintenance" FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMaintenance" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."DataSetMaintenance" TO read_only_user;
-GRANT ALL ON TABLE lter_metabase."DataSetMaintenance" TO %db_owner%;
+REVOKE ALL ON TABLE pkg_mgmt.maintenance_changehistory FROM PUBLIC;
+REVOKE ALL ON TABLE pkg_mgmt.maintenance_changehistory FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE pkg_mgmt.maintenance_changehistory TO read_write_user;
+GRANT SELECT ON TABLE pkg_mgmt.maintenance_changehistory TO read_only_user;
+GRANT ALL ON TABLE pkg_mgmt.maintenance_changehistory TO %db_owner%;
 
-ALTER TABLE mb2eml_r.vw_eml_maintenance OWNER TO %db_owner%;
+ALTER TABLE mb2eml_r.vw_eml_changehistory OWNER TO %db_owner%;
 
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_maintenance FROM PUBLIC;
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_maintenance FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_maintenance TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_maintenance TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_maintenance TO %db_owner%;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_changehistory FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_changehistory FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_changehistory TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_changehistory TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_changehistory TO %db_owner%;
+
+ALTER TABLE mb2eml_r.vw_eml_dataset OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_dataset FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_dataset FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_dataset TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_dataset TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_dataset TO %db_owner%;
