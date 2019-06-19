@@ -2,7 +2,7 @@
 
 CREATE TABLE pkg_mgmt.cv_maint_freq(
 	eml_maintenance_frequency character varying(50)
-)
+);
 
 COPY pkg_mgmt.cv_maint_freq (eml_maintenance_frequency) FROM stdin;
 annually
