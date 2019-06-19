@@ -4,6 +4,10 @@ CREATE TABLE pkg_mgmt.cv_maint_freq(
 	eml_maintenance_frequency character varying(50)
 );
 
+ALTER TABLE pkg_mgmt.cv_maint_freq
+	ADD CONSTRAINT "PK_cv_maint_freq"
+	PRIMARY KEY (eml_maintenance_frequency);
+
 COPY pkg_mgmt.cv_maint_freq (eml_maintenance_frequency) FROM stdin;
 annually
 asNeeded
