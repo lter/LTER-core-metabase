@@ -30,13 +30,13 @@ CREATE OR REPLACE VIEW mb2eml_r.vw_eml_associatedparty AS
 	ON (((d."NameID")::text = (i."NameID")::text))) 
 		ORDER BY d."DataSetID", d."AuthorshipOrder";
 
-ALTER TABLE mb2eml_r.vw_eml_personnel OWNER to %db_owner%;
+ALTER TABLE mb2eml_r.vw_eml_associatedparty OWNER to %db_owner%;
 
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_personnel FROM PUBLIC;
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_personnel FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_personnel TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_personnel TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_personnel TO %db_owner%;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_associatedparty FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_associatedparty FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_associatedparty TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_associatedparty TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_associatedparty TO %db_owner%;
 
 DROP VIEW mb2eml_r.vw_eml_creator;
 
@@ -67,3 +67,11 @@ AS SELECT d."DataSetID" AS datasetid,
      LEFT JOIN lter_metabase."Peopleidentification" i ON d."NameID"::text = i."NameID"::text
   WHERE d."AuthorshipRole"::text = 'creator'::text
   ORDER BY d."DataSetID", d."AuthorshipOrder";
+
+ALTER TABLE mb2eml_r.vw_eml_creator OWNER to %db_owner%;
+
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_creator FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_creator FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_creator TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_creator TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_creator TO %db_owner%;
