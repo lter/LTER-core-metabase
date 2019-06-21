@@ -1,4 +1,4 @@
-# LTER Core Metabase quick start guide
+# LTER-core-metabase quick installation guide
 
 ## Outline
 1. install pg (if needed)
