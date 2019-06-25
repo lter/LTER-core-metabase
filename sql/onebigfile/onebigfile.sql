@@ -70,20 +70,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: AttributeMissingCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
---
-
-CREATE TABLE lter_metabase."AttributeMissingCodes" (
-    "DataSetID" integer NOT NULL,
-    "EntitySortOrder" integer NOT NULL,
-    "ColumnName" character varying(200) NOT NULL,
-    "MissingValueCodeID" character varying(20) NOT NULL
-);
-
-
-ALTER TABLE lter_metabase."AttributeMissingCodes" OWNER TO %db_owner%;
-
---
 -- Name: DataSet; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -122,6 +108,35 @@ COMMENT ON COLUMN lter_metabase."DataSet"."UpdateFrequency" IS 'Use controlled v
 
 COMMENT ON COLUMN lter_metabase."DataSet"."MaintenanceDescription" IS 'Freeform text meant to go into /dataset/maintenance/description/.';
 
+
+--
+-- Name: DataSetAttributeEnumeration; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."DataSetAttributeEnumeration" (
+    "DataSetID" integer NOT NULL,
+    "EntitySortOrder" integer NOT NULL,
+    "ColumnName" character varying(200) NOT NULL,
+    code character varying(200) NOT NULL,
+    definition character varying(1024) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."DataSetAttributeEnumeration" OWNER TO %db_owner%;
+
+--
+-- Name: DataSetAttributeMissingCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."DataSetAttributeMissingCodes" (
+    "DataSetID" integer NOT NULL,
+    "EntitySortOrder" integer NOT NULL,
+    "ColumnName" character varying(200) NOT NULL,
+    "MissingValueCodeID" character varying(20) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."DataSetAttributeMissingCodes" OWNER TO %db_owner%;
 
 --
 -- Name: DataSetAttributes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -271,71 +286,100 @@ CREATE TABLE lter_metabase."DataSetTemporal" (
 ALTER TABLE lter_metabase."DataSetTemporal" OWNER TO %db_owner%;
 
 --
--- Name: EMLAttributeCodeDefinition; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLFileTypes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."EMLAttributeCodeDefinition" (
-    "DataSetID" integer NOT NULL,
-    "EntitySortOrder" integer NOT NULL,
-    "ColumnName" character varying(200) NOT NULL,
-    code character varying(200) NOT NULL,
-    definition character varying(1024) NOT NULL
+CREATE TABLE lter_metabase."EMLFileTypes" (
+    "FileType" character varying(10) NOT NULL,
+    "TypeName" character varying(50) NOT NULL,
+    "FileFormat" character varying(80) NOT NULL,
+    "Extension" character varying(10) NOT NULL,
+    "Description" character varying(255) NOT NULL,
+    "Delimiters" character varying(50) NOT NULL,
+    "Header" character varying(300) NOT NULL,
+    "EML_FormatType" character varying(50),
+    "RecordDelimiter" character varying(10),
+    "NumHeaderLines" smallint,
+    "NumFooterLines" smallint,
+    "AttributeOrientation" character varying(20) DEFAULT 'column'::character varying,
+    "QuoteCharacter" character(1),
+    "FieldDelimiter" character varying(10),
+    "CharacterEncoding" character varying(20),
+    "CollapseDelimiters" character varying(3),
+    "LiteralCharacter" character varying(4),
+    "externallyDefinedFormat_formatName" character varying(200),
+    "externallyDefinedFormat_formatVersion" character varying(200),
+    CONSTRAINT "CK_FileTypeList_CollapseDelimiters" CHECK (((("CollapseDelimiters")::text = ANY (ARRAY[('yes'::character varying)::text, ('no'::character varying)::text])) OR ("CollapseDelimiters" IS NULL)))
 );
 
 
-ALTER TABLE lter_metabase."EMLAttributeCodeDefinition" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."EMLFileTypes" OWNER TO %db_owner%;
 
 --
--- Name: EMLKeywordTypeList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLKeywordTypes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."EMLKeywordTypeList" (
+CREATE TABLE lter_metabase."EMLKeywordTypes" (
     "KeywordType" character varying(20) NOT NULL,
     "TypeDefinition" character varying(500)
 );
 
 
-ALTER TABLE lter_metabase."EMLKeywordTypeList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."EMLKeywordTypes" OWNER TO %db_owner%;
 
 --
--- Name: EMLMeasurementScaleList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLMeasurementScaleDomains; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."EMLMeasurementScaleList" (
+CREATE TABLE lter_metabase."EMLMeasurementScaleDomains" (
+    "EMLDomainType" character varying(17) NOT NULL,
+    "MeasurementScale" character varying(8) NOT NULL,
+    "NonNumericDomain" character varying(17),
+    "MeasurementScaleDomainID" character varying(12) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."EMLMeasurementScaleDomains" OWNER TO %db_owner%;
+
+--
+-- Name: EMLMeasurementScales; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."EMLMeasurementScales" (
     "measurementScale" character varying(20) NOT NULL
 );
 
 
-ALTER TABLE lter_metabase."EMLMeasurementScaleList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."EMLMeasurementScales" OWNER TO %db_owner%;
 
 --
--- Name: EMLNumberTypeList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLNumberTypes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."EMLNumberTypeList" (
+CREATE TABLE lter_metabase."EMLNumberTypes" (
     "NumberType" character varying(30) NOT NULL
 );
 
 
-ALTER TABLE lter_metabase."EMLNumberTypeList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."EMLNumberTypes" OWNER TO %db_owner%;
 
 --
--- Name: EMLStorageTypeList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLStorageTypes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."EMLStorageTypeList" (
+CREATE TABLE lter_metabase."EMLStorageTypes" (
     "StorageType" character varying(30) NOT NULL,
     "typeSystem" character varying(200)
 );
 
 
-ALTER TABLE lter_metabase."EMLStorageTypeList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."EMLStorageTypes" OWNER TO %db_owner%;
 
 --
--- Name: COLUMN "EMLStorageTypeList"."typeSystem"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: COLUMN "EMLStorageTypes"."typeSystem"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COMMENT ON COLUMN lter_metabase."EMLStorageTypeList"."typeSystem" IS 'include the entire url if it is a url';
+COMMENT ON COLUMN lter_metabase."EMLStorageTypes"."typeSystem" IS 'include the entire url if it is a url';
 
 
 --
@@ -372,40 +416,10 @@ CREATE TABLE lter_metabase."EMLUnitTypes" (
 ALTER TABLE lter_metabase."EMLUnitTypes" OWNER TO %db_owner%;
 
 --
--- Name: FileTypeList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListKeywordThesauri; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."FileTypeList" (
-    "FileType" character varying(10) NOT NULL,
-    "TypeName" character varying(50) NOT NULL,
-    "FileFormat" character varying(80) NOT NULL,
-    "Extension" character varying(10) NOT NULL,
-    "Description" character varying(255) NOT NULL,
-    "Delimiters" character varying(50) NOT NULL,
-    "Header" character varying(300) NOT NULL,
-    "EML_FormatType" character varying(50),
-    "RecordDelimiter" character varying(10),
-    "NumHeaderLines" smallint,
-    "NumFooterLines" smallint,
-    "AttributeOrientation" character varying(20) DEFAULT 'column'::character varying,
-    "QuoteCharacter" character(1),
-    "FieldDelimiter" character varying(10),
-    "CharacterEncoding" character varying(20),
-    "CollapseDelimiters" character varying(3),
-    "LiteralCharacter" character varying(4),
-    "externallyDefinedFormat_formatName" character varying(200),
-    "externallyDefinedFormat_formatVersion" character varying(200),
-    CONSTRAINT "CK_FileTypeList_CollapseDelimiters" CHECK (((("CollapseDelimiters")::text = ANY (ARRAY[('yes'::character varying)::text, ('no'::character varying)::text])) OR ("CollapseDelimiters" IS NULL)))
-);
-
-
-ALTER TABLE lter_metabase."FileTypeList" OWNER TO %db_owner%;
-
---
--- Name: KeywordThesaurus; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
---
-
-CREATE TABLE lter_metabase."KeywordThesaurus" (
+CREATE TABLE lter_metabase."ListKeywordThesauri" (
     "ThesaurusID" character varying(50) NOT NULL,
     "ThesaurusLabel" character varying(250),
     "ThesaurusUrl" character varying(250),
@@ -414,53 +428,39 @@ CREATE TABLE lter_metabase."KeywordThesaurus" (
 );
 
 
-ALTER TABLE lter_metabase."KeywordThesaurus" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListKeywordThesauri" OWNER TO %db_owner%;
 
 --
--- Name: Keywords; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListKeywords; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."Keywords" (
+CREATE TABLE lter_metabase."ListKeywords" (
     "Keyword" character varying(50) NOT NULL,
     "ThesaurusID" character varying(50) NOT NULL,
     "KeywordType" character varying(20) DEFAULT 'theme'::character varying NOT NULL
 );
 
 
-ALTER TABLE lter_metabase."Keywords" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListKeywords" OWNER TO %db_owner%;
 
 --
--- Name: MeasurementScaleDomains; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListMissingCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."MeasurementScaleDomains" (
-    "EMLDomainType" character varying(17) NOT NULL,
-    "MeasurementScale" character varying(8) NOT NULL,
-    "NonNumericDomain" character varying(17),
-    "MeasurementScaleDomainID" character varying(12) NOT NULL
-);
-
-
-ALTER TABLE lter_metabase."MeasurementScaleDomains" OWNER TO %db_owner%;
-
---
--- Name: MissingCodesList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
---
-
-CREATE TABLE lter_metabase."MissingCodesList" (
+CREATE TABLE lter_metabase."ListMissingCodes" (
     "MissingValueCodeID" character varying(20) NOT NULL,
     "MissingValueCode" character varying(200) NOT NULL,
     "MissingValueCodeExplanation" character varying(1024) NOT NULL
 );
 
 
-ALTER TABLE lter_metabase."MissingCodesList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListMissingCodes" OWNER TO %db_owner%;
 
 --
--- Name: People; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeople; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."People" (
+CREATE TABLE lter_metabase."ListPeople" (
     "NameID" character varying(20) NOT NULL,
     "GivenName" character varying(30) NOT NULL,
     "MiddleName" character varying(30),
@@ -480,13 +480,13 @@ CREATE TABLE lter_metabase."People" (
 );
 
 
-ALTER TABLE lter_metabase."People" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListPeople" OWNER TO %db_owner%;
 
 --
--- Name: Peopleidentification; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeopleID; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."Peopleidentification" (
+CREATE TABLE lter_metabase."ListPeopleID" (
     "NameID" character varying(20) NOT NULL,
     "IdentificationID" smallint NOT NULL,
     "Identificationtype" character varying(30),
@@ -494,13 +494,13 @@ CREATE TABLE lter_metabase."Peopleidentification" (
 );
 
 
-ALTER TABLE lter_metabase."Peopleidentification" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListPeopleID" OWNER TO %db_owner%;
 
 --
--- Name: ProtocolList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListProtocols; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."ProtocolList" (
+CREATE TABLE lter_metabase."ListProtocols" (
     "protocolID" integer NOT NULL,
     author character varying(16),
     title character varying(300),
@@ -508,13 +508,13 @@ CREATE TABLE lter_metabase."ProtocolList" (
 );
 
 
-ALTER TABLE lter_metabase."ProtocolList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListProtocols" OWNER TO %db_owner%;
 
 --
--- Name: SiteList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListSites; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."SiteList" (
+CREATE TABLE lter_metabase."ListSites" (
     "SiteCode" character varying(50) NOT NULL,
     "SiteType" character varying(10) NOT NULL,
     "SiteName" character varying(100) NOT NULL,
@@ -536,13 +536,13 @@ CREATE TABLE lter_metabase."SiteList" (
 );
 
 
-ALTER TABLE lter_metabase."SiteList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListSites" OWNER TO %db_owner%;
 
 --
--- Name: TaxaList; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListTaxa; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."TaxaList" (
+CREATE TABLE lter_metabase."ListTaxa" (
     "TaxonID" character varying(50) NOT NULL,
     "TaxonomicAuthority" character varying(50) NOT NULL,
     "TaxonRankName" character varying(50),
@@ -552,7 +552,7 @@ CREATE TABLE lter_metabase."TaxaList" (
 );
 
 
-ALTER TABLE lter_metabase."TaxaList" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListTaxa" OWNER TO %db_owner%;
 
 --
 -- Name: vw_custom_units; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
@@ -600,8 +600,8 @@ CREATE VIEW mb2eml_r.vw_eml_associatedparty AS
     i."Identificationtype" AS userid_type,
     i."Identificationlink" AS userid
    FROM ((lter_metabase."DataSetPersonnel" d
-     LEFT JOIN lter_metabase."People" p ON (((d."NameID")::text = (p."NameID")::text)))
-     LEFT JOIN lter_metabase."Peopleidentification" i ON (((d."NameID")::text = (i."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeople" p ON (((d."NameID")::text = (p."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeopleID" i ON (((d."NameID")::text = (i."NameID")::text)))
   ORDER BY d."DataSetID", d."AuthorshipOrder";
 
 
@@ -617,7 +617,7 @@ CREATE VIEW mb2eml_r.vw_eml_attributecodedefinition AS
     d."ColumnName" AS "attributeName",
     d.code,
     d.definition
-   FROM lter_metabase."EMLAttributeCodeDefinition" d
+   FROM lter_metabase."DataSetAttributeEnumeration" d
   ORDER BY d."DataSetID", d."EntitySortOrder";
 
 
@@ -699,7 +699,7 @@ CREATE VIEW mb2eml_r.vw_eml_changehistory AS
     p."MiddleName" AS givenname2,
     p."SurName" AS surname
    FROM (pkg_mgmt.maintenance_changehistory m
-     LEFT JOIN lter_metabase."People" p ON (((m."NameID")::text = (p."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeople" p ON (((m."NameID")::text = (p."NameID")::text)))
   ORDER BY m."DataSetID", m.revision_number;
 
 
@@ -730,8 +730,8 @@ CREATE VIEW mb2eml_r.vw_eml_creator AS
     i."Identificationtype" AS userid_type,
     i."Identificationlink" AS userid
    FROM ((lter_metabase."DataSetPersonnel" d
-     LEFT JOIN lter_metabase."People" p ON (((d."NameID")::text = (p."NameID")::text)))
-     LEFT JOIN lter_metabase."Peopleidentification" i ON (((d."NameID")::text = (i."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeople" p ON (((d."NameID")::text = (p."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeopleID" i ON (((d."NameID")::text = (i."NameID")::text)))
   WHERE ((d."AuthorshipRole")::text = 'creator'::text)
   ORDER BY d."DataSetID", d."AuthorshipOrder";
 
@@ -775,8 +775,8 @@ CREATE VIEW mb2eml_r.vw_eml_datasetmethod AS
     d."softwareDescription",
     d."softwareVersion"
    FROM ((lter_metabase."DataSetMethods" d
-     LEFT JOIN lter_metabase."ProtocolList" p ON (((d."protocolID")::text = (p."protocolID")::text)))
-     LEFT JOIN lter_metabase."People" k ON (((p.author)::text = (k."NameID")::text)))
+     LEFT JOIN lter_metabase."ListProtocols" p ON (((d."protocolID")::text = (p."protocolID")::text)))
+     LEFT JOIN lter_metabase."ListPeople" k ON (((p.author)::text = (k."NameID")::text)))
   ORDER BY d."DataSetID", d."methodDocument";
 
 
@@ -805,7 +805,7 @@ CREATE VIEW mb2eml_r.vw_eml_entities AS
     k."QuoteCharacter" AS quotecharacter,
     k."CollapseDelimiters" AS collapsedelimiter
    FROM (lter_metabase."DataSetEntities" e
-     LEFT JOIN lter_metabase."FileTypeList" k ON (((e."FileType")::text = (k."FileType")::text)))
+     LEFT JOIN lter_metabase."EMLFileTypes" k ON (((e."FileType")::text = (k."FileType")::text)))
   ORDER BY e."DataSetID", e."EntitySortOrder";
 
 
@@ -829,7 +829,7 @@ CREATE VIEW mb2eml_r.vw_eml_geographiccoverage AS
     s."AltitudeMax" AS altitudemaximum,
     s.unit AS altitudeunits
    FROM (lter_metabase."DataSetSites" d
-     LEFT JOIN lter_metabase."SiteList" s ON (((d."SiteCode")::text = (s."SiteCode")::text)))
+     LEFT JOIN lter_metabase."ListSites" s ON (((d."SiteCode")::text = (s."SiteCode")::text)))
   ORDER BY d."DataSetID", d."GeoCoverageSortOrder", d."SiteCode";
 
 
@@ -846,8 +846,8 @@ CREATE VIEW mb2eml_r.vw_eml_keyword AS
     COALESCE(t."ThesaurusLabel", 'none'::character varying) AS keyword_thesaurus,
     k."KeywordType" AS keywordtype
    FROM ((lter_metabase."DataSetKeywords" d
-     LEFT JOIN lter_metabase."Keywords" k ON (((d."Keyword")::text = (k."Keyword")::text)))
-     JOIN lter_metabase."KeywordThesaurus" t ON (((k."ThesaurusID")::text = (t."ThesaurusID")::text)))
+     LEFT JOIN lter_metabase."ListKeywords" k ON (((d."Keyword")::text = (k."Keyword")::text)))
+     JOIN lter_metabase."ListKeywordThesauri" t ON (((k."ThesaurusID")::text = (t."ThesaurusID")::text)))
   GROUP BY d."DataSetID", t."ThesaurusSortOrder", d."Keyword", t."ThesaurusLabel", k."KeywordType"
   ORDER BY d."DataSetID", t."ThesaurusSortOrder", d."Keyword";
 
@@ -864,8 +864,8 @@ CREATE VIEW mb2eml_r.vw_eml_missingcodes AS
     d."ColumnName" AS "attributeName",
     e."MissingValueCode" AS code,
     e."MissingValueCodeExplanation" AS definition
-   FROM (lter_metabase."AttributeMissingCodes" d
-     JOIN lter_metabase."MissingCodesList" e ON (((d."MissingValueCodeID")::text = (e."MissingValueCodeID")::text)))
+   FROM (lter_metabase."DataSetAttributeMissingCodes" d
+     JOIN lter_metabase."ListMissingCodes" e ON (((d."MissingValueCodeID")::text = (e."MissingValueCodeID")::text)))
   ORDER BY d."DataSetID";
 
 
@@ -883,7 +883,7 @@ CREATE VIEW mb2eml_r.vw_eml_taxonomy AS
     l."TaxonRankValue" AS taxonrankvalue,
     l."CommonName" AS commonname
    FROM (lter_metabase."DataSetTaxa" d
-     JOIN lter_metabase."TaxaList" l ON ((((d."TaxonID")::text = (l."TaxonID")::text) AND ((d."TaxonomicAuthority")::text = (l."TaxonomicAuthority")::text))))
+     JOIN lter_metabase."ListTaxa" l ON ((((d."TaxonID")::text = (l."TaxonID")::text) AND ((d."TaxonomicAuthority")::text = (l."TaxonomicAuthority")::text))))
   ORDER BY d."DataSetID";
 
 
@@ -1487,14 +1487,6 @@ CREATE VIEW pkg_mgmt.vw_temporal AS
 ALTER TABLE pkg_mgmt.vw_temporal OWNER TO %db_owner%;
 
 --
--- Data for Name: AttributeMissingCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."AttributeMissingCodes" ("DataSetID", "EntitySortOrder", "ColumnName", "MissingValueCodeID") FROM stdin;
-\.
-
-
---
 -- Data for Name: DataSet; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -1503,6 +1495,49 @@ COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abst
 99024	\N	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	\N	\N	\N	\N
 99013	\N	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	\N	\N	\N	\N
 99021	\N	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	\N	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: DataSetAttributeEnumeration; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", code, definition) FROM stdin;
+99013	1	site_code	ABUR	Arroyo Burro
+99013	1	site_code	AHND	Arroyo Hondo
+99013	1	site_code	AQUE	Arroyo Quemado
+99013	1	site_code	BULL	Bulito
+99013	1	site_code	CARP	Carpinteria
+99013	1	site_code	GOLB	Goleta Bay
+99013	1	site_code	IVEE	Isla Vista
+99013	1	site_code	MOHK	Mohawk
+99013	1	site_code	NAPL	Naples
+99013	1	site_code	SCDI	Santa Cruz Island, Diablo 
+99013	1	site_code	SCTW	Santa Cruz Island, Twin Harbor West Reef
+99013	1	frondcondition	growing	Frond is still growing
+99013	1	frondcondition	terminal	Frond has reached terminal size
+99021	1	Site	ABUR	Arroyo Burro
+99021	1	Site	MOHK	Mohawk
+99021	1	Site	AQUE	Arroyo Quemado.
+99021	2	Site	ABUR	Arroyo Burro
+99021	2	Site	MOHK	Mohawk
+99021	2	Site	AQUE	Arroyo Quemado.
+99021	3	Site	ABUR	Arroyo Burro
+99021	3	Site	MOHK	Mohawk
+99021	3	Site	AQUE	Arroyo Quemado.
+99024	1	SITE	ABUR	Arroyo Burro
+99024	1	SITE	AQUE	Arroyo Quemado
+99024	1	SITE	MOHK	Mohawk
+99024	1	Replicate	1	Sample replicate 1
+99024	1	Replicate	2	Sample replicate 2
+\.
+
+
+--
+-- Data for Name: DataSetAttributeMissingCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."DataSetAttributeMissingCodes" ("DataSetID", "EntitySortOrder", "ColumnName", "MissingValueCodeID") FROM stdin;
 \.
 
 
@@ -1804,45 +1839,37 @@ COPY lter_metabase."DataSetTemporal" ("DataSetID", "EntitySortOrder", "BeginDate
 
 
 --
--- Data for Name: EMLAttributeCodeDefinition; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: EMLFileTypes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."EMLAttributeCodeDefinition" ("DataSetID", "EntitySortOrder", "ColumnName", code, definition) FROM stdin;
-99013	1	site_code	ABUR	Arroyo Burro
-99013	1	site_code	AHND	Arroyo Hondo
-99013	1	site_code	AQUE	Arroyo Quemado
-99013	1	site_code	BULL	Bulito
-99013	1	site_code	CARP	Carpinteria
-99013	1	site_code	GOLB	Goleta Bay
-99013	1	site_code	IVEE	Isla Vista
-99013	1	site_code	MOHK	Mohawk
-99013	1	site_code	NAPL	Naples
-99013	1	site_code	SCDI	Santa Cruz Island, Diablo 
-99013	1	site_code	SCTW	Santa Cruz Island, Twin Harbor West Reef
-99013	1	frondcondition	growing	Frond is still growing
-99013	1	frondcondition	terminal	Frond has reached terminal size
-99021	1	Site	ABUR	Arroyo Burro
-99021	1	Site	MOHK	Mohawk
-99021	1	Site	AQUE	Arroyo Quemado.
-99021	2	Site	ABUR	Arroyo Burro
-99021	2	Site	MOHK	Mohawk
-99021	2	Site	AQUE	Arroyo Quemado.
-99021	3	Site	ABUR	Arroyo Burro
-99021	3	Site	MOHK	Mohawk
-99021	3	Site	AQUE	Arroyo Quemado.
-99024	1	SITE	ABUR	Arroyo Burro
-99024	1	SITE	AQUE	Arroyo Quemado
-99024	1	SITE	MOHK	Mohawk
-99024	1	Replicate	1	Sample replicate 1
-99024	1	Replicate	2	Sample replicate 2
+COPY lter_metabase."EMLFileTypes" ("FileType", "TypeName", "FileFormat", "Extension", "Description", "Delimiters", "Header", "EML_FormatType", "RecordDelimiter", "NumHeaderLines", "NumFooterLines", "AttributeOrientation", "QuoteCharacter", "FieldDelimiter", "CharacterEncoding", "CollapseDelimiters", "LiteralCharacter", "externallyDefinedFormat_formatName", "externallyDefinedFormat_formatVersion") FROM stdin;
+csv_C	CSV unix, hdr, ftr	comma separated values	csv	CSV. unix line ending, 1-line header, 1-line footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\n	1	1	column	"	,	\N	no	\\	\N	\N
+csv_D	CSV ms, hdr, no ftr	comma separated values	csv	CSV. ms line ending, 1-line header, no footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\r\\n	1	0	column	"	,	\N	no	\\	\N	\N
+csv_E	CSV ms,  hdr, ftr	comma separated values	csv	CSV. ms line ending, 1-line header, 1-line footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\r\\n	1	1	column	"	,	\N	no	\\	\N	\N
+excel_A	MS-Excel file, xlsx extension	MS-Excel	xslx	readable by several versions, eg available 2009 - 2015	not applicable	not applicable	externallyDefinedFormat	\N	\N	\N	column	\N	\N	\N	\N	\N	MS-Excel	\N
+gif_A	GIF type A	GIF image	gif	GIF image	not applicable	not applicable	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	GIF	\N
+mov_A	Movie, type A	MOV	mov	QuickTime movie	not applicable	none	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	QuickTime movie	\N
+netcdf	NetCDF type	NetCDF file	nc	self-describing, machine-independent data formats and it was developed at the Unidata Program Center in Boulder, Colorado.	not applicable	none	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	NetCDF	\N
+png_A	PNG type A	PNG	png	PNG image	not applicable	none	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	PNG	\N
+csv_A	CSV unix, no hdr, no ftr	comma separated values	csv	CSV. unix line ending, no header, no footer, optional quoted strings and literal chars.	single comma	none	textFormat	\\n	0	0	column	"	,	\N	no	\\	\N	\N
+csv_B	CSV unix, hdr, no ftr	comma separated values	csv	CSV. unix line ending, 1-line header, no footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\n	1	0	column	"	,	\N	no	\\	\N	\N
+csv_F	CSV unix, 2-ln-hdr, no ftr	comma separated values	csv	CSV. unix line ending, 2-line header (table-specific), no footer, optional quoted strings and literal chars.	single comma	table-specific	textFormat	\\n	2	0	column	"	,	\N	no	\\	\N	\N
+csv_G	CSV unix, 6-ln-hdr, no ftr	comma separated values	csv	CSV. unix line ending, 6-line header (table-specific), no footer, optional quoted strings and literal chars.	single comma	table-specific	textFormat	\\n	6	0	column	"	,	\N	no	\\	\N	\N
+csv_H	CSV slash-r, hdr	comma-sep, mac line ending	csv	slash-r used by old macs (OS-9 and earlier)	single comma	column names	textFormat	\\r	1	0	column	"	,	\N	no	\\	\N	\N
+mat_A	MATLAB type	MATLAB formatted data	mat	Partial access of variables in MATLAB workspace or saved MATLAB workspace	not applicable	none	externallyDefinedFormat	\N	\N	\N	column	\N	\N	\N	\N	\N	MATLAB	\N
+txt_A	TXT type A	text file	txt	text file, unix line-ending, space-separated, collapse yes, hex code in EML, no header, no footer, optional quoted strings and literal chars.	space (hex code), collapse multiple.	none	textFormat	\\n	0	\N	column	"	#x20	\N	yes	\\	\N	\N
+txt_B	TXT type B	text file	txt	ODV format: text file, unix line-ending, semicolon-separated, 1-line header, no footer, optional quoted strings and literal chars.	single semicolon	column names	textFormat	\\n	1	\N	column	"	;	\N	no	\\	\N	\N
+txt_C	TXT type C	text file	txt	txt, tab-delimited. microsoft line ending, 1-line header, no footer, optional quoted strings and literal chars.	tab	column names	textFormat	\\r\\n	1	\N	column	"	\\t	\N	no	\\	\N	\N
+txt_D	TXT type D	text file, moorings as of 2014	txt	resembles txt_A, but has a one line header	single space	column names	textFormat	\\n	1	\N	column	"	#x20	\N	yes	\\	\N	\N
+txt_E	TXT type E	text file	txt	text file, unix line-ending, tab-separated, collapse yes, 1-line header, no footer, optional quoted strings and literal chars.	tab	column names	textFormat	\\n	1	\N	column	"	\\t	\N	yes	\\	\N	\N
 \.
 
 
 --
--- Data for Name: EMLKeywordTypeList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: EMLKeywordTypes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."EMLKeywordTypeList" ("KeywordType", "TypeDefinition") FROM stdin;
+COPY lter_metabase."EMLKeywordTypes" ("KeywordType", "TypeDefinition") FROM stdin;
 place	\N
 theme	\N
 taxonomic	\N
@@ -1852,10 +1879,25 @@ temporal	\N
 
 
 --
--- Data for Name: EMLMeasurementScaleList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: EMLMeasurementScaleDomains; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."EMLMeasurementScaleList" ("measurementScale") FROM stdin;
+COPY lter_metabase."EMLMeasurementScaleDomains" ("EMLDomainType", "MeasurementScale", "NonNumericDomain", "MeasurementScaleDomainID") FROM stdin;
+dateTimeDomain	dateTime		dateTime
+numericDomain	interval		interval
+nonNumericDomain	nominal	enumeratedDomain	nominalEnum
+nonNumericDomain	nominal	textDomain	nominalText
+nonNumericDomain	ordinal	enumeratedDomain	ordinalEnum
+nonNumericDomain	ordinal	textDomain	ordinalText
+numericDomain	ratio		ratio
+\.
+
+
+--
+-- Data for Name: EMLMeasurementScales; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."EMLMeasurementScales" ("measurementScale") FROM stdin;
 dateTime
 interval
 nominal
@@ -1865,10 +1907,10 @@ ratio
 
 
 --
--- Data for Name: EMLNumberTypeList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: EMLNumberTypes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."EMLNumberTypeList" ("NumberType") FROM stdin;
+COPY lter_metabase."EMLNumberTypes" ("NumberType") FROM stdin;
 integer
 natural
 real
@@ -1877,10 +1919,10 @@ whole
 
 
 --
--- Data for Name: EMLStorageTypeList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: EMLStorageTypes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."EMLStorageTypeList" ("StorageType", "typeSystem") FROM stdin;
+COPY lter_metabase."EMLStorageTypes" ("StorageType", "typeSystem") FROM stdin;
 anyURI	http://www.w3.org/2001/XMLSchema-datatypes
 boolean	http://www.w3.org/2001/XMLSchema-datatypes
 byte	http://www.w3.org/2001/XMLSchema-datatypes
@@ -2274,37 +2316,10 @@ molePerMeterSquaredPerSecond	molePerMeterSquaredPerSecond	amount	\N
 
 
 --
--- Data for Name: FileTypeList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListKeywordThesauri; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."FileTypeList" ("FileType", "TypeName", "FileFormat", "Extension", "Description", "Delimiters", "Header", "EML_FormatType", "RecordDelimiter", "NumHeaderLines", "NumFooterLines", "AttributeOrientation", "QuoteCharacter", "FieldDelimiter", "CharacterEncoding", "CollapseDelimiters", "LiteralCharacter", "externallyDefinedFormat_formatName", "externallyDefinedFormat_formatVersion") FROM stdin;
-csv_C	CSV unix, hdr, ftr	comma separated values	csv	CSV. unix line ending, 1-line header, 1-line footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\n	1	1	column	"	,	\N	no	\\	\N	\N
-csv_D	CSV ms, hdr, no ftr	comma separated values	csv	CSV. ms line ending, 1-line header, no footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\r\\n	1	0	column	"	,	\N	no	\\	\N	\N
-csv_E	CSV ms,  hdr, ftr	comma separated values	csv	CSV. ms line ending, 1-line header, 1-line footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\r\\n	1	1	column	"	,	\N	no	\\	\N	\N
-excel_A	MS-Excel file, xlsx extension	MS-Excel	xslx	readable by several versions, eg available 2009 - 2015	not applicable	not applicable	externallyDefinedFormat	\N	\N	\N	column	\N	\N	\N	\N	\N	MS-Excel	\N
-gif_A	GIF type A	GIF image	gif	GIF image	not applicable	not applicable	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	GIF	\N
-mov_A	Movie, type A	MOV	mov	QuickTime movie	not applicable	none	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	QuickTime movie	\N
-netcdf	NetCDF type	NetCDF file	nc	self-describing, machine-independent data formats and it was developed at the Unidata Program Center in Boulder, Colorado.	not applicable	none	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	NetCDF	\N
-png_A	PNG type A	PNG	png	PNG image	not applicable	none	externallyDefinedFormat	\N	\N	\N	\N	\N	\N	\N	\N	\N	PNG	\N
-csv_A	CSV unix, no hdr, no ftr	comma separated values	csv	CSV. unix line ending, no header, no footer, optional quoted strings and literal chars.	single comma	none	textFormat	\\n	0	0	column	"	,	\N	no	\\	\N	\N
-csv_B	CSV unix, hdr, no ftr	comma separated values	csv	CSV. unix line ending, 1-line header, no footer, optional quoted strings and literal chars.	single comma	column names	textFormat	\\n	1	0	column	"	,	\N	no	\\	\N	\N
-csv_F	CSV unix, 2-ln-hdr, no ftr	comma separated values	csv	CSV. unix line ending, 2-line header (table-specific), no footer, optional quoted strings and literal chars.	single comma	table-specific	textFormat	\\n	2	0	column	"	,	\N	no	\\	\N	\N
-csv_G	CSV unix, 6-ln-hdr, no ftr	comma separated values	csv	CSV. unix line ending, 6-line header (table-specific), no footer, optional quoted strings and literal chars.	single comma	table-specific	textFormat	\\n	6	0	column	"	,	\N	no	\\	\N	\N
-csv_H	CSV slash-r, hdr	comma-sep, mac line ending	csv	slash-r used by old macs (OS-9 and earlier)	single comma	column names	textFormat	\\r	1	0	column	"	,	\N	no	\\	\N	\N
-mat_A	MATLAB type	MATLAB formatted data	mat	Partial access of variables in MATLAB workspace or saved MATLAB workspace	not applicable	none	externallyDefinedFormat	\N	\N	\N	column	\N	\N	\N	\N	\N	MATLAB	\N
-txt_A	TXT type A	text file	txt	text file, unix line-ending, space-separated, collapse yes, hex code in EML, no header, no footer, optional quoted strings and literal chars.	space (hex code), collapse multiple.	none	textFormat	\\n	0	\N	column	"	#x20	\N	yes	\\	\N	\N
-txt_B	TXT type B	text file	txt	ODV format: text file, unix line-ending, semicolon-separated, 1-line header, no footer, optional quoted strings and literal chars.	single semicolon	column names	textFormat	\\n	1	\N	column	"	;	\N	no	\\	\N	\N
-txt_C	TXT type C	text file	txt	txt, tab-delimited. microsoft line ending, 1-line header, no footer, optional quoted strings and literal chars.	tab	column names	textFormat	\\r\\n	1	\N	column	"	\\t	\N	no	\\	\N	\N
-txt_D	TXT type D	text file, moorings as of 2014	txt	resembles txt_A, but has a one line header	single space	column names	textFormat	\\n	1	\N	column	"	#x20	\N	yes	\\	\N	\N
-txt_E	TXT type E	text file	txt	text file, unix line-ending, tab-separated, collapse yes, 1-line header, no footer, optional quoted strings and literal chars.	tab	column names	textFormat	\\n	1	\N	column	"	\\t	\N	yes	\\	\N	\N
-\.
-
-
---
--- Data for Name: KeywordThesaurus; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."KeywordThesaurus" ("ThesaurusID", "ThesaurusLabel", "ThesaurusUrl", "UseInMetadata", "ThesaurusSortOrder") FROM stdin;
+COPY lter_metabase."ListKeywordThesauri" ("ThesaurusID", "ThesaurusLabel", "ThesaurusUrl", "UseInMetadata", "ThesaurusSortOrder") FROM stdin;
 dwc	Darwin Core Terms	\N	t	100
 ea	Ecological Archives	\N	t	90
 ebv	Essential Biodiversity Variables	\N	t	80
@@ -2320,10 +2335,10 @@ sbclter_place	Santa Barbara Coastal LTER Places	\N	t	40
 
 
 --
--- Data for Name: Keywords; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListKeywords; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."Keywords" ("Keyword", "ThesaurusID", "KeywordType") FROM stdin;
+COPY lter_metabase."ListKeywords" ("Keyword", "ThesaurusID", "KeywordType") FROM stdin;
 abundance	lter_cv	theme
 acidity	lter_cv	theme
 Air Temperature	lter_cv	theme
@@ -2987,33 +3002,18 @@ allometry	none	theme
 
 
 --
--- Data for Name: MeasurementScaleDomains; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListMissingCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."MeasurementScaleDomains" ("EMLDomainType", "MeasurementScale", "NonNumericDomain", "MeasurementScaleDomainID") FROM stdin;
-dateTimeDomain	dateTime		dateTime
-numericDomain	interval		interval
-nonNumericDomain	nominal	enumeratedDomain	nominalEnum
-nonNumericDomain	nominal	textDomain	nominalText
-nonNumericDomain	ordinal	enumeratedDomain	ordinalEnum
-nonNumericDomain	ordinal	textDomain	ordinalText
-numericDomain	ratio		ratio
+COPY lter_metabase."ListMissingCodes" ("MissingValueCodeID", "MissingValueCode", "MissingValueCodeExplanation") FROM stdin;
 \.
 
 
 --
--- Data for Name: MissingCodesList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListPeople; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."MissingCodesList" ("MissingValueCodeID", "MissingValueCode", "MissingValueCodeExplanation") FROM stdin;
-\.
-
-
---
--- Data for Name: People; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."People" ("NameID", "GivenName", "MiddleName", "SurName", "Organization", "Address1", "Address2", "Address3", "City", "State", "Country", "ZipCode", "Email", "WebPage", "Phone1", dbupdatetime) FROM stdin;
+COPY lter_metabase."ListPeople" ("NameID", "GivenName", "MiddleName", "SurName", "Organization", "Address1", "Address2", "Address3", "City", "State", "Country", "ZipCode", "Email", "WebPage", "Phone1", dbupdatetime) FROM stdin;
 dreed	Daniel	C	Reed	\N	Marine Science Institute	University of California	\N	Santa Barbara	CA	US	93106-6150	dan.reed@lifesci.ucsb.edu	http://sbc.lternet.edu/people/danreed/	805-893-8363	2019-06-25 15:33:47.27755
 sharrer	Shannon	\N	Harrer	\N	Marine Science Institute	University of California	\N	Santa Barbara	CA	US	93106-6150	harrer@msi.ucsb.edu	\N	805-893-7295	2019-06-25 15:33:47.27755
 kcavanaugh	Kyle	C	Cavanaugh	\N	Department of Geography	University of California	\N	Los Angeles	CA	US	90095	kcavanaugh@geog.ucla.edu	\N	\N	2019-06-25 15:33:47.27755
@@ -3027,10 +3027,10 @@ arassweiler	Andrew	A	Rassweiler	\N	Marine Science Institute	University of Califo
 
 
 --
--- Data for Name: Peopleidentification; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListPeopleID; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."Peopleidentification" ("NameID", "IdentificationID", "Identificationtype", "Identificationlink") FROM stdin;
+COPY lter_metabase."ListPeopleID" ("NameID", "IdentificationID", "Identificationtype", "Identificationlink") FROM stdin;
 dreed	1	ORCID	0000-0003-3015-8717
 dsiegel	1	ORCID	0000-0003-1674-3055
 mbrzezinski	1	ORCID	0000-0003-3432-2297
@@ -3041,10 +3041,10 @@ mobrien	1	ORCID	0000-0002-1693-8322
 
 
 --
--- Data for Name: ProtocolList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListProtocols; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ProtocolList" ("protocolID", author, title, url) FROM stdin;
+COPY lter_metabase."ListProtocols" ("protocolID", author, title, url) FROM stdin;
 8	dreed	MDS MkV Light Sensor Protocol 	http://sbc.lternet.edu/external/Reef/Protocols/Light/MDS_MkV_Light_Sensor_Protocol.pdf
 11	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/kelp_biomass_landsat/SBC_LTER_protocol_Cavanaugh_Bell_landsat5_kelp_biomass.pdf
 13	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/rodriguez_2014/._rodriguez_2014_macrocystis_frond_turnover_20150403.pdf
@@ -3151,10 +3151,10 @@ COPY lter_metabase."ProtocolList" ("protocolID", author, title, url) FROM stdin;
 
 
 --
--- Data for Name: SiteList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListSites; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."SiteList" ("SiteCode", "SiteType", "SiteName", "SiteLocation", "SiteDesc", "Ownership", "ShapeType", "CenterLon", "CenterLat", "WBoundLon", "EBoundLon", "SBoundLat", "NBoundLat", "AltitudeMin", "AltitudeMax", unit) FROM stdin;
+COPY lter_metabase."ListSites" ("SiteCode", "SiteType", "SiteName", "SiteLocation", "SiteDesc", "Ownership", "ShapeType", "CenterLon", "CenterLat", "WBoundLon", "EBoundLon", "SBoundLat", "NBoundLat", "AltitudeMin", "AltitudeMax", unit) FROM stdin;
 046161	other	NEWHALL 5 NW	California, USA	NEWHALL 5 NW	National Weather Service - COOP	point	-118.599999999999994	34.3999999999999986	-118.599999999999994	-118.599999999999994	34.3999999999999986	34.3999999999999986	538	538	meter
 046162	other	NEWHALL S FC32CE	California, USA	NEWHALL S FC32CE	National Weather Service - COOP	point	-118.533332999999999	34.3833330000000004	-118.533332999999999	-118.533332999999999	34.3833330000000004	34.3833330000000004	378.899999999999977	378.899999999999977	meter
 046399	other	OJAI	California, USA	OJAI	National Weather Service - COOP	point	-119.25	34.4666670000000011	-119.25	-119.25	34.4666670000000011	34.4666670000000011	216.400000000000006	216.400000000000006	meter
@@ -3659,10 +3659,10 @@ SRW	reef	SRW	California, USA	SHIP ROCK WEST	\N	point	-118.491749999999996	33.463
 
 
 --
--- Data for Name: TaxaList; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListTaxa; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."TaxaList" ("TaxonID", "TaxonomicAuthority", "TaxonRankName", "TaxonRankValue", "CommonName", "LocalID") FROM stdin;
+COPY lter_metabase."ListTaxa" ("TaxonID", "TaxonomicAuthority", "TaxonRankName", "TaxonRankValue", "CommonName", "LocalID") FROM stdin;
 \.
 
 
@@ -4610,10 +4610,10 @@ ALTER TABLE ONLY lter_metabase."DataSet"
 
 
 --
--- Name: AttributeMissingCodes PK_AttributeMissingCodes; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetAttributeMissingCodes PK_AttributeMissingCodes; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."AttributeMissingCodes"
+ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
     ADD CONSTRAINT "PK_AttributeMissingCodes" PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "MissingValueCodeID");
 
 
@@ -4682,34 +4682,34 @@ ALTER TABLE ONLY lter_metabase."DataSetTemporal"
 
 
 --
--- Name: EMLKeywordTypeList PK_EMLKeywordTypeList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLKeywordTypes PK_EMLKeywordTypeList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."EMLKeywordTypeList"
+ALTER TABLE ONLY lter_metabase."EMLKeywordTypes"
     ADD CONSTRAINT "PK_EMLKeywordTypeList" PRIMARY KEY ("KeywordType");
 
 
 --
--- Name: EMLMeasurementScaleList PK_EMLMeasurementScale; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLMeasurementScales PK_EMLMeasurementScale; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleList"
+ALTER TABLE ONLY lter_metabase."EMLMeasurementScales"
     ADD CONSTRAINT "PK_EMLMeasurementScale" PRIMARY KEY ("measurementScale");
 
 
 --
--- Name: EMLNumberTypeList PK_EMLNumberType; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLNumberTypes PK_EMLNumberType; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."EMLNumberTypeList"
+ALTER TABLE ONLY lter_metabase."EMLNumberTypes"
     ADD CONSTRAINT "PK_EMLNumberType" PRIMARY KEY ("NumberType");
 
 
 --
--- Name: EMLStorageTypeList PK_EML_NumberTypeList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLStorageTypes PK_EML_NumberTypeList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."EMLStorageTypeList"
+ALTER TABLE ONLY lter_metabase."EMLStorageTypes"
     ADD CONSTRAINT "PK_EML_NumberTypeList" PRIMARY KEY ("StorageType");
 
 
@@ -4730,26 +4730,26 @@ ALTER TABLE ONLY lter_metabase."EMLUnitTypes"
 
 
 --
--- Name: FileTypeList PK_FileTypeList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLFileTypes PK_FileTypeList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."FileTypeList"
+ALTER TABLE ONLY lter_metabase."EMLFileTypes"
     ADD CONSTRAINT "PK_FileTypeList" PRIMARY KEY ("FileType");
 
 
 --
--- Name: KeywordThesaurus PK_KeywordThesaurus; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListKeywordThesauri PK_KeywordThesaurus; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."KeywordThesaurus"
+ALTER TABLE ONLY lter_metabase."ListKeywordThesauri"
     ADD CONSTRAINT "PK_KeywordThesaurus" PRIMARY KEY ("ThesaurusID");
 
 
 --
--- Name: Keywords PK_Keywords; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListKeywords PK_Keywords; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."Keywords"
+ALTER TABLE ONLY lter_metabase."ListKeywords"
     ADD CONSTRAINT "PK_Keywords" PRIMARY KEY ("Keyword", "ThesaurusID");
 
 
@@ -4762,58 +4762,58 @@ ALTER TABLE ONLY lter_metabase."DataSetMethods"
 
 
 --
--- Name: MissingCodesList PK_MissingCodesList_MissingValueCodeID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListMissingCodes PK_MissingCodesList_MissingValueCodeID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."MissingCodesList"
+ALTER TABLE ONLY lter_metabase."ListMissingCodes"
     ADD CONSTRAINT "PK_MissingCodesList_MissingValueCodeID" PRIMARY KEY ("MissingValueCodeID");
 
 
 --
--- Name: People PK_People; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeople PK_People; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."People"
+ALTER TABLE ONLY lter_metabase."ListPeople"
     ADD CONSTRAINT "PK_People" PRIMARY KEY ("NameID");
 
 
 --
--- Name: Peopleidentification PK_Peopleidentification; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeopleID PK_Peopleidentification; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."Peopleidentification"
+ALTER TABLE ONLY lter_metabase."ListPeopleID"
     ADD CONSTRAINT "PK_Peopleidentification" PRIMARY KEY ("IdentificationID", "NameID");
 
 
 --
--- Name: SiteList PK_SiteRegister; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListSites PK_SiteRegister; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."SiteList"
+ALTER TABLE ONLY lter_metabase."ListSites"
     ADD CONSTRAINT "PK_SiteRegister" PRIMARY KEY ("SiteCode");
 
 
 --
--- Name: TaxaList PK_TaxaList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListTaxa PK_TaxaList; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."TaxaList"
+ALTER TABLE ONLY lter_metabase."ListTaxa"
     ADD CONSTRAINT "PK_TaxaList" PRIMARY KEY ("TaxonID", "TaxonomicAuthority");
 
 
 --
--- Name: ProtocolList PK_protocolID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListProtocols PK_protocolID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ProtocolList"
+ALTER TABLE ONLY lter_metabase."ListProtocols"
     ADD CONSTRAINT "PK_protocolID" PRIMARY KEY ("protocolID");
 
 
 --
--- Name: Peopleidentification Peopleidentification_UQ_NameID_IdentificationID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeopleID Peopleidentification_UQ_NameID_IdentificationID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."Peopleidentification"
+ALTER TABLE ONLY lter_metabase."ListPeopleID"
     ADD CONSTRAINT "Peopleidentification_UQ_NameID_IdentificationID" UNIQUE ("NameID", "IdentificationID");
 
 
@@ -4826,18 +4826,18 @@ ALTER TABLE ONLY lter_metabase."DataSetEntities"
 
 
 --
--- Name: MeasurementScaleDomains pk_MeasurementScaleDomains; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLMeasurementScaleDomains pk_MeasurementScaleDomains; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."MeasurementScaleDomains"
+ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
     ADD CONSTRAINT "pk_MeasurementScaleDomains" PRIMARY KEY ("MeasurementScaleDomainID");
 
 
 --
--- Name: EMLAttributeCodeDefinition pk_emlattributecodedefinition_pk; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetAttributeEnumeration pk_emlattributecodedefinition_pk; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."EMLAttributeCodeDefinition"
+ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
     ADD CONSTRAINT pk_emlattributecodedefinition_pk PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", code);
 
 
@@ -4949,7 +4949,7 @@ ALTER TABLE ONLY pkg_mgmt.pkg_state
 -- Name: fki_MeasurementScaleDomains_FK_MeasurementScale; Type: INDEX; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE INDEX "fki_MeasurementScaleDomains_FK_MeasurementScale" ON lter_metabase."MeasurementScaleDomains" USING btree ("MeasurementScale");
+CREATE INDEX "fki_MeasurementScaleDomains_FK_MeasurementScale" ON lter_metabase."EMLMeasurementScaleDomains" USING btree ("MeasurementScale");
 
 
 --
@@ -4974,10 +4974,10 @@ CREATE INDEX fki_pkg_sort_fk_spatial_extent ON pkg_mgmt.pkg_sort USING btree (sp
 
 
 --
--- Name: People people_trig_dbupdatetime; Type: TRIGGER; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeople people_trig_dbupdatetime; Type: TRIGGER; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TRIGGER people_trig_dbupdatetime BEFORE INSERT OR UPDATE ON lter_metabase."People" FOR EACH ROW EXECUTE PROCEDURE pkg_mgmt.update_modified_column();
+CREATE TRIGGER people_trig_dbupdatetime BEFORE INSERT OR UPDATE ON lter_metabase."ListPeople" FOR EACH ROW EXECUTE PROCEDURE pkg_mgmt.update_modified_column();
 
 
 --
@@ -5007,7 +5007,7 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributes"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributes"
-    ADD CONSTRAINT "DataSetAttributes_FK_MeasurementScaleDomainID" FOREIGN KEY ("MeasurementScaleDomainID") REFERENCES lter_metabase."MeasurementScaleDomains"("MeasurementScaleDomainID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "DataSetAttributes_FK_MeasurementScaleDomainID" FOREIGN KEY ("MeasurementScaleDomainID") REFERENCES lter_metabase."EMLMeasurementScaleDomains"("MeasurementScaleDomainID") ON UPDATE CASCADE;
 
 
 --
@@ -5015,7 +5015,7 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributes"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributes"
-    ADD CONSTRAINT "DataSetAttributes_FK_NumberType" FOREIGN KEY ("NumberType") REFERENCES lter_metabase."EMLNumberTypeList"("NumberType") ON UPDATE CASCADE;
+    ADD CONSTRAINT "DataSetAttributes_FK_NumberType" FOREIGN KEY ("NumberType") REFERENCES lter_metabase."EMLNumberTypes"("NumberType") ON UPDATE CASCADE;
 
 
 --
@@ -5023,7 +5023,7 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributes"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributes"
-    ADD CONSTRAINT "DataSetAttributes_FK_StorageType" FOREIGN KEY ("StorageType") REFERENCES lter_metabase."EMLStorageTypeList"("StorageType") ON UPDATE CASCADE;
+    ADD CONSTRAINT "DataSetAttributes_FK_StorageType" FOREIGN KEY ("StorageType") REFERENCES lter_metabase."EMLStorageTypes"("StorageType") ON UPDATE CASCADE;
 
 
 --
@@ -5047,7 +5047,7 @@ ALTER TABLE ONLY lter_metabase."DataSetEntities"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetEntities"
-    ADD CONSTRAINT "FK_DataSetEntities_FileType" FOREIGN KEY ("FileType") REFERENCES lter_metabase."FileTypeList"("FileType") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetEntities_FileType" FOREIGN KEY ("FileType") REFERENCES lter_metabase."EMLFileTypes"("FileType") ON UPDATE CASCADE;
 
 
 --
@@ -5071,7 +5071,7 @@ ALTER TABLE ONLY lter_metabase."DataSetKeywords"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetKeywords"
-    ADD CONSTRAINT "FK_DataSetKeywords_Keyword" FOREIGN KEY ("Keyword", "ThesaurusID") REFERENCES lter_metabase."Keywords"("Keyword", "ThesaurusID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetKeywords_Keyword" FOREIGN KEY ("Keyword", "ThesaurusID") REFERENCES lter_metabase."ListKeywords"("Keyword", "ThesaurusID") ON UPDATE CASCADE;
 
 
 --
@@ -5079,7 +5079,7 @@ ALTER TABLE ONLY lter_metabase."DataSetKeywords"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetMethods"
-    ADD CONSTRAINT "FK_DataSetMethod_ProtocolID" FOREIGN KEY ("protocolID") REFERENCES lter_metabase."ProtocolList"("protocolID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetMethod_ProtocolID" FOREIGN KEY ("protocolID") REFERENCES lter_metabase."ListProtocols"("protocolID") ON UPDATE CASCADE;
 
 
 --
@@ -5103,7 +5103,7 @@ ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
-    ADD CONSTRAINT "FK_DataSetPersonnel_People" FOREIGN KEY ("NameID") REFERENCES lter_metabase."People"("NameID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetPersonnel_People" FOREIGN KEY ("NameID") REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
 
 
 --
@@ -5111,7 +5111,7 @@ ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetSites"
-    ADD CONSTRAINT "FK_DataSetSite_SiteCode" FOREIGN KEY ("SiteCode") REFERENCES lter_metabase."SiteList"("SiteCode") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetSite_SiteCode" FOREIGN KEY ("SiteCode") REFERENCES lter_metabase."ListSites"("SiteCode") ON UPDATE CASCADE;
 
 
 --
@@ -5127,7 +5127,7 @@ ALTER TABLE ONLY lter_metabase."DataSetTaxa"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetTaxa"
-    ADD CONSTRAINT "FK_DataSetTaxa_TaxonID" FOREIGN KEY ("TaxonID", "TaxonomicAuthority") REFERENCES lter_metabase."TaxaList"("TaxonID", "TaxonomicAuthority") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetTaxa_TaxonID" FOREIGN KEY ("TaxonID", "TaxonomicAuthority") REFERENCES lter_metabase."ListTaxa"("TaxonID", "TaxonomicAuthority") ON UPDATE CASCADE;
 
 
 --
@@ -5139,18 +5139,18 @@ ALTER TABLE ONLY lter_metabase."DataSetTemporal"
 
 
 --
--- Name: EMLAttributeCodeDefinition FK_DataSet_SortOrder_ColumnName; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetAttributeEnumeration FK_DataSet_SortOrder_ColumnName; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."EMLAttributeCodeDefinition"
+ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
     ADD CONSTRAINT "FK_DataSet_SortOrder_ColumnName" FOREIGN KEY ("DataSetID", "EntitySortOrder", "ColumnName") REFERENCES lter_metabase."DataSetAttributes"("DataSetID", "EntitySortOrder", "ColumnName") ON UPDATE CASCADE;
 
 
 --
--- Name: AttributeMissingCodes FK_DataSet_SortOrder_ColumnName; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetAttributeMissingCodes FK_DataSet_SortOrder_ColumnName; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."AttributeMissingCodes"
+ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
     ADD CONSTRAINT "FK_DataSet_SortOrder_ColumnName" FOREIGN KEY ("DataSetID", "EntitySortOrder", "ColumnName") REFERENCES lter_metabase."DataSetAttributes"("DataSetID", "EntitySortOrder", "ColumnName") ON UPDATE CASCADE;
 
 
@@ -5163,19 +5163,19 @@ ALTER TABLE ONLY lter_metabase."DataSet"
 
 
 --
--- Name: ProtocolList FK_DataSet_author; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListProtocols FK_DataSet_author; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ProtocolList"
-    ADD CONSTRAINT "FK_DataSet_author" FOREIGN KEY (author) REFERENCES lter_metabase."People"("NameID") ON UPDATE CASCADE;
+ALTER TABLE ONLY lter_metabase."ListProtocols"
+    ADD CONSTRAINT "FK_DataSet_author" FOREIGN KEY (author) REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
 
 
 --
--- Name: AttributeMissingCodes FK_DatasetMissingCode_MissingValueCodeID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetAttributeMissingCodes FK_DatasetMissingCode_MissingValueCodeID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."AttributeMissingCodes"
-    ADD CONSTRAINT "FK_DatasetMissingCode_MissingValueCodeID" FOREIGN KEY ("MissingValueCodeID") REFERENCES lter_metabase."MissingCodesList"("MissingValueCodeID") ON UPDATE CASCADE;
+ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
+    ADD CONSTRAINT "FK_DatasetMissingCode_MissingValueCodeID" FOREIGN KEY ("MissingValueCodeID") REFERENCES lter_metabase."ListMissingCodes"("MissingValueCodeID") ON UPDATE CASCADE;
 
 
 --
@@ -5187,43 +5187,43 @@ ALTER TABLE ONLY lter_metabase."EMLUnitDictionary"
 
 
 --
--- Name: Keywords FK_Keywords_KeywordType; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListKeywords FK_Keywords_KeywordType; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."Keywords"
-    ADD CONSTRAINT "FK_Keywords_KeywordType" FOREIGN KEY ("KeywordType") REFERENCES lter_metabase."EMLKeywordTypeList"("KeywordType") ON UPDATE CASCADE;
-
-
---
--- Name: Keywords FK_Keywords_ThesaurusID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
---
-
-ALTER TABLE ONLY lter_metabase."Keywords"
-    ADD CONSTRAINT "FK_Keywords_ThesaurusID" FOREIGN KEY ("ThesaurusID") REFERENCES lter_metabase."KeywordThesaurus"("ThesaurusID") ON UPDATE CASCADE;
+ALTER TABLE ONLY lter_metabase."ListKeywords"
+    ADD CONSTRAINT "FK_Keywords_KeywordType" FOREIGN KEY ("KeywordType") REFERENCES lter_metabase."EMLKeywordTypes"("KeywordType") ON UPDATE CASCADE;
 
 
 --
--- Name: Peopleidentification FK_Peopleidentification_People; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListKeywords FK_Keywords_ThesaurusID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."Peopleidentification"
-    ADD CONSTRAINT "FK_Peopleidentification_People" FOREIGN KEY ("NameID") REFERENCES lter_metabase."People"("NameID") ON UPDATE CASCADE;
+ALTER TABLE ONLY lter_metabase."ListKeywords"
+    ADD CONSTRAINT "FK_Keywords_ThesaurusID" FOREIGN KEY ("ThesaurusID") REFERENCES lter_metabase."ListKeywordThesauri"("ThesaurusID") ON UPDATE CASCADE;
 
 
 --
--- Name: SiteList FK_SiteRegister_unit; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListPeopleID FK_Peopleidentification_People; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."SiteList"
+ALTER TABLE ONLY lter_metabase."ListPeopleID"
+    ADD CONSTRAINT "FK_Peopleidentification_People" FOREIGN KEY ("NameID") REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
+
+
+--
+-- Name: ListSites FK_SiteRegister_unit; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListSites"
     ADD CONSTRAINT "FK_SiteRegister_unit" FOREIGN KEY (unit) REFERENCES lter_metabase."EMLUnitDictionary"(id) ON UPDATE CASCADE;
 
 
 --
--- Name: MeasurementScaleDomains MeasurementScaleDomains_FK_MeasurementScale; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: EMLMeasurementScaleDomains MeasurementScaleDomains_FK_MeasurementScale; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."MeasurementScaleDomains"
-    ADD CONSTRAINT "MeasurementScaleDomains_FK_MeasurementScale" FOREIGN KEY ("MeasurementScale") REFERENCES lter_metabase."EMLMeasurementScaleList"("measurementScale") ON UPDATE CASCADE;
+ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
+    ADD CONSTRAINT "MeasurementScaleDomains_FK_MeasurementScale" FOREIGN KEY ("MeasurementScale") REFERENCES lter_metabase."EMLMeasurementScales"("measurementScale") ON UPDATE CASCADE;
 
 
 --
@@ -5255,7 +5255,7 @@ ALTER TABLE ONLY pkg_mgmt.maintenance_changehistory
 --
 
 ALTER TABLE ONLY pkg_mgmt.maintenance_changehistory
-    ADD CONSTRAINT "FK_maintenance_changehistory_NameID" FOREIGN KEY ("NameID") REFERENCES lter_metabase."People"("NameID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_maintenance_changehistory_NameID" FOREIGN KEY ("NameID") REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
 
 
 --
@@ -5347,18 +5347,26 @@ GRANT USAGE ON SCHEMA pkg_mgmt TO read_only_user;
 
 
 --
--- Name: TABLE "AttributeMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT ON TABLE lter_metabase."AttributeMissingCodes" TO read_only_user;
-
-
---
 -- Name: TABLE "DataSet"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
 GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSet" TO read_write_user;
 GRANT SELECT ON TABLE lter_metabase."DataSet" TO read_only_user;
+
+
+--
+-- Name: TABLE "DataSetAttributeEnumeration"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetAttributeEnumeration" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."DataSetAttributeEnumeration" TO read_only_user;
+
+
+--
+-- Name: TABLE "DataSetAttributeMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT ON TABLE lter_metabase."DataSetAttributeMissingCodes" TO read_only_user;
 
 
 --
@@ -5426,43 +5434,51 @@ GRANT SELECT ON TABLE lter_metabase."DataSetTemporal" TO read_only_user;
 
 
 --
--- Name: TABLE "EMLAttributeCodeDefinition"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "EMLFileTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLAttributeCodeDefinition" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."EMLAttributeCodeDefinition" TO read_only_user;
-
-
---
--- Name: TABLE "EMLKeywordTypeList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLKeywordTypeList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."EMLKeywordTypeList" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLFileTypes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."EMLFileTypes" TO read_only_user;
 
 
 --
--- Name: TABLE "EMLMeasurementScaleList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "EMLKeywordTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLMeasurementScaleList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."EMLMeasurementScaleList" TO read_only_user;
-
-
---
--- Name: TABLE "EMLNumberTypeList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLNumberTypeList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."EMLNumberTypeList" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLKeywordTypes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."EMLKeywordTypes" TO read_only_user;
 
 
 --
--- Name: TABLE "EMLStorageTypeList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "EMLMeasurementScaleDomains"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLStorageTypeList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."EMLStorageTypeList" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLMeasurementScaleDomains" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."EMLMeasurementScaleDomains" TO read_only_user;
+
+
+--
+-- Name: TABLE "EMLMeasurementScales"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLMeasurementScales" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."EMLMeasurementScales" TO read_only_user;
+
+
+--
+-- Name: TABLE "EMLNumberTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLNumberTypes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."EMLNumberTypes" TO read_only_user;
+
+
+--
+-- Name: TABLE "EMLStorageTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."EMLStorageTypes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."EMLStorageTypes" TO read_only_user;
 
 
 --
@@ -5482,83 +5498,67 @@ GRANT SELECT ON TABLE lter_metabase."EMLUnitTypes" TO read_only_user;
 
 
 --
--- Name: TABLE "FileTypeList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListKeywordThesauri"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."FileTypeList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."FileTypeList" TO read_only_user;
-
-
---
--- Name: TABLE "KeywordThesaurus"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."KeywordThesaurus" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."KeywordThesaurus" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListKeywordThesauri" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListKeywordThesauri" TO read_only_user;
 
 
 --
--- Name: TABLE "Keywords"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListKeywords"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."Keywords" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."Keywords" TO read_only_user;
-
-
---
--- Name: TABLE "MeasurementScaleDomains"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MeasurementScaleDomains" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."MeasurementScaleDomains" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListKeywords" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListKeywords" TO read_only_user;
 
 
 --
--- Name: TABLE "MissingCodesList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MissingCodesList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."MissingCodesList" TO read_only_user;
-
-
---
--- Name: TABLE "People"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."People" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."People" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMissingCodes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMissingCodes" TO read_only_user;
 
 
 --
--- Name: TABLE "Peopleidentification"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListPeople"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."Peopleidentification" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."Peopleidentification" TO read_only_user;
-
-
---
--- Name: TABLE "ProtocolList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ProtocolList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."ProtocolList" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListPeople" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListPeople" TO read_only_user;
 
 
 --
--- Name: TABLE "SiteList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListPeopleID"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."SiteList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."SiteList" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListPeopleID" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListPeopleID" TO read_only_user;
 
 
 --
--- Name: TABLE "TaxaList"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListProtocols"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."TaxaList" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."TaxaList" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListProtocols" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListProtocols" TO read_only_user;
+
+
+--
+-- Name: TABLE "ListSites"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListSites" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListSites" TO read_only_user;
+
+
+--
+-- Name: TABLE "ListTaxa"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListTaxa" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListTaxa" TO read_only_user;
 
 
 --
