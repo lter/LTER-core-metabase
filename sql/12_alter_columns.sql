@@ -96,7 +96,7 @@ GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_creator TO read_write_user;
 
 -- SiteList
 
-DROP VIEW mb2eml_r.vw_eml_geographiccoverage
+DROP VIEW mb2eml_r.vw_eml_geographiccoverage;
 
 ALTER TABLE lter_metabase."SiteList" ALTER COLUMN "SiteLocation" DROP DEFAULT;
 ALTER TABLE lter_metabase."SiteList" ALTER COLUMN "AltitudeMin" TYPE double precision USING "AltitudeMin"::double precision;
