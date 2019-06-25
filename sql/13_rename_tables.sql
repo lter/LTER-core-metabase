@@ -1,0 +1,16 @@
+ALTER TABLE lter_metabase."EMLAttributeCodeDefinition" RENAME TO "DataSetAttributeEnumeration";
+ALTER TABLE lter_metabase."AttributeMissingCodes" RENAME TO "DataSetAttributeMissingCodes";
+ALTER TABLE lter_metabase."EMLKeywordTypeList" RENAME TO "EMLKeywordTypes";
+ALTER TABLE lter_metabase."EMLMeasurementScaleList" RENAME TO "EMLMeasurementScales";
+ALTER TABLE lter_metabase."EMLNumberTypeList" RENAME TO "EMLNumberTypes";
+ALTER TABLE lter_metabase."EMLStorageTypeList" RENAME TO "EMLStorageTypes";
+ALTER TABLE lter_metabase."FileTypeList" RENAME TO "EMLFileTypes";
+ALTER TABLE lter_metabase."Peopleidentification" RENAME TO "ListPeopleID";
+ALTER TABLE lter_metabase."KeywordThesaurus" RENAME TO "ListKeywordThesauri";
+ALTER TABLE lter_metabase."Keywords" RENAME TO "ListKeywords";
+ALTER TABLE lter_metabase."MeasurementScaleDomains" RENAME TO "EMLMeasurementScaleDomains";
+ALTER TABLE lter_metabase."MissingCodesList" RENAME TO "ListMissingCodes";
+ALTER TABLE lter_metabase."People" RENAME TO "ListPeople";
+ALTER TABLE lter_metabase."ProtocolList" RENAME TO "ListProtocols";
+ALTER TABLE lter_metabase."SiteList" RENAME TO "ListSites";
+ALTER TABLE lter_metabase."TaxaList" RENAME TO "ListTaxa";
