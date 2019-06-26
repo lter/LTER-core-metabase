@@ -18,7 +18,16 @@ The overall database design contains these schemas. They are designed for separa
 
 #### Schema `lter_metabase`
 
-Generally, you will only need to populate controlled-vocabulary parent tables (tables starting with EML) once at the beginning. You might need to update site-specific parent tables (tables ending with List) periodically. You will need to update dataset-specific tables (the rest) with every new dataset or new revision to old datasets.
+There are three broad types of tables in `lter_metabase`:
+
+- `EML`-prefixed tables: contain controlled vocabularies specified by the EML schema, or network-level CVs to which sites rarely add, such as units.
+
+- `List`-prefixed tables: contain controlled vocabularies specific to a site such as personnel and sampling sites.
+
+- `DataSet`-prefixed tables: contain information used to create or update specific datasets.
+
+
+Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. You might need to update tables starting with List or site-specific CVs periodically. You will need to update dataset-specific tables (the rest) with every new dataset or new revision to old datasets.
 
 #### Schema `pkg_mgmt`
 
@@ -38,6 +47,10 @@ TODO
 
 ### Project information
 boilerplate
+
+### How to specify entity-level coverage
+
+Sometimes datasets include multiple entities and 
 
 
 ## Known wonkinesses and workarounds
