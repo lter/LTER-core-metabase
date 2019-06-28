@@ -117,8 +117,8 @@ CREATE TABLE lter_metabase."DataSetAttributeEnumeration" (
     "DataSetID" integer NOT NULL,
     "EntitySortOrder" integer NOT NULL,
     "ColumnName" character varying(200) NOT NULL,
-    code character varying(200) NOT NULL,
-    definition character varying(1024) NOT NULL
+    "Code" character varying(200) NOT NULL,
+    "Definition" character varying(1024) NOT NULL
 );
 
 
@@ -149,23 +149,23 @@ CREATE TABLE lter_metabase."DataSetAttributes" (
     "ColumnName" character varying(200) NOT NULL,
     "AttributeID" character varying(200) NOT NULL,
     "AttributeLabel" character varying(200) NOT NULL,
-    "Description" character varying(2000) DEFAULT 'none'::character varying,
+    "Description" character varying(2000) NOT NULL,
     "StorageType" character varying(30),
-    "MeasurementScaleDomainID" character varying(12),
-    "FormatString" character varying(40),
-    "PrecisionDateTime" character varying(40),
+    "MeasurementScaleDomainID" character varying(12) NOT NULL,
+    "DateTimeFormatString" character varying(40),
+    "DateTimePrecision" character varying(40),
     "TextPatternDefinition" character varying(500),
     "Unit" character varying(100),
-    "PrecisionNumeric" double precision,
+    "NumericPrecision" double precision,
     "NumberType" character varying(30),
     "MissingValueCode" character varying(30),
     "MissingValueCodeExplanation" character varying(200),
     "BoundsMinimum" character varying(100),
     "BoundsMaximum" character varying(100),
-    CONSTRAINT "DataSetAttributes_CK_FormatString" CHECK (((("FormatString" IS NULL) AND (("MeasurementScaleDomainID")::text !~~ 'dateTime'::text)) OR (("FormatString" IS NOT NULL) AND (("MeasurementScaleDomainID")::text ~~ 'dateTime'::text)))),
+    CONSTRAINT "DataSetAttributes_CK_FormatString" CHECK (((("DateTimeFormatString" IS NULL) AND (("MeasurementScaleDomainID")::text !~~ 'dateTime'::text)) OR (("DateTimeFormatString" IS NOT NULL) AND (("MeasurementScaleDomainID")::text ~~ 'dateTime'::text)))),
     CONSTRAINT "DataSetAttributes_CK_NumberType" CHECK (((("NumberType" IS NULL) AND (("MeasurementScaleDomainID")::text <> ALL (ARRAY['ratio'::text, 'interval'::text]))) OR (("NumberType" IS NOT NULL) AND (("MeasurementScaleDomainID")::text = ANY (ARRAY['ratio'::text, 'interval'::text]))))),
-    CONSTRAINT "DataSetAttributes_CK_PrecisionDateTime" CHECK (((("PrecisionDateTime" IS NULL) AND (("MeasurementScaleDomainID")::text !~~ 'dateTime'::text)) OR (("PrecisionDateTime" IS NOT NULL) AND (("MeasurementScaleDomainID")::text ~~ 'dateTime'::text)))),
-    CONSTRAINT "DataSetAttributes_CK_PrecisionNumeric" CHECK (((("PrecisionNumeric" IS NULL) AND (("MeasurementScaleDomainID")::text <> ALL (ARRAY['ratio'::text, 'interval'::text]))) OR (("MeasurementScaleDomainID")::text = ANY (ARRAY['ratio'::text, 'interval'::text])))),
+    CONSTRAINT "DataSetAttributes_CK_PrecisionDateTime" CHECK (((("DateTimePrecision" IS NULL) AND (("MeasurementScaleDomainID")::text !~~ 'dateTime'::text)) OR (("DateTimePrecision" IS NOT NULL) AND (("MeasurementScaleDomainID")::text ~~ 'dateTime'::text)))),
+    CONSTRAINT "DataSetAttributes_CK_PrecisionNumeric" CHECK (((("NumericPrecision" IS NULL) AND (("MeasurementScaleDomainID")::text <> ALL (ARRAY['ratio'::text, 'interval'::text]))) OR (("MeasurementScaleDomainID")::text = ANY (ARRAY['ratio'::text, 'interval'::text])))),
     CONSTRAINT "DataSetAttributes_CK_TextPatternDefinition" CHECK (((("TextPatternDefinition" IS NULL) AND (("MeasurementScaleDomainID")::text !~~ '%Text'::text)) OR (("TextPatternDefinition" IS NOT NULL) AND (("MeasurementScaleDomainID")::text ~~ '%Text'::text)))),
     CONSTRAINT "DataSetAttributes_CK_unit" CHECK (((("Unit" IS NULL) AND (("MeasurementScaleDomainID")::text <> ALL (ARRAY['ratio'::text, 'interval'::text]))) OR (("Unit" IS NOT NULL) AND (("MeasurementScaleDomainID")::text = ANY (ARRAY['ratio'::text, 'interval'::text])))))
 );
@@ -188,11 +188,18 @@ CREATE TABLE lter_metabase."DataSetEntities" (
     "Urlhead" character varying(1024),
     "Subpath" character varying(1024),
     "FileName" character varying(200),
-    "DataAnomalies" character varying(7000)
+    "AdditionalInfo" character varying(7000)
 );
 
 
 ALTER TABLE lter_metabase."DataSetEntities" OWNER TO %db_owner%;
+
+--
+-- Name: COLUMN "DataSetEntities"."FileName"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."DataSetEntities"."FileName" IS 'goes into physical/objectName';
+
 
 --
 -- Name: DataSetKeywords; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -201,7 +208,7 @@ ALTER TABLE lter_metabase."DataSetEntities" OWNER TO %db_owner%;
 CREATE TABLE lter_metabase."DataSetKeywords" (
     "DataSetID" integer NOT NULL,
     "Keyword" character varying(100) NOT NULL,
-    "ThesaurusID" character varying(1024) DEFAULT 'foo'::character varying NOT NULL
+    "ThesaurusID" character varying(50) DEFAULT 'none'::character varying NOT NULL
 );
 
 
@@ -244,18 +251,32 @@ CREATE TABLE lter_metabase."DataSetPersonnel" (
 ALTER TABLE lter_metabase."DataSetPersonnel" OWNER TO %db_owner%;
 
 --
+-- Name: COLUMN "DataSetPersonnel"."AuthorshipRole"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipRole" IS 'if not creator, then will go into associatedParty';
+
+
+--
 -- Name: DataSetSites; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
 CREATE TABLE lter_metabase."DataSetSites" (
     "DataSetID" integer NOT NULL,
-    "EntitySortOrder" integer NOT NULL,
+    "EntitySortOrder" integer DEFAULT 0 NOT NULL,
     "SiteCode" character varying(50) NOT NULL,
     "GeoCoverageSortOrder" integer DEFAULT 1 NOT NULL
 );
 
 
 ALTER TABLE lter_metabase."DataSetSites" OWNER TO %db_owner%;
+
+--
+-- Name: COLUMN "DataSetSites"."EntitySortOrder"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."DataSetSites"."EntitySortOrder" IS 'convention: if not 0, then specifies the entity the coverage goes under';
+
 
 --
 -- Name: DataSetTaxa; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -276,7 +297,7 @@ ALTER TABLE lter_metabase."DataSetTaxa" OWNER TO %db_owner%;
 
 CREATE TABLE lter_metabase."DataSetTemporal" (
     "DataSetID" integer NOT NULL,
-    "EntitySortOrder" integer NOT NULL,
+    "EntitySortOrder" integer DEFAULT 0 NOT NULL,
     "BeginDate" date NOT NULL,
     "EndDate" date NOT NULL,
     "UseOnlyYear" boolean
@@ -284,6 +305,13 @@ CREATE TABLE lter_metabase."DataSetTemporal" (
 
 
 ALTER TABLE lter_metabase."DataSetTemporal" OWNER TO %db_owner%;
+
+--
+-- Name: COLUMN "DataSetTemporal"."EntitySortOrder"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."DataSetTemporal"."EntitySortOrder" IS 'convention: if not 0, then specifies the entity the coverage goes under';
+
 
 --
 -- Name: EMLFileTypes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -475,7 +503,7 @@ CREATE TABLE lter_metabase."ListPeople" (
     "ZipCode" character varying(20),
     "Email" character varying(50),
     "WebPage" character varying(100),
-    "Phone1" character varying(50),
+    "Phone" character varying(50),
     dbupdatetime timestamp without time zone
 );
 
@@ -519,7 +547,7 @@ CREATE TABLE lter_metabase."ListSites" (
     "SiteType" character varying(10) NOT NULL,
     "SiteName" character varying(100) NOT NULL,
     "SiteLocation" character varying(100) NOT NULL,
-    "SiteDesc" character varying(1000),
+    "SiteDescription" character varying(1000),
     "Ownership" character varying(100),
     "ShapeType" character varying(20) NOT NULL,
     "CenterLon" double precision,
@@ -530,7 +558,7 @@ CREATE TABLE lter_metabase."ListSites" (
     "NBoundLat" double precision,
     "AltitudeMin" double precision,
     "AltitudeMax" double precision,
-    unit character varying(10),
+    "AltitudeUnit" character varying(10),
     CONSTRAINT "CK_SiteRegister_ShapeType" CHECK ((("ShapeType")::text = ANY (ARRAY[('point'::character varying)::text, ('rectangle'::character varying)::text, ('polygon'::character varying)::text, ('polyline'::character varying)::text, ('vector'::character varying)::text]))),
     CONSTRAINT "CK_SiteRegister_SiteType" CHECK ((("SiteType")::text = ANY (ARRAY[('beach'::character varying)::text, ('intertidal'::character varying)::text, ('land'::character varying)::text, ('nearshore'::character varying)::text, ('offshore'::character varying)::text, ('other'::character varying)::text, ('pier'::character varying)::text, ('reef'::character varying)::text])))
 );
@@ -595,7 +623,7 @@ CREATE VIEW mb2eml_r.vw_eml_associatedparty AS
     p."State" AS state,
     p."Country" AS country,
     p."ZipCode" AS zipcode,
-    p."Phone1" AS phone1,
+    p."Phone" AS phone1,
     p."Email" AS email,
     i."Identificationtype" AS userid_type,
     i."Identificationlink" AS userid
@@ -615,8 +643,8 @@ CREATE VIEW mb2eml_r.vw_eml_attributecodedefinition AS
  SELECT d."DataSetID" AS datasetid,
     d."EntitySortOrder" AS entity_position,
     d."ColumnName" AS "attributeName",
-    d.code,
-    d.definition
+    d."Code" AS code,
+    d."Definition" AS definition
    FROM lter_metabase."DataSetAttributeEnumeration" d
   ORDER BY d."DataSetID", d."EntitySortOrder";
 
@@ -646,11 +674,11 @@ CREATE VIEW mb2eml_r.vw_eml_attributes AS
             ELSE NULL::text
         END AS domain,
     d."StorageType" AS "storageType",
-    d."FormatString" AS "formatString",
-    d."PrecisionDateTime" AS "dateTimePrecision",
+    d."DateTimeFormatString" AS "formatString",
+    d."DateTimePrecision" AS "dateTimePrecision",
     d."TextPatternDefinition" AS definition,
     d."Unit" AS unit,
-    d."PrecisionNumeric" AS "precision",
+    d."NumericPrecision" AS "precision",
     d."NumberType" AS "numberType",
     d."MissingValueCode" AS "missingValueCode",
     d."MissingValueCodeExplanation" AS "missingValueCodeExplanation",
@@ -725,7 +753,7 @@ CREATE VIEW mb2eml_r.vw_eml_creator AS
     p."State" AS state,
     p."Country" AS country,
     p."ZipCode" AS zipcode,
-    p."Phone1" AS phone1,
+    p."Phone" AS phone1,
     p."Email" AS email,
     i."Identificationtype" AS userid_type,
     i."Identificationlink" AS userid
@@ -820,14 +848,14 @@ CREATE VIEW mb2eml_r.vw_eml_geographiccoverage AS
     d."EntitySortOrder" AS entity_position,
     d."GeoCoverageSortOrder" AS geocoverage_sort_order,
     d."SiteCode" AS id,
-    ((s."SiteName")::text || COALESCE((': '::text || (s."SiteDesc")::text), ''::text)) AS geographicdescription,
+    ((s."SiteName")::text || COALESCE((': '::text || (s."SiteDescription")::text), ''::text)) AS geographicdescription,
     s."NBoundLat" AS northboundingcoordinate,
     s."SBoundLat" AS southboundingcoordinate,
     s."EBoundLon" AS eastboundingcoordinate,
     s."WBoundLon" AS westboundingcoordinate,
     s."AltitudeMin" AS altitudeminimum,
     s."AltitudeMax" AS altitudemaximum,
-    s.unit AS altitudeunits
+    s."AltitudeUnit" AS altitudeunits
    FROM (lter_metabase."DataSetSites" d
      LEFT JOIN lter_metabase."ListSites" s ON (((d."SiteCode")::text = (s."SiteCode")::text)))
   ORDER BY d."DataSetID", d."GeoCoverageSortOrder", d."SiteCode";
@@ -1502,7 +1530,7 @@ COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abst
 -- Data for Name: DataSetAttributeEnumeration; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", code, definition) FROM stdin;
+COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", "Code", "Definition") FROM stdin;
 99013	1	site_code	ABUR	Arroyo Burro
 99013	1	site_code	AHND	Arroyo Hondo
 99013	1	site_code	AQUE	Arroyo Quemado
@@ -1545,7 +1573,7 @@ COPY lter_metabase."DataSetAttributeMissingCodes" ("DataSetID", "EntitySortOrder
 -- Data for Name: DataSetAttributes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetAttributes" ("DataSetID", "EntitySortOrder", "ColumnPosition", "ColumnName", "AttributeID", "AttributeLabel", "Description", "StorageType", "MeasurementScaleDomainID", "FormatString", "PrecisionDateTime", "TextPatternDefinition", "Unit", "PrecisionNumeric", "NumberType", "MissingValueCode", "MissingValueCodeExplanation", "BoundsMinimum", "BoundsMaximum") FROM stdin;
+COPY lter_metabase."DataSetAttributes" ("DataSetID", "EntitySortOrder", "ColumnPosition", "ColumnName", "AttributeID", "AttributeLabel", "Description", "StorageType", "MeasurementScaleDomainID", "DateTimeFormatString", "DateTimePrecision", "TextPatternDefinition", "Unit", "NumericPrecision", "NumberType", "MissingValueCode", "MissingValueCodeExplanation", "BoundsMinimum", "BoundsMaximum") FROM stdin;
 99021	1	2	year	year	Year	Year of collection	string	dateTime	YYYY	1	\N	\N	\N	\N	-99999	no information available	\N	\N
 99054	101	3	date_utc	date_utc	Date UTC	Date of measurement, Universal Time Coordinate	date	dateTime	YYYYMMDD	1	\N	\N	\N	\N	\N	\N	\N	\N
 99013	1	1	date	date	Date	date	date	dateTime	MM/DD/YYYY	1	\N	\N	\N	\N	-99999	value not recorded or not available	1/1/2000	1/1/2100
@@ -1645,7 +1673,7 @@ COPY lter_metabase."DataSetAttributes" ("DataSetID", "EntitySortOrder", "ColumnP
 -- Data for Name: DataSetEntities; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetEntities" ("DataSetID", "EntitySortOrder", "EntityName", "EntityType", "EntityDescription", "EntityRecords", "FileType", "Urlhead", "Subpath", "FileName", "DataAnomalies") FROM stdin;
+COPY lter_metabase."DataSetEntities" ("DataSetID", "EntitySortOrder", "EntityName", "EntityType", "EntityDescription", "EntityRecords", "FileType", "Urlhead", "Subpath", "FileName", "AdditionalInfo") FROM stdin;
 99054	102	UCSB kelp timeseries video	otherEntity	Movie: time series of kelp canopy distribution near UC Santa Barbara, 1984 - 2009	\N	mov_A	http://sbc.lternet.edu/external/Reef/Data/	kelp_biomass_landsat/	ucsb_kelp_ts.mov	\N
 99054	101	Kelp biomass, Landsat	dataTable	Kelp Biomass from Landsat	44930474	csv_A	http://sbc.lternet.edu/external/Reef/Data/	kelp_biomass_landsat/	kelp_biomass_landsat.zip	<para>The text table is 1.6 gb, and has been compressed to 365 mb for download.</para>
 99013	1	bottom_temp_all_years_20120626.csv	dataTable	continuous temperature at permanent reef sites	10	csv_D	http://sbc.lternet.edu/external/Reef/Data/Bottom_Temperature/	\N	bottom_temp_all_years_20120626.csv	\N
@@ -3013,7 +3041,7 @@ COPY lter_metabase."ListMissingCodes" ("MissingValueCodeID", "MissingValueCode",
 -- Data for Name: ListPeople; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ListPeople" ("NameID", "GivenName", "MiddleName", "SurName", "Organization", "Address1", "Address2", "Address3", "City", "State", "Country", "ZipCode", "Email", "WebPage", "Phone1", dbupdatetime) FROM stdin;
+COPY lter_metabase."ListPeople" ("NameID", "GivenName", "MiddleName", "SurName", "Organization", "Address1", "Address2", "Address3", "City", "State", "Country", "ZipCode", "Email", "WebPage", "Phone", dbupdatetime) FROM stdin;
 dreed	Daniel	C	Reed	\N	Marine Science Institute	University of California	\N	Santa Barbara	CA	US	93106-6150	dan.reed@lifesci.ucsb.edu	http://sbc.lternet.edu/people/danreed/	805-893-8363	2019-06-25 15:33:47.27755
 sharrer	Shannon	\N	Harrer	\N	Marine Science Institute	University of California	\N	Santa Barbara	CA	US	93106-6150	harrer@msi.ucsb.edu	\N	805-893-7295	2019-06-25 15:33:47.27755
 kcavanaugh	Kyle	C	Cavanaugh	\N	Department of Geography	University of California	\N	Los Angeles	CA	US	90095	kcavanaugh@geog.ucla.edu	\N	\N	2019-06-25 15:33:47.27755
@@ -3154,7 +3182,7 @@ COPY lter_metabase."ListProtocols" ("protocolID", author, title, url) FROM stdin
 -- Data for Name: ListSites; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ListSites" ("SiteCode", "SiteType", "SiteName", "SiteLocation", "SiteDesc", "Ownership", "ShapeType", "CenterLon", "CenterLat", "WBoundLon", "EBoundLon", "SBoundLat", "NBoundLat", "AltitudeMin", "AltitudeMax", unit) FROM stdin;
+COPY lter_metabase."ListSites" ("SiteCode", "SiteType", "SiteName", "SiteLocation", "SiteDescription", "Ownership", "ShapeType", "CenterLon", "CenterLat", "WBoundLon", "EBoundLon", "SBoundLat", "NBoundLat", "AltitudeMin", "AltitudeMax", "AltitudeUnit") FROM stdin;
 046161	other	NEWHALL 5 NW	California, USA	NEWHALL 5 NW	National Weather Service - COOP	point	-118.599999999999994	34.3999999999999986	-118.599999999999994	-118.599999999999994	34.3999999999999986	34.3999999999999986	538	538	meter
 046162	other	NEWHALL S FC32CE	California, USA	NEWHALL S FC32CE	National Weather Service - COOP	point	-118.533332999999999	34.3833330000000004	-118.533332999999999	-118.533332999999999	34.3833330000000004	34.3833330000000004	378.899999999999977	378.899999999999977	meter
 046399	other	OJAI	California, USA	OJAI	National Weather Service - COOP	point	-119.25	34.4666670000000011	-119.25	-119.25	34.4666670000000011	34.4666670000000011	216.400000000000006	216.400000000000006	meter
@@ -4838,7 +4866,7 @@ ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
-    ADD CONSTRAINT pk_emlattributecodedefinition_pk PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", code);
+    ADD CONSTRAINT pk_emlattributecodedefinition_pk PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "Code");
 
 
 --
@@ -5215,7 +5243,7 @@ ALTER TABLE ONLY lter_metabase."ListPeopleID"
 --
 
 ALTER TABLE ONLY lter_metabase."ListSites"
-    ADD CONSTRAINT "FK_SiteRegister_unit" FOREIGN KEY (unit) REFERENCES lter_metabase."EMLUnitDictionary"(id) ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_SiteRegister_unit" FOREIGN KEY ("AltitudeUnit") REFERENCES lter_metabase."EMLUnitDictionary"(id) ON UPDATE CASCADE;
 
 
 --
