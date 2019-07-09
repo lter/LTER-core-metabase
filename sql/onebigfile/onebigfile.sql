@@ -285,7 +285,7 @@ COMMENT ON COLUMN lter_metabase."DataSetSites"."EntitySortOrder" IS 'convention:
 CREATE TABLE lter_metabase."DataSetTaxa" (
     "DataSetID" integer NOT NULL,
     "TaxonID" character varying(50) NOT NULL,
-    "TaxonomicAuthority" character varying(50) NOT NULL
+    "TaxonomicProviderID" character varying(50) NOT NULL
 );
 
 
@@ -572,7 +572,7 @@ ALTER TABLE lter_metabase."ListSites" OWNER TO %db_owner%;
 
 CREATE TABLE lter_metabase."ListTaxa" (
     "TaxonID" character varying(50) NOT NULL,
-    "TaxonomicAuthority" character varying(50) NOT NULL,
+    "TaxonomicProviderID" character varying(50) NOT NULL,
     "TaxonRankName" character varying(50),
     "TaxonRankValue" character varying(200),
     "CommonName" character varying(200),
@@ -581,6 +581,19 @@ CREATE TABLE lter_metabase."ListTaxa" (
 
 
 ALTER TABLE lter_metabase."ListTaxa" OWNER TO %db_owner%;
+
+--
+-- Name: ListTaxonomicProviders; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."ListTaxonomicProviders" (
+    "ProviderID" character varying(20) NOT NULL,
+    "ProviderName" character varying(100) NOT NULL,
+    "ProviderURL" character varying(250)
+);
+
+
+ALTER TABLE lter_metabase."ListTaxonomicProviders" OWNER TO %db_owner%;
 
 --
 -- Name: vw_custom_units; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
@@ -906,12 +919,14 @@ ALTER TABLE mb2eml_r.vw_eml_missingcodes OWNER TO %db_owner%;
 CREATE VIEW mb2eml_r.vw_eml_taxonomy AS
  SELECT d."DataSetID" AS datasetid,
     d."TaxonID" AS taxonid,
-    d."TaxonomicAuthority" AS taxonid_provider,
+    p."ProviderName" AS taxonid_provider,
+    p."ProviderID" AS providerid,
     l."TaxonRankName" AS taxonrankname,
     l."TaxonRankValue" AS taxonrankvalue,
     l."CommonName" AS commonname
-   FROM (lter_metabase."DataSetTaxa" d
-     JOIN lter_metabase."ListTaxa" l ON ((((d."TaxonID")::text = (l."TaxonID")::text) AND ((d."TaxonomicAuthority")::text = (l."TaxonomicAuthority")::text))))
+   FROM ((lter_metabase."DataSetTaxa" d
+     JOIN lter_metabase."ListTaxa" l ON ((((d."TaxonID")::text = (l."TaxonID")::text) AND ((d."TaxonomicProviderID")::text = (l."TaxonomicProviderID")::text))))
+     JOIN lter_metabase."ListTaxonomicProviders" p ON (((d."TaxonomicProviderID")::text = (p."ProviderID")::text)))
   ORDER BY d."DataSetID";
 
 
@@ -1853,7 +1868,7 @@ COPY lter_metabase."DataSetSites" ("DataSetID", "EntitySortOrder", "SiteCode", "
 -- Data for Name: DataSetTaxa; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetTaxa" ("DataSetID", "TaxonID", "TaxonomicAuthority") FROM stdin;
+COPY lter_metabase."DataSetTaxa" ("DataSetID", "TaxonID", "TaxonomicProviderID") FROM stdin;
 \.
 
 
@@ -3213,6 +3228,7 @@ AHND_to_AQUE_1km_box	reef	Arroyo Hondo-to-Arroyo Quemado lobster trap survey ext
 AHON_reef	reef	Arroyo Hondo Reef	California, USA	Arroyo Hondo Reef is located on the Santa Barbara Channel near the east end of Gaviota State Park, CA. Depth ranges from -4.3m to -6.6 meters. 	\N	polygon	-120.144401999999999	34.4724007000000015	-120.144401999999999	-120.144401999999999	34.4724007000000015	34.4724007000000015	\N	\N	\N
 ABUR_ws	land	Arroyo Burro watershed	California, USA	Arroyo Burro watershed	\N	polygon	\N	\N	\N	\N	\N	\N	\N	\N	\N
 ALC	other	Anacapa Island Landing Cove Pier (ALC)	California, USA	North shore of Anacapa Island, Santa Barbara Channel Islands, California.	\N	point	-119.362099999999998	34.0163999999999973	-119.362099999999998	-119.362099999999998	34.0163999999999973	34.0163999999999973	\N	\N	\N
+B0065	other	CDIP Modeled output site B0065	California, USA	CDIP Modeled output site: B0065. Nearest to SBC LTER site(s): CARP1 CARP10 CARP2 CARP3 CARP4 CARP6 CARP7 CARP9	\N	point	-119.543099999999995	34.3900999999999968	-119.543099999999995	-119.543099999999995	34.3900999999999968	34.3900999999999968	\N	\N	\N
 ALE	other	ALE	California, USA	Alegria (ALE) is located offshore from the community of Hollister Ranch, between Gaviota and Pt. Conception. Depth: 15 meters.	\N	point	-120.28998	34.4608500000000006	-120.28998	-120.28998	34.4608500000000006	34.4608500000000006	-16.5	0	meter
 ALE_nearsh	nearshore	Alegria nearshore ocean	California, USA	Nearshore ocean area near the community of Hollister Ranch, between Gaviota and Pt. Conception. Depth: 15 meters.	\N	polygon	\N	\N	\N	\N	\N	\N	\N	\N	\N
 anacapa	other	Anacapa Island CA	California, USA	Anacapa Island CA	\N	point	-119.362097000000006	34.0168099999999995	-119.362097000000006	-119.362097000000006	34.0168099999999995	34.0168099999999995	\N	\N	\N
@@ -3239,7 +3255,6 @@ AQUE_beach	beach	Arroyo Quemado Beach	California, USA	Arroyo Quemado Beach	\N	po
 AQUE_ws	land	Arroyo Quemado watershed	California, USA	Arroyo Quemado watershed	\N	polygon	\N	\N	\N	\N	\N	\N	\N	\N	\N
 AT07	other	Atascadero Creek at Puente Street	California, USA	Atascadero Creek, Atascadero at Puente	\N	point	-119.784139999999994	34.4322599999999994	-119.784139999999994	-119.784139999999994	34.4322599999999994	34.4322599999999994	\N	\N	\N
 B0064	other	CDIP Modeled output site B0064	California, USA	CDIP Modeled output site: B0064. Nearest to SBC LTER site(s): CARP5 CARP8	\N	point	-119.538300000000007	34.3894999999999982	-119.538300000000007	-119.538300000000007	34.3894999999999982	34.3894999999999982	\N	\N	\N
-B0065	other	CDIP Modeled output site B0065	California, USA	CDIP Modeled output site: B0065. Nearest to SBC LTER site(s): CARP1 CARP10 CARP2 CARP3 CARP4 CARP6 CARP7 CARP9	\N	point	-119.543099999999995	34.3900999999999968	-119.543099999999995	-119.543099999999995	34.3900999999999968	34.3900999999999968	\N	\N	\N
 B0263	other	CDIP Modeled output site B0263	California, USA	CDIP Modeled output site: B0263. Nearest to SBC LTER site(s): MOHK2 MOHK3 MOHK4	\N	point	-119.728999999999999	34.3935000000000031	-119.728999999999999	-119.728999999999999	34.3935000000000031	34.3935000000000031	\N	\N	\N
 B0264	other	CDIP Modeled output site B0264	California, USA	CDIP Modeled output site: B0264. Nearest to SBC LTER site(s): MOHK1	\N	point	-119.7303	34.3939999999999984	-119.7303	-119.7303	34.3939999999999984	34.3939999999999984	\N	\N	\N
 B0278	other	CDIP Modeled output site B0278	California, USA	CDIP Modeled output site: B0278. Nearest to SBC LTER site(s): ABUR1	\N	point	-119.744100000000003	34.3995999999999995	-119.744100000000003	-119.744100000000003	34.3995999999999995	34.3995999999999995	\N	\N	\N
@@ -3272,6 +3287,7 @@ cape_evans_mcmurdo	other	Cape Evans, McMurdo Sound, Antarctica	McMurdo Sound, An
 frys_3	other	Fry's 3	California, USA	Fry's 3 is north of the Fry's harbor anchorage on the north shore of Santa Cruz Island, CA.	\N	point	-119.756299999999996	34.0577666699999995	-119.756299999999996	-119.756299999999996	34.0577666699999995	34.0577666699999995	-30	-30	Foot_US
 CAR	other	Carpinteria Reef mooring 	California, USA	Carpinteria Reef (CAR) is ofshore of the rock groin near the salt marsh, west of the campground. Depth is estimated at 26 ft.	\N	point	-119.539900000000003	34.3901499999999984	-119.539900000000003	-119.539900000000003	34.3901499999999984	34.3901499999999984	-8.5	0	meter
 CARP	other	CARP	California, USA	Carpinteria Reef is located on the Santa Barbara Channel offshore of the Carpinteria Salt Marsh. Depth range is from -2.2 to -8.8 meters	\N	point	-119.541693300000006	34.3916319000000001	-119.541693300000006	-119.541693300000006	34.3916319000000001	34.3916319000000001	\N	\N	\N
+geocov_adcp150.ds1104.e4	other	geocov_adcp150.ds1104.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.634500000000003	35.4046999999999983	-121.991799999999998	-119.277199999999993	34.0247000000000028	36.7847000000000008	-495	-23	meter
 CARP1	other	CARP1	California, USA	Carpinteria Transect 1: a line starting at the lat-lon coordinates with a length of 40 (meter), and width of 2 (meter) along a heading of 70 (degree). Transect runs parallel along the significant NE-running reef ridge and has significant relief (up to 3 m) on the northern side. Bedrock substrate with some slight relief (0-1 m). Depth is approximately 8-12 feet.	\N	point	-119.543800000000005	34.3924170000000018	-119.543800000000005	-119.543800000000005	34.3924170000000018	34.3924170000000018	-3.04999999999999982	-3.04999999999999982	meter
 CARP10	other	CARP10	California, USA	Carpinteria Transect 10: a line starting at the lat-lon coordinates with a length of 40 (meter), and width of 2 (meter) along a heading of 90 (degree). Bedrock substrate with moderate relief (0-1.5 m). Depth approximately 24â. Transect heading is ~ 90 degrees. Kelp continually cleared in 2m band on all sides of the transect. Depth is approximately 24 feet.	\N	point	-119.541183000000004	34.3912169999999975	-119.541183000000004	-119.541183000000004	34.3912169999999975	34.3912169999999975	-7.40000000000000036	-7.40000000000000036	meter
 CARP_1km_box	reef	Carpinteria Reef lobster trap survey extent	California, USA	Approximate maximum bounding coordinates for lobster trap survey. Survey area covers a swath parallel to shore, from shoreline to the 15m isobath (approx 1km offshore). 	\N	point	-119.539169999999999	34.4697299999999984	-119.548330000000007	-119.530000000000001	34.3851000000000013	34.4050000000000011	\N	\N	\N
@@ -3331,7 +3347,7 @@ GB201	other	Gobernador at Veddar's Ranch	California, USA	Gobernador at Veddar's 
 geocov_adcp150.ds1101.e4	other	geocov_adcp150.ds1101.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.631050000000002	35.3884499999999989	-121.992900000000006	-119.269199999999998	34.0234000000000023	36.7535000000000025	-495	-23	meter
 geocov_adcp150.ds1102.e4	other	geocov_adcp150.ds1102.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-119.922449999999998	34.2444500000000005	-120.563500000000005	-119.281400000000005	34.0240000000000009	34.4649000000000001	-495	-23	meter
 geocov_adcp150.ds1103.e4	other	geocov_adcp150.ds1103.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.634600000000006	35.4169499999999999	-121.987799999999993	-119.281400000000005	34.0253000000000014	36.8085999999999984	-495	-23	meter
-geocov_adcp150.ds1104.e4	other	geocov_adcp150.ds1104.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.634500000000003	35.4046999999999983	-121.991799999999998	-119.277199999999993	34.0247000000000028	36.7847000000000008	-495	-23	meter
+ATMY	other	ATMY	California, USA	Atascadero Creek, Atascadero	\N	point	-119.810784999999996	34.4247190000000032	-119.810784999999996	-119.810784999999996	34.4247190000000032	34.4247190000000032	\N	\N	\N
 geocov_adcp150.ds1105.e4	other	geocov_adcp150.ds1105.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.83005	35.4080500000000029	-122.377499999999998	-119.282600000000002	34.0223000000000013	36.7937999999999974	-495	-23	meter
 geocov_adcp150.ds1106.e4	other	geocov_adcp150.ds1106.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.661850000000001	35.3896000000000015	-122.043999999999997	-119.279700000000005	34.0234000000000023	36.7558000000000007	-495	-23	meter
 geocov_adcp150.ds1107.e4	other	geocov_adcp150.ds1107.e4	California, USA	Data table bounding box coordinates	\N	rectangle	-120.636600000000001	35.4142999999999972	-121.992500000000007	-119.280699999999996	34.0255999999999972	36.8029999999999973	-495	-23	meter
@@ -3432,6 +3448,7 @@ geocov_udas.ds1104.e2	other	geocov_udas.ds1104.e2	California, USA	Data table bou
 geocov_udas.ds1105.e2	other	geocov_udas.ds1105.e2	California, USA	Data table bounding box coordinates	\N	rectangle	-120.635450000000006	35.3604500000000002	-121.987399999999994	-119.283500000000004	34.0223000000000013	36.698599999999999	-3	-3	meter
 geocov_udas.ds1106.e2	other	geocov_udas.ds1106.e2	California, USA	Data table bounding box coordinates	\N	rectangle	-120.657650000000004	35.3832499999999968	-122.039400000000001	-119.275899999999993	34.0217000000000027	36.7447999999999979	-3	-3	meter
 geocov_udas.ds1107.e2	other	geocov_udas.ds1107.e2	California, USA	Data table bounding box coordinates	\N	rectangle	-120.633650000000003	35.4116	-121.988699999999994	-119.278599999999997	34.0251000000000019	36.798099999999998	-3	-3	meter
+GOLB_reef1	reef	GOLB	California, USA	Goleta Bay reef	\N	point	-119.824167000000003	34.4087829999999997	-119.824167000000003	-119.824167000000003	34.4087829999999997	34.4087829999999997	\N	\N	\N
 geocov_udas.ds1108.e2	other	geocov_udas.ds1108.e2	California, USA	Data table bounding box coordinates	\N	rectangle	-120.559899999999999	35.0969499999999996	-121.839799999999997	-119.280000000000001	34.0197999999999965	36.1741000000000028	-3	-3	meter
 geocov_udas.ds1109.e2	other	geocov_udas.ds1109.e2	California, USA	Data table bounding box coordinates	\N	rectangle	-119.909649999999999	34.2436000000000007	-120.564700000000002	-119.254599999999996	34.0236999999999981	34.4635000000000034	-3	-3	meter
 geocov_udas.ds1110.e2	other	geocov_udas.ds1110.e2	California, USA	Data table bounding box coordinates	\N	rectangle	-119.930350000000004	34.2430499999999967	-120.572699999999998	-119.287999999999997	34.0223000000000013	34.4637999999999991	-3	-3	meter
@@ -3552,6 +3569,7 @@ pb3	other	Santa Barbara Channel offshore station pb3	California, USA	Santa Barba
 pb4	other	Santa Barbara Channel offshore station pb4	California, USA	Santa Barbara Channel offshore station pb4	\N	point	-119.906329999999997	34.2501699999999971	-119.906329999999997	-119.906329999999997	34.2501699999999971	34.2501699999999971	-522	-522	meter
 pb5	other	Santa Barbara Channel offshore station pb5	California, USA	Santa Barbara Channel offshore station pb5	\N	point	-119.928330000000003	34.2034999999999982	-119.928330000000003	-119.928330000000003	34.2034999999999982	34.2034999999999982	-538	-538	meter
 pb6	other	Santa Barbara Channel offshore station pb6	California, USA	Santa Barbara Channel offshore station pb6	\N	point	-119.95017	34.1568299999999994	-119.95017	-119.95017	34.1568299999999994	34.1568299999999994	-440	-440	meter
+GOSL	reef	GOSL	California, USA	Goleta Slough	\N	point	-119.827594000000005	34.4184750000000008	-119.827594000000005	-119.827594000000005	34.4184750000000008	34.4184750000000008	\N	\N	\N
 pb7	other	Santa Barbara Channel offshore station pb7	California, USA	Santa Barbara Channel offshore station pb7	\N	point	-120.033330000000007	34.0833299999999966	-120.033330000000007	-120.033330000000007	34.0833299999999966	34.0833299999999966	-83	-83	meter
 PRZ	other	Prisoner's Harbor Pier, Santa Cruz Island (PRZ)	California, USA	North shore of Santa Cruz Island, Santa Barbara Channel Islands, California.	\N	point	-119.684299999999993	34.0204000000000022	-119.684299999999993	-119.684299999999993	34.0204000000000022	34.0204000000000022	\N	\N	\N
 PUR	nearshore	Purisima Point	California	Purisima (PUR) is located pproximately 3.5 km SSE of Purisima Point, California, USA, in rocky habitat 15 meters below Mean Sea Level (MSL).	\N	point	-120.627600000000001	34.7260199999999983	-120.627600000000001	-120.627600000000001	34.7260199999999983	34.7260199999999983	-15	0	meter
@@ -3631,9 +3649,6 @@ ABURE	land	ABURE	California, USA	Arroyo Burro Estuary	\N	point	-119.742856000000
 ABUR_rapid	land	ABUR	California, USA	Arroyo Burro	\N	point	-119.743483299999994	34.3965166999999994	-119.743483299999994	-119.743483299999994	34.3965166999999994	34.3965166999999994	\N	\N	\N
 AHON_reef1	reef	AHND	California, USA	Arroyo Hondo Reef	\N	point	-120.140917000000002	34.4791669999999968	-120.140917000000002	-120.140917000000002	34.4791669999999968	34.4791669999999968	\N	\N	\N
 AQUE_reef1	reef	AQUE	California, USA	Arroyo Quemado Reef.	\N	polygon	-120.131666999999993	34.469183000000001	-120.131666999999993	-120.131666999999993	34.469183000000001	34.469183000000001	\N	\N	\N
-ATMY	other	ATMY	California, USA	Atascadero Creek, Atascadero	\N	point	-119.810784999999996	34.4247190000000032	-119.810784999999996	-119.810784999999996	34.4247190000000032	34.4247190000000032	\N	\N	\N
-GOLB_reef1	reef	GOLB	California, USA	Goleta Bay reef	\N	point	-119.824167000000003	34.4087829999999997	-119.824167000000003	-119.824167000000003	34.4087829999999997	34.4087829999999997	\N	\N	\N
-GOSL	reef	GOSL	California, USA	Goleta Slough	\N	point	-119.827594000000005	34.4184750000000008	-119.827594000000005	-119.827594000000005	34.4184750000000008	34.4184750000000008	\N	\N	\N
 IVEE_reef1	reef	IVEE	California, USA	Isla Vista (IV) Reef	\N	point	-119.865233000000003	34.4036329999999992	-119.865233000000003	-119.865233000000003	34.4036329999999992	34.4036329999999992	\N	\N	\N
 MOHK_rapid	other	MOHK	California, USA	Mohawk	\N	point	-119.728083299999994	34.387516699999999	-119.728083299999994	-119.728083299999994	34.387516699999999	34.387516699999999	\N	\N	\N
 REFU_rapid	other	REFU	California, USA	Refugio	\N	point	-120.069999999999993	34.4572000000000003	-120.069999999999993	-120.069999999999993	34.4572000000000003	34.4572000000000003	\N	\N	\N
@@ -3690,7 +3705,27 @@ SRW	reef	SRW	California, USA	SHIP ROCK WEST	\N	point	-118.491749999999996	33.463
 -- Data for Name: ListTaxa; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ListTaxa" ("TaxonID", "TaxonomicAuthority", "TaxonRankName", "TaxonRankValue", "CommonName", "LocalID") FROM stdin;
+COPY lter_metabase."ListTaxa" ("TaxonID", "TaxonomicProviderID", "TaxonRankName", "TaxonRankValue", "CommonName", "LocalID") FROM stdin;
+\.
+
+
+--
+-- Data for Name: ListTaxonomicProviders; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."ListTaxonomicProviders" ("ProviderID", "ProviderName", "ProviderURL") FROM stdin;
+itis	Integrated Taxonomic Information System	https://itis.gov/
+ncbi	National Center for Biotechnology Information	https://www.ncbi.nlm.nih.gov/taxonomy
+eol	Encyclopedia of Life	https://eol.org/
+col	Catalogue of Life	https://www.catalogueoflife.org/
+tropicos	Tropicos	https://www.tropicos.org/
+gbif	Global Biodiversity Information Facility	https://www.gbif.org/en/
+nbn	National Biodiversity Network	https://nbn.org.uk/
+worms	World Register of Marine Species	http://www.marinespecies.org/
+natserv	NatureServe	http://explorer.natureserve.org/index.htm
+bold	Barcode of Life Data System	http://v3.boldsystems.org/
+wiki	Wikispecies	https://species.wikimedia.org/wiki/Main_Page
+pow	Kew's Plants of the World	http://www.plantsoftheworldonline.org/
 \.
 
 
@@ -4698,7 +4733,7 @@ ALTER TABLE ONLY lter_metabase."DataSetSites"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetTaxa"
-    ADD CONSTRAINT "PK_DataSetTaxa" PRIMARY KEY ("DataSetID", "TaxonID", "TaxonomicAuthority");
+    ADD CONSTRAINT "PK_DataSetTaxa" PRIMARY KEY ("DataSetID", "TaxonID", "TaxonomicProviderID");
 
 
 --
@@ -4782,6 +4817,14 @@ ALTER TABLE ONLY lter_metabase."ListKeywords"
 
 
 --
+-- Name: ListTaxonomicProviders PK_ListTaxonomicAuthorities; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListTaxonomicProviders"
+    ADD CONSTRAINT "PK_ListTaxonomicAuthorities" PRIMARY KEY ("ProviderID");
+
+
+--
 -- Name: DataSetMethods PK_MethodID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4826,7 +4869,7 @@ ALTER TABLE ONLY lter_metabase."ListSites"
 --
 
 ALTER TABLE ONLY lter_metabase."ListTaxa"
-    ADD CONSTRAINT "PK_TaxaList" PRIMARY KEY ("TaxonID", "TaxonomicAuthority");
+    ADD CONSTRAINT "PK_TaxaList" PRIMARY KEY ("TaxonID", "TaxonomicProviderID");
 
 
 --
@@ -5155,7 +5198,7 @@ ALTER TABLE ONLY lter_metabase."DataSetTaxa"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetTaxa"
-    ADD CONSTRAINT "FK_DataSetTaxa_TaxonID" FOREIGN KEY ("TaxonID", "TaxonomicAuthority") REFERENCES lter_metabase."ListTaxa"("TaxonID", "TaxonomicAuthority") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetTaxa_TaxonID" FOREIGN KEY ("TaxonID", "TaxonomicProviderID") REFERENCES lter_metabase."ListTaxa"("TaxonID", "TaxonomicProviderID") ON UPDATE CASCADE;
 
 
 --
@@ -5252,6 +5295,14 @@ ALTER TABLE ONLY lter_metabase."ListSites"
 
 ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
     ADD CONSTRAINT "MeasurementScaleDomains_FK_MeasurementScale" FOREIGN KEY ("MeasurementScale") REFERENCES lter_metabase."EMLMeasurementScales"("measurementScale") ON UPDATE CASCADE;
+
+
+--
+-- Name: ListTaxa fk_listtaxa_authorityid; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListTaxa"
+    ADD CONSTRAINT fk_listtaxa_authorityid FOREIGN KEY ("TaxonomicProviderID") REFERENCES lter_metabase."ListTaxonomicProviders"("ProviderID") ON UPDATE CASCADE;
 
 
 --
@@ -5590,6 +5641,14 @@ GRANT SELECT ON TABLE lter_metabase."ListTaxa" TO read_only_user;
 
 
 --
+-- Name: TABLE "ListTaxonomicProviders"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListTaxonomicProviders" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListTaxonomicProviders" TO read_only_user;
+
+
+--
 -- Name: TABLE vw_custom_units; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -5697,7 +5756,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_missingcodes TO read_only_user;
 -- Name: TABLE vw_eml_taxonomy; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_taxonomy TO read_write_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_taxonomy TO read_write_user;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_taxonomy TO read_only_user;
 
 
