@@ -8,6 +8,7 @@ ALTER TABLE lter_metabase."DataSet" DROP COLUMN "Georeferences";
 ALTER TABLE lter_metabase."DataSet" DROP COLUMN "ProjectRelease";
 ALTER TABLE lter_metabase."DataSet" DROP COLUMN "PublicRelease";
 ALTER TABLE lter_metabase."DataSet" DROP COLUMN "geographicDescription";
+ALTER TABLE lter_metabase."DataSet" DROP COLUMN "Status";
 
 ALTER TABLE lter_metabase."DataSet" ALTER COLUMN "PubDate" TYPE date USING "PubDate"::date;
 
