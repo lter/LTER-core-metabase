@@ -32,6 +32,15 @@ CREATE TABLE lter_metabase."ListMethodSoftware"
 --In EML, the instrumentation element is just plain-string type, not even text type. Not like software. 
 -- methodStep/instrumentation is a plain string type (not complex text type).
   
+ALTER TABLE lter_metabase."ListMethodSoftware" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."ListMethodSoftware" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."ListMethodSoftware" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodSoftware" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMethodSoftware" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."ListMethodSoftware" TO %db_owner%;
+
+
 CREATE TABLE lter_metabase."ListMethodInstruments"
 (
   "InstrumentID" integer NOT NULL, 
@@ -39,6 +48,15 @@ CREATE TABLE lter_metabase."ListMethodInstruments"
   CONSTRAINT "PK_InstrumentID" PRIMARY KEY ("InstrumentID"),
   CONSTRAINT "UQ_InstrumentDescription" UNIQUE ("Description") -- because an integer PK is not meaningful.
   );
+
+ALTER TABLE lter_metabase."ListMethodInstruments" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."ListMethodInstruments" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."ListMethodInstruments" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodInstruments" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMethodInstruments" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."ListMethodInstruments" TO %db_owner%;
+
   
 CREATE TABLE lter_metabase."ListMethodProtocols" -- nearly identical to ListProtocols 
 (
@@ -52,6 +70,15 @@ CREATE TABLE lter_metabase."ListMethodProtocols" -- nearly identical to ListProt
       ON UPDATE CASCADE ON DELETE NO ACTION,
   CONSTRAINT "UQ_Protocol_Title" UNIQUE ("Title") -- because an integer PK is not meaningful
 );
+
+ALTER TABLE lter_metabase."ListMethodProtocols" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."ListMethodProtocols" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."ListMethodProtocols" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodProtocols" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMethodProtocols" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."ListMethodProtocols" TO %db_owner%;
+
 
 -- The main table for Methods
 
@@ -70,6 +97,14 @@ CREATE TABLE lter_metabase."DataSetMethodSteps" -- nearly identical to ListProto
     CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ("Description" IS NOT NULL OR "Method_xml" IS NOT NULL)
 );
 
+ALTER TABLE lter_metabase."DataSetMethodSteps" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."DataSetMethodSteps" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."DataSetMethodSteps" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethodSteps" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."DataSetMethodSteps" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."DataSetMethodSteps" TO %db_owner%;
+
 -- The three Method* xref tables are all three of the same form.
 
 CREATE TABLE lter_metabase."MethodProtocols"
@@ -86,6 +121,14 @@ CREATE TABLE lter_metabase."MethodProtocols"
   ON UPDATE CASCADE ON DELETE NO ACTION
   );
   
+ALTER TABLE lter_metabase."MethodProtocols" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."MethodProtocols" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."MethodProtocols" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodProtocols" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."MethodProtocols" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."MethodProtocols" TO %db_owner%;
+
   CREATE TABLE lter_metabase."MethodSoftware"
 (
   "DataSetID" integer NOT NULL,
@@ -99,7 +142,15 @@ CREATE TABLE lter_metabase."MethodProtocols"
   CONSTRAINT "FK_DataSetSoftware_SoftwareID" FOREIGN KEY ("SoftwareID") REFERENCES lter_metabase."ListMethodSoftware" ("SoftwareID")
   ON UPDATE CASCADE ON DELETE NO ACTION
   );
-  
+
+ALTER TABLE lter_metabase."MethodSoftware" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."MethodSoftware" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."MethodSoftware" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodSoftware" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."MethodSoftware" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."MethodSoftware" TO %db_owner%;
+
   CREATE TABLE lter_metabase."MethodInstruments"
 (
   "DataSetID" integer NOT NULL,
@@ -114,6 +165,13 @@ CREATE TABLE lter_metabase."MethodProtocols"
   ON UPDATE CASCADE ON DELETE NO ACTION
   );
 
+ALTER TABLE lter_metabase."MethodInstruments" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE lter_metabase."MethodInstruments" FROM PUBLIC;
+REVOKE ALL ON TABLE lter_metabase."MethodInstruments" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodInstruments" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."MethodInstruments" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."MethodSoftware" TO %db_owner%;
 
 
 
