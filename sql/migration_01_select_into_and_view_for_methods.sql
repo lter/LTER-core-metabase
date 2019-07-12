@@ -53,5 +53,13 @@ CREATE VIEW mb2eml_r.vw_eml_method_document AS
     m."MethodStepSet" as methodstep_position,
     --m."DescriptionType" as content_type,
     m."Description" as "methodDocument"
-    FROM lter_metabase."DataSetMethodSteps" m
+    FROM lter_metabase."DataSetMethodSteps" m;
      -- to do: join to sw, instr, proto
+
+ALTER TABLE mb2eml_r.vw_eml_method_document OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_method_document FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_method_document FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_method_document TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_document TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_method_document TO %db_owner%;
