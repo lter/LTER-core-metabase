@@ -77,16 +77,17 @@ ALTER TABLE pkg_mgmt.maintenance_changehistory
 
 DROP VIEW mb2eml_r.vw_eml_dataset;
 
-CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset AS
-	SELECT d."DataSetID" AS datasetid, 
-	d."Revision" as revision_number,
-	d."Title" AS title, 
-	d."Abstract" AS abstract, 
-	d."ShortName" AS shortname,
-	d."UpdateFrequency" as update_frequency,
-	d."MaintenanceDescription" as maintenance_desc 
-	FROM lter_metabase."DataSet" d 
-	ORDER BY d."DataSetID";
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset
+AS SELECT d."DataSetID" AS datasetid,
+    d."Revision" AS revision_number,
+    d."Title" AS title,
+    d."Abstract" AS abstract,
+    d."ShortName" AS shortname,
+    d."UpdateFrequency" AS update_frequency,
+    d."MaintenanceDescription" AS maintenance_desc,
+    d."PubDate" as pubdate
+   FROM lter_metabase."DataSet" d
+  ORDER BY d."DataSetID";
 
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_changehistory AS
 	SELECT m."DataSetID" AS datasetid, 
