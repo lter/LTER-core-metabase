@@ -22,6 +22,7 @@ COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipRole" IS 'if not c
 
 ALTER TABLE lter_metabase."DataSetSites" ALTER COLUMN "EntitySortOrder" SET DEFAULT 0;
 COMMENT ON COLUMN lter_metabase."DataSetSites"."EntitySortOrder" IS 'convention: if not 0, then specifies the entity the coverage goes under';
+ALTER TABLE lter_metabase."DataSetSites" RENAME COLUMN "SiteCode" TO "SiteID";
 
 ALTER TABLE lter_metabase."DataSetTemporal" ALTER COLUMN "EntitySortOrder" SET DEFAULT 0;
 COMMENT ON COLUMN lter_metabase."DataSetTemporal"."EntitySortOrder" IS 'convention: if not 0, then specifies the entity the coverage goes under';
@@ -30,5 +31,11 @@ ALTER TABLE lter_metabase."ListPeople" RENAME COLUMN "Phone1" TO "Phone";
 
 ALTER TABLE lter_metabase."ListSites" RENAME COLUMN "SiteDesc" TO "SiteDescription";
 ALTER TABLE lter_metabase."ListSites" RENAME COLUMN unit TO "AltitudeUnit";
+ALTER TABLE lter_metabase."ListSites" RENAME COLUMN "SiteCode" TO "SiteID";
 
 ALTER TABLE lter_metabase."ListSites" DROP CONSTRAINT "CK_SiteRegister_SiteType";
+
+ALTER TABLE lter_metabase."ListPeopleID" RENAME COLUMN "Identificationtype" TO "IdentificationSystem";
+
+ALTER TABLE lter_metabase."ListPeopleID" RENAME COLUMN "Identificationlink" TO "IdentificationURL";
+
