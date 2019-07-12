@@ -28,7 +28,7 @@ ALTER SCHEMA lter_metabase OWNER TO %db_owner%;
 -- Name: SCHEMA lter_metabase; Type: COMMENT; Schema: -; Owner: %db_owner%
 --
 
-COMMENT ON SCHEMA lter_metabase IS 'Schema holds portions of metabase, as needed by SBC LTER.';
+COMMENT ON SCHEMA lter_metabase IS 'Contains metadata for dataset EML.';
 
 
 --
@@ -41,6 +41,13 @@ CREATE SCHEMA mb2eml_r;
 ALTER SCHEMA mb2eml_r OWNER TO %db_owner%;
 
 --
+-- Name: SCHEMA mb2eml_r; Type: COMMENT; Schema: -; Owner: %db_owner%
+--
+
+COMMENT ON SCHEMA mb2eml_r IS 'Contains read-only views for exporting to EML via R.';
+
+
+--
 -- Name: pkg_mgmt; Type: SCHEMA; Schema: -; Owner: %db_owner%
 --
 
@@ -48,6 +55,13 @@ CREATE SCHEMA pkg_mgmt;
 
 
 ALTER SCHEMA pkg_mgmt OWNER TO %db_owner%;
+
+--
+-- Name: SCHEMA pkg_mgmt; Type: COMMENT; Schema: -; Owner: %db_owner%
+--
+
+COMMENT ON SCHEMA pkg_mgmt IS 'Contains tables for internal data package inventory and tracking.';
+
 
 --
 -- Name: update_modified_column(); Type: FUNCTION; Schema: pkg_mgmt; Owner: %db_owner%
@@ -79,7 +93,6 @@ CREATE TABLE lter_metabase."DataSet" (
     "Title" character varying(300) NOT NULL,
     "PubDate" date DEFAULT now(),
     "Abstract" character varying(5000) NOT NULL,
-    "Status" character varying(50) DEFAULT 'New Submission'::character varying,
     "ShortName" character varying(200),
     "UpdateFrequency" character varying(50),
     "MaintenanceDescription" character varying(500)
@@ -195,10 +208,17 @@ CREATE TABLE lter_metabase."DataSetEntities" (
 ALTER TABLE lter_metabase."DataSetEntities" OWNER TO %db_owner%;
 
 --
+-- Name: COLUMN "DataSetEntities"."EntityType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."DataSetEntities"."EntityType" IS 'One of "dataTable," "spatialVector," "spatialRaster," or "otherEntity."';
+
+
+--
 -- Name: COLUMN "DataSetEntities"."FileName"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COMMENT ON COLUMN lter_metabase."DataSetEntities"."FileName" IS 'goes into physical/objectName';
+COMMENT ON COLUMN lter_metabase."DataSetEntities"."FileName" IS 'goes into physical/objectName. Also used to look up the entity in file system.';
 
 
 --
@@ -251,10 +271,17 @@ CREATE TABLE lter_metabase."DataSetPersonnel" (
 ALTER TABLE lter_metabase."DataSetPersonnel" OWNER TO %db_owner%;
 
 --
+-- Name: COLUMN "DataSetPersonnel"."AuthorshipOrder"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipOrder" IS 'This is only relevant for "creator" roles.';
+
+
+--
 -- Name: COLUMN "DataSetPersonnel"."AuthorshipRole"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipRole" IS 'if not creator, then will go into associatedParty';
+COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipRole" IS 'Note that if role is not "creator," then the person will go into associatedParty in EML.';
 
 
 --
@@ -264,7 +291,7 @@ COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipRole" IS 'if not c
 CREATE TABLE lter_metabase."DataSetSites" (
     "DataSetID" integer NOT NULL,
     "EntitySortOrder" integer DEFAULT 0 NOT NULL,
-    "SiteCode" character varying(50) NOT NULL,
+    "SiteID" character varying(50) NOT NULL,
     "GeoCoverageSortOrder" integer DEFAULT 1 NOT NULL
 );
 
@@ -517,12 +544,26 @@ ALTER TABLE lter_metabase."ListPeople" OWNER TO %db_owner%;
 CREATE TABLE lter_metabase."ListPeopleID" (
     "NameID" character varying(20) NOT NULL,
     "IdentificationID" smallint NOT NULL,
-    "Identificationtype" character varying(30),
-    "Identificationlink" character varying(200)
+    "IdentificationSystem" character varying(30),
+    "IdentificationURL" character varying(200)
 );
 
 
 ALTER TABLE lter_metabase."ListPeopleID" OWNER TO %db_owner%;
+
+--
+-- Name: COLUMN "ListPeopleID"."IdentificationSystem"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListPeopleID"."IdentificationSystem" IS 'ID System, e.g. ORCID or LTER LDAP.';
+
+
+--
+-- Name: COLUMN "ListPeopleID"."IdentificationURL"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListPeopleID"."IdentificationURL" IS 'Full URLs under the ID system. E.g: "https://orcid.org/0000-0002-1693-8322"';
+
 
 --
 -- Name: ListProtocols; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -543,7 +584,7 @@ ALTER TABLE lter_metabase."ListProtocols" OWNER TO %db_owner%;
 --
 
 CREATE TABLE lter_metabase."ListSites" (
-    "SiteCode" character varying(50) NOT NULL,
+    "SiteID" character varying(50) NOT NULL,
     "SiteType" character varying(10) NOT NULL,
     "SiteName" character varying(100) NOT NULL,
     "SiteLocation" character varying(100) NOT NULL,
@@ -559,12 +600,46 @@ CREATE TABLE lter_metabase."ListSites" (
     "AltitudeMin" double precision,
     "AltitudeMax" double precision,
     "AltitudeUnit" character varying(10),
-    CONSTRAINT "CK_SiteRegister_ShapeType" CHECK ((("ShapeType")::text = ANY (ARRAY[('point'::character varying)::text, ('rectangle'::character varying)::text, ('polygon'::character varying)::text, ('polyline'::character varying)::text, ('vector'::character varying)::text]))),
-    CONSTRAINT "CK_SiteRegister_SiteType" CHECK ((("SiteType")::text = ANY (ARRAY[('beach'::character varying)::text, ('intertidal'::character varying)::text, ('land'::character varying)::text, ('nearshore'::character varying)::text, ('offshore'::character varying)::text, ('other'::character varying)::text, ('pier'::character varying)::text, ('reef'::character varying)::text])))
+    CONSTRAINT "CK_SiteRegister_ShapeType" CHECK ((("ShapeType")::text = ANY (ARRAY[('point'::character varying)::text, ('rectangle'::character varying)::text, ('polygon'::character varying)::text, ('polyline'::character varying)::text, ('vector'::character varying)::text])))
 );
 
 
 ALTER TABLE lter_metabase."ListSites" OWNER TO %db_owner%;
+
+--
+-- Name: COLUMN "ListSites"."SiteType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListSites"."SiteType" IS 'does not go into EML. this is meant to help LTER sites sort and organize their sampling sites. For example, SBC had "intertidal," "beach," "reef" site types, etc.';
+
+
+--
+-- Name: COLUMN "ListSites"."SiteName"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListSites"."SiteName" IS 'SiteName and SiteLocation are concatenated to form geographicDescription in EML.';
+
+
+--
+-- Name: COLUMN "ListSites"."SiteLocation"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListSites"."SiteLocation" IS 'does not go into EML. this is meant to help LTER sites organize their sites.';
+
+
+--
+-- Name: COLUMN "ListSites"."SiteDescription"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListSites"."SiteDescription" IS 'SiteName and SiteLocation are concatenated to form geographicDescription in EML.';
+
+
+--
+-- Name: COLUMN "ListSites"."ShapeType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListSites"."ShapeType" IS 'one of: point, rectangle, polygon, polyline, vector';
+
 
 --
 -- Name: ListTaxa; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -574,13 +649,20 @@ CREATE TABLE lter_metabase."ListTaxa" (
     "TaxonID" character varying(50) NOT NULL,
     "TaxonomicProviderID" character varying(50) NOT NULL,
     "TaxonRankName" character varying(50),
-    "TaxonRankValue" character varying(200),
+    "TaxonRankValue" character varying(200) NOT NULL,
     "CommonName" character varying(200),
     "LocalID" character varying(50)
 );
 
 
 ALTER TABLE lter_metabase."ListTaxa" OWNER TO %db_owner%;
+
+--
+-- Name: COLUMN "ListTaxa"."TaxonID"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON COLUMN lter_metabase."ListTaxa"."TaxonID" IS 'The taxon ID under the specified taxonomic system (provider).';
+
 
 --
 -- Name: ListTaxonomicProviders; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -638,8 +720,8 @@ CREATE VIEW mb2eml_r.vw_eml_associatedparty AS
     p."ZipCode" AS zipcode,
     p."Phone" AS phone1,
     p."Email" AS email,
-    i."Identificationtype" AS userid_type,
-    i."Identificationlink" AS userid
+    i."IdentificationSystem" AS userid_type,
+    i."IdentificationURL" AS userid
    FROM ((lter_metabase."DataSetPersonnel" d
      LEFT JOIN lter_metabase."ListPeople" p ON (((d."NameID")::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((d."NameID")::text = (i."NameID")::text)))
@@ -768,8 +850,8 @@ CREATE VIEW mb2eml_r.vw_eml_creator AS
     p."ZipCode" AS zipcode,
     p."Phone" AS phone1,
     p."Email" AS email,
-    i."Identificationtype" AS userid_type,
-    i."Identificationlink" AS userid
+    i."IdentificationSystem" AS userid_type,
+    i."IdentificationURL" AS userid
    FROM ((lter_metabase."DataSetPersonnel" d
      LEFT JOIN lter_metabase."ListPeople" p ON (((d."NameID")::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((d."NameID")::text = (i."NameID")::text)))
@@ -790,7 +872,8 @@ CREATE VIEW mb2eml_r.vw_eml_dataset AS
     d."Abstract" AS abstract,
     d."ShortName" AS shortname,
     d."UpdateFrequency" AS update_frequency,
-    d."MaintenanceDescription" AS maintenance_desc
+    d."MaintenanceDescription" AS maintenance_desc,
+    d."PubDate" AS pubdate
    FROM lter_metabase."DataSet" d
   ORDER BY d."DataSetID";
 
@@ -860,7 +943,7 @@ CREATE VIEW mb2eml_r.vw_eml_geographiccoverage AS
  SELECT d."DataSetID" AS datasetid,
     d."EntitySortOrder" AS entity_position,
     d."GeoCoverageSortOrder" AS geocoverage_sort_order,
-    d."SiteCode" AS id,
+    d."SiteID" AS id,
     ((s."SiteName")::text || COALESCE((': '::text || (s."SiteDescription")::text), ''::text)) AS geographicdescription,
     s."NBoundLat" AS northboundingcoordinate,
     s."SBoundLat" AS southboundingcoordinate,
@@ -870,8 +953,8 @@ CREATE VIEW mb2eml_r.vw_eml_geographiccoverage AS
     s."AltitudeMax" AS altitudemaximum,
     s."AltitudeUnit" AS altitudeunits
    FROM (lter_metabase."DataSetSites" d
-     LEFT JOIN lter_metabase."ListSites" s ON (((d."SiteCode")::text = (s."SiteCode")::text)))
-  ORDER BY d."DataSetID", d."GeoCoverageSortOrder", d."SiteCode";
+     LEFT JOIN lter_metabase."ListSites" s ON (((d."SiteID")::text = (s."SiteID")::text)))
+  ORDER BY d."DataSetID", d."GeoCoverageSortOrder", d."SiteID";
 
 
 ALTER TABLE mb2eml_r.vw_eml_geographiccoverage OWNER TO %db_owner%;
@@ -1533,11 +1616,11 @@ ALTER TABLE pkg_mgmt.vw_temporal OWNER TO %db_owner%;
 -- Data for Name: DataSet; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abstract", "Status", "ShortName", "UpdateFrequency", "MaintenanceDescription") FROM stdin;
-99054	\N	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	\N	\N	\N	\N
-99024	\N	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	\N	\N	\N	\N
-99013	\N	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	\N	\N	\N	\N
-99021	\N	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	\N	\N	\N	\N
+COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abstract", "ShortName", "UpdateFrequency", "MaintenanceDescription") FROM stdin;
+99054	\N	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	\N	\N	\N
+99024	\N	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	\N	\N	\N
+99013	\N	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	\N	\N	\N
+99021	\N	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	\N	\N	\N
 \.
 
 
@@ -1842,7 +1925,7 @@ COPY lter_metabase."DataSetPersonnel" ("DataSetID", "NameID", "AuthorshipOrder",
 -- Data for Name: DataSetSites; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetSites" ("DataSetID", "EntitySortOrder", "SiteCode", "GeoCoverageSortOrder") FROM stdin;
+COPY lter_metabase."DataSetSites" ("DataSetID", "EntitySortOrder", "SiteID", "GeoCoverageSortOrder") FROM stdin;
 99013	0	ABUR_reef	1
 99013	0	AHON_reef	1
 99013	0	AQUE_reef	1
@@ -3073,7 +3156,7 @@ arassweiler	Andrew	A	Rassweiler	\N	Marine Science Institute	University of Califo
 -- Data for Name: ListPeopleID; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ListPeopleID" ("NameID", "IdentificationID", "Identificationtype", "Identificationlink") FROM stdin;
+COPY lter_metabase."ListPeopleID" ("NameID", "IdentificationID", "IdentificationSystem", "IdentificationURL") FROM stdin;
 dreed	1	ORCID	0000-0003-3015-8717
 dsiegel	1	ORCID	0000-0003-1674-3055
 mbrzezinski	1	ORCID	0000-0003-3432-2297
@@ -3197,7 +3280,7 @@ COPY lter_metabase."ListProtocols" ("protocolID", author, title, url) FROM stdin
 -- Data for Name: ListSites; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ListSites" ("SiteCode", "SiteType", "SiteName", "SiteLocation", "SiteDescription", "Ownership", "ShapeType", "CenterLon", "CenterLat", "WBoundLon", "EBoundLon", "SBoundLat", "NBoundLat", "AltitudeMin", "AltitudeMax", "AltitudeUnit") FROM stdin;
+COPY lter_metabase."ListSites" ("SiteID", "SiteType", "SiteName", "SiteLocation", "SiteDescription", "Ownership", "ShapeType", "CenterLon", "CenterLat", "WBoundLon", "EBoundLon", "SBoundLat", "NBoundLat", "AltitudeMin", "AltitudeMax", "AltitudeUnit") FROM stdin;
 046161	other	NEWHALL 5 NW	California, USA	NEWHALL 5 NW	National Weather Service - COOP	point	-118.599999999999994	34.3999999999999986	-118.599999999999994	-118.599999999999994	34.3999999999999986	34.3999999999999986	538	538	meter
 046162	other	NEWHALL S FC32CE	California, USA	NEWHALL S FC32CE	National Weather Service - COOP	point	-118.533332999999999	34.3833330000000004	-118.533332999999999	-118.533332999999999	34.3833330000000004	34.3833330000000004	378.899999999999977	378.899999999999977	meter
 046399	other	OJAI	California, USA	OJAI	National Weather Service - COOP	point	-119.25	34.4666670000000011	-119.25	-119.25	34.4666670000000011	34.4666670000000011	216.400000000000006	216.400000000000006	meter
@@ -4725,7 +4808,7 @@ ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetSites"
-    ADD CONSTRAINT "PK_DataSetSites" PRIMARY KEY ("DataSetID", "SiteCode");
+    ADD CONSTRAINT "PK_DataSetSites" PRIMARY KEY ("DataSetID", "SiteID");
 
 
 --
@@ -4861,7 +4944,7 @@ ALTER TABLE ONLY lter_metabase."ListPeopleID"
 --
 
 ALTER TABLE ONLY lter_metabase."ListSites"
-    ADD CONSTRAINT "PK_SiteRegister" PRIMARY KEY ("SiteCode");
+    ADD CONSTRAINT "PK_SiteRegister" PRIMARY KEY ("SiteID");
 
 
 --
@@ -5182,7 +5265,7 @@ ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetSites"
-    ADD CONSTRAINT "FK_DataSetSite_SiteCode" FOREIGN KEY ("SiteCode") REFERENCES lter_metabase."ListSites"("SiteCode") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetSite_SiteCode" FOREIGN KEY ("SiteID") REFERENCES lter_metabase."ListSites"("SiteID") ON UPDATE CASCADE;
 
 
 --
