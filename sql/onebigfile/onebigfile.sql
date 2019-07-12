@@ -235,10 +235,28 @@ CREATE TABLE lter_metabase."DataSetKeywords" (
 ALTER TABLE lter_metabase."DataSetKeywords" OWNER TO %db_owner%;
 
 --
--- Name: DataSetMethods; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetMethodSteps; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."DataSetMethods" (
+CREATE TABLE lter_metabase."DataSetMethodSteps" (
+    "DataSetID" integer NOT NULL,
+    "MethodStepSet" integer NOT NULL,
+    "DescriptionType" character varying(10),
+    "Description" text,
+    "Method_xml" xml,
+    CONSTRAINT "CK_DataSetMethodSteps_DescriptionHasType" CHECK (((("DescriptionType" IS NULL) AND ("Description" IS NULL)) OR (("DescriptionType" IS NOT NULL) AND ("Description" IS NOT NULL)))),
+    CONSTRAINT "CK_DataSetMethodSteps_DescriptionType" CHECK ((("DescriptionType")::text = ANY ((ARRAY['file'::character varying, 'md'::character varying, 'plaintext'::character varying])::text[]))),
+    CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ((("Description" IS NOT NULL) OR ("Method_xml" IS NOT NULL)))
+);
+
+
+ALTER TABLE lter_metabase."DataSetMethodSteps" OWNER TO %db_owner%;
+
+--
+-- Name: DataSetMethods_deprecated; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."DataSetMethods_deprecated" (
     "MethodID" integer NOT NULL,
     "DataSetID" integer NOT NULL,
     "effectiveRange" integer NOT NULL,
@@ -254,7 +272,7 @@ CREATE TABLE lter_metabase."DataSetMethods" (
 );
 
 
-ALTER TABLE lter_metabase."DataSetMethods" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."DataSetMethods_deprecated" OWNER TO %db_owner%;
 
 --
 -- Name: DataSetPersonnel; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -499,6 +517,48 @@ CREATE TABLE lter_metabase."ListKeywords" (
 ALTER TABLE lter_metabase."ListKeywords" OWNER TO %db_owner%;
 
 --
+-- Name: ListMethodInstruments; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."ListMethodInstruments" (
+    "InstrumentID" integer NOT NULL,
+    "Description" character varying(5000) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."ListMethodInstruments" OWNER TO %db_owner%;
+
+--
+-- Name: ListMethodProtocols; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."ListMethodProtocols" (
+    "ProtocolID" integer NOT NULL,
+    "NameID" character varying(50),
+    "Title" character varying(300),
+    "URL" character varying(1024) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."ListMethodProtocols" OWNER TO %db_owner%;
+
+--
+-- Name: ListMethodSoftware; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."ListMethodSoftware" (
+    "SoftwareID" integer NOT NULL,
+    "Title" character varying(1024),
+    "AuthorSurname" character varying(100),
+    "Description" character varying(5000),
+    "Version" character varying(32),
+    "URL" character varying(1024)
+);
+
+
+ALTER TABLE lter_metabase."ListMethodSoftware" OWNER TO %db_owner%;
+
+--
 -- Name: ListMissingCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -676,6 +736,45 @@ CREATE TABLE lter_metabase."ListTaxonomicProviders" (
 
 
 ALTER TABLE lter_metabase."ListTaxonomicProviders" OWNER TO %db_owner%;
+
+--
+-- Name: MethodInstruments; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."MethodInstruments" (
+    "DataSetID" integer NOT NULL,
+    "MethodStepSet" integer NOT NULL,
+    "InstrumentID" integer NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."MethodInstruments" OWNER TO %db_owner%;
+
+--
+-- Name: MethodProtocols; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."MethodProtocols" (
+    "DataSetID" integer NOT NULL,
+    "MethodStepSet" integer NOT NULL,
+    "ProtocolID" integer NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."MethodProtocols" OWNER TO %db_owner%;
+
+--
+-- Name: MethodSoftware; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."MethodSoftware" (
+    "DataSetID" integer NOT NULL,
+    "MethodStepSet" integer NOT NULL,
+    "SoftwareID" integer NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."MethodSoftware" OWNER TO %db_owner%;
 
 --
 -- Name: vw_custom_units; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
@@ -898,7 +997,7 @@ CREATE VIEW mb2eml_r.vw_eml_datasetmethod AS
     d."softwareOwner",
     d."softwareDescription",
     d."softwareVersion"
-   FROM ((lter_metabase."DataSetMethods" d
+   FROM ((lter_metabase."DataSetMethods_deprecated" d
      LEFT JOIN lter_metabase."ListProtocols" p ON (((d."protocolID")::text = (p."protocolID")::text)))
      LEFT JOIN lter_metabase."ListPeople" k ON (((p.author)::text = (k."NameID")::text)))
   ORDER BY d."DataSetID", d."methodDocument";
@@ -977,6 +1076,19 @@ CREATE VIEW mb2eml_r.vw_eml_keyword AS
 
 
 ALTER TABLE mb2eml_r.vw_eml_keyword OWNER TO %db_owner%;
+
+--
+-- Name: vw_eml_method_document; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+CREATE VIEW mb2eml_r.vw_eml_method_document AS
+ SELECT m."DataSetID" AS datasetid,
+    m."MethodStepSet" AS methodstep_position,
+    m."Description" AS "methodDocument"
+   FROM lter_metabase."DataSetMethodSteps" m;
+
+
+ALTER TABLE mb2eml_r.vw_eml_method_document OWNER TO %db_owner%;
 
 --
 -- Name: vw_eml_missingcodes; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
@@ -1617,10 +1729,10 @@ ALTER TABLE pkg_mgmt.vw_temporal OWNER TO %db_owner%;
 --
 
 COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abstract", "ShortName", "UpdateFrequency", "MaintenanceDescription") FROM stdin;
-99054	\N	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	\N	\N	\N
-99024	\N	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	\N	\N	\N
-99013	\N	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	\N	\N	\N
-99021	\N	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	\N	\N	\N
+99013	21	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	Reef bottom water temperature	\N	\N
+99024	17	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	Kelp - algal weights and CHN	\N	\N
+99054	4	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	Satellite kelp canopy biomass	\N	\N
+99021	11	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	Beach wrack IV 2005-06	\N	\N
 \.
 
 
@@ -1889,10 +2001,21 @@ COPY lter_metabase."DataSetKeywords" ("DataSetID", "Keyword", "ThesaurusID") FRO
 
 
 --
--- Data for Name: DataSetMethods; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: DataSetMethodSteps; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetMethods" ("MethodID", "DataSetID", "effectiveRange", "methodDocument", "protocolID", "instrumentTitle", "instrumentOwner", "instrumentDescription", "softwareTitle", "softwareOwner", "softwareDescription", "softwareVersion") FROM stdin;
+COPY lter_metabase."DataSetMethodSteps" ("DataSetID", "MethodStepSet", "DescriptionType", "Description", "Method_xml") FROM stdin;
+99021	10	file	method.21.10.docx	\N
+99024	10	file	method.24.10.docx	\N
+99013	10	file	method.13.10.docx	\N
+\.
+
+
+--
+-- Data for Name: DataSetMethods_deprecated; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."DataSetMethods_deprecated" ("MethodID", "DataSetID", "effectiveRange", "methodDocument", "protocolID", "instrumentTitle", "instrumentOwner", "instrumentDescription", "softwareTitle", "softwareOwner", "softwareDescription", "softwareVersion") FROM stdin;
 33	99021	0	method.21.10.docx	57	\N	\N	\N	\N	\N	\N	\N
 34	99024	0	method.24.10.docx	55	\N	\N	\N	\N	\N	\N	\N
 30	99013	0	method.13.10.docx	46	TidbiT with a range of -20 to 30 degrees Celsius, and accuracy of ± 0.20 C at 25 degrees Celsius, manufactured by Onset Computer Corporation 	\N	\N	\N	\N	\N	\N
@@ -3128,6 +3251,132 @@ allometry	none	theme
 
 
 --
+-- Data for Name: ListMethodInstruments; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."ListMethodInstruments" ("InstrumentID", "Description") FROM stdin;
+\.
+
+
+--
+-- Data for Name: ListMethodProtocols; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."ListMethodProtocols" ("ProtocolID", "NameID", "Title", "URL") FROM stdin;
+8	dreed	MDS MkV Light Sensor Protocol 	http://sbc.lternet.edu/external/Reef/Protocols/Light/MDS_MkV_Light_Sensor_Protocol.pdf
+11	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/kelp_biomass_landsat/SBC_LTER_protocol_Cavanaugh_Bell_landsat5_kelp_biomass.pdf
+13	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/rodriguez_2014/._rodriguez_2014_macrocystis_frond_turnover_20150403.pdf
+14	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Turf_NPP/Turf_and_Foliose_Algae_Productivity_Experiment_Protocol.pdf
+16	dreed	SBC LTER Kelp Forest Community Structure Methods - Density of Reef Fish-20130524	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBC_LTER_protocol_Reed_Kelp_forest_community_Density_fish_20130524.pdf
+17	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBCLTER_Cover_Protocol.pdf
+18	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBCLTER_Quadrat_Protocol.pdf
+19	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBCLTER_Swath_Protocol.pdf
+20	dreed	Kelp Forest Community Structure Methods - Bottom Topography-20130524	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBC_LTER_protocol_Reed_Kelp_forest_community_Bottom_topography_20130524.pdf
+22	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBCLTER_Species_Codes.pdf
+23	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBCLTER_Fish_Protocol.pdf
+24	dreed	Kelp Forest Community Structure Methods - Percent Cover of Algae, Invertebrates and Bottom Substrate-20130524	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBC_LTER_protocol_Reed_Kelp_forest_community_Percent_cover_20130524.pdf
+26	dreed	Kelp Forest Community Structure Methods - Density of algae and invertebrates-20130524	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBC_LTER_protocol_Reed_Kelp_forest_community_Density_algae_inverts_20130524.pdf
+27	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBCLTER_Kelp_Protocol.pdf
+28	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/LTE_Detritus_Processing_Protocol_2009.pdf
+29	dreed	\N	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Irrad_sfc_seafloor_20130523.pdf
+30	dreed	SBC-LTER Long Term Experiment Methods - Biomass of Macroalgal Detritus-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Biomass_detritus_20130523.pdf
+31	dreed	SBC-LTER Long Term Experiment Methods - Bottom Topography Last Modified: 5/25/2013	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Bottom_topography_20130524.pdf
+32	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/Methods_excerpt_Harrer_etal_2013.pdf
+33	dreed	SBC LTER Long Term Experiment Methods - Reef Fish Density-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Density_fish_20130524.pdf
+34	dreed	SBC LTER Long Term Experiment Methods - Net Primary Production of Macroalgae-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_NPP_macroalgae_20130524.pdf
+35	dreed	SBC LTER Long Term Experiment Methods - Density of algae and invertebrates-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Density_algae_inverts_20130524.pdf
+36	dreed	SBC-LTER Long Term Experiment Methods - Density of Giant Kelp-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Density_giant_kelp_20130524.pdf
+37	dreed	SBC LTER Long Term Experiment Methods - Percent Cover of Algae, Invertebrates and Bottom Substrate-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Percent_cover_algae_inverts_20130524.pdf
+38	dreed	SBC LTER Long Term Experiment Methods - Understory Kelp Allometrics-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Understory_kelp_allometrics_20130523.pdf
+39	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/Long_Term_Experiment_Protocols_2009.pdf
+40	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/Kelp_Removal_diagram.pdf
+92	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/worksheets.pdf
+21	dreed	SBC LTER Protocols: Biomass of algae invertebrates and fish	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBC_LTER_protocol_Reed_Kelp_forest_community_biomass_bytaxon_20161018.pdf
+41	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/Long_Term_Experiment_Protocols_2010.pdf
+95	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/ADCP_Teledyne_RDI_ocean_surveyor_ds_lr.pdf
+42	dreed	SBC LTER Long Term Experiment Methods - Biomass of Macroalgae-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Biomass_macroalgae_20130523.pdf
+43	dreed	SBC LTER Long Term Experiment Methods - Sea Urchin Size Structure-20130525	http://sbc.lternet.edu/external/Reef/Protocols/Long_Term_Kelp_Removal/SBC_LTER_protocol_Reed_LTE_Urchin_size_structure_20130523.pdf
+44	dreed	Methods for macroalgal photosynthetic parameters and biomass relationships 	http://sbc.lternet.edu/external/Reef/Protocols/NPP_macroalgae/SBC_LTER_20130513_Algal_PE_Biomass_Parameters.pdf
+45	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/NPP_macroalgae/Methods_macrolgal_PE_biomass_relationships.pdf
+46	dreed	SBC LTER Methods: Measurement of continuous benthic water temperature	http://sbc.lternet.edu/external/Reef/Protocols/Bottom_Temperature/SBC_LTER_protocol_Reed_Continuous_benthic_water_temperature_20130615.pdf
+47	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Bottom_Temperature/Continuous_Temperature_Protocol.pdf
+48	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Foodweb_Stable_Isotopes/SBC LTER Foodweb Isotopes-Benthic organisms.pdf
+49	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Foodweb_Stable_Isotopes/SBCLTER_Species_Codes.pdf
+50	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Foodweb_Stable_Isotopes/SBC LTER Foodweb Isotopes-Sediment.pdf
+51	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Foodweb_Stable_Isotopes/SBC LTER Foodweb Isotopes-Monthly Water and Kelp.pdf
+52	dreed	SBC LTER Protocols - Reed Lab - Lobster Abundance and Size-20141007	http://sbc.lternet.edu/external/Reef/Protocols/lobsters/Reed_2014-09-29_lobster_abundance.pdf
+53	dreed	SBC LTER Protocols - Reed Lab - Lobster Fishing Pressure-20141008	http://sbc.lternet.edu/external/Reef/Protocols/lobsters/Reed_2014-09-29_lobster_trap_counts.pdf
+54	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_NPP/SBC-LTER_Kelp_NPP_Protocol.pdf
+55	dreed	SBC LTER Protocols - Reed Lab - Giant Kelp Carbon and Nitrogen Content-20130703	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_NPP/SBC_LTER_protocol_Reed_Giant_kelp_carbon_nitrogen_content_20130718.pdf
+56	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_NPP/Kelp_Net_Primary_Production_Protocol.pdf
+57	arassweiler	Net primary production, growth and standing crop of Macrocystis pyrifera in southern California	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_NPP/Rassweiler_et_al_2008_NPP_Mpyrifera_E089-119.pdf
+58	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/Historical_Kelp/Historical_Kelp_Overview.pdf
+62	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_towed_CTD_processing.pdf
+63	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_MaterialSafetyDataSheets.pdf
+65	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/wipetest.pdf
+66	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/ADCP_Teledyne_RDI_wh_mariner_ds_lr.pdf
+67	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Kapsenberg_pHsample_collection_SCUBA_20160805.pdf
+70	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/water_collection.pdf
+71	mbrzezinski	Particulate Silica Filtration Procedure	http://sbc.lternet.edu/external/Ocean/Protocols/Particulate_Si_filtration.pdf
+72	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_CTD_processing.pdf
+73	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_ADCP_collection.pdf
+74	mbrzezinski	Discrete Chlorophyll Filtration Procedrure: 2000-2008	http://sbc.lternet.edu/external/Ocean/Protocols/Chl_filtration_discrete.pdf
+75	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/SBE_37_power_budget.pdf
+76	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Variable_fluorescence.pdf
+77	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_ADCP_processing.pdf
+78	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Phytoplankton_Sampling.pdf
+80	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_UDAS_collection.pdf
+81	mbrzezinski	Processing Chlorophyll Samples - Digital Fluorometer Use: 2009-Present	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2009-01-01_Chl_analysis.pdf
+82	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2003_Primary_Production.pdf
+83	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Carlson_2011-06-22_DNAeasy_protocol.pdf
+84	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/SBE37SM_014.pdf
+85	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Scanfish.pdf
+86	mbrzezinski	Water Collection Procedure - Field	http://sbc.lternet.edu/external/Ocean/Protocols/Field_water_collection.pdf
+87	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Nutrient_DON_DOP_filtration.pdf
+88	mbrzezinski	Primary Production – modified JGOFS 14C method	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2002b_Primary_Production.pdf
+89	mbrzezinski	Particulate Si Determination 	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2001_PSi_protocol_2001.pdf
+91	mbrzezinski	Processing Chlorophyll Samples-Digital Fluorometer Use: 2000-2008	http://sbc.lternet.edu/external/Ocean/Protocols/Chl_analysis.pdf
+93	mbrzezinski	CHN and Isotope Filtration Procedure	http://sbc.lternet.edu/external/Ocean/Protocols/CHN_Isotope_filtration.pdf
+94	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_CTD_collection.pdf
+96	mbrzezinski	Discrete Chlorophyll Filtration Procedure: 2009-Present	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2009-01-01_Chl_filtration_discrete.pdf
+98	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Hofmann_Washburn_SeaFET_deployment_processing_20150801.pdf
+99	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_towed_CTD_collection.pdf
+100	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Monthly_CTD_processing.pdf
+101	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Carlson_2011-06-22_DOC_SOP.pdf
+103	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2002a_Primary_Production.pdf
+104	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Monthly_Water_Sampling_CTD_bottles_textonly.pdf
+105	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2002c_Primary_Production.pdf
+106	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/LTERcruise_UDAS_processing.pdf
+107	mbrzezinski	Water Collection-Field	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2008-06-10_field_water_collection.pdf
+108	mbrzezinski	Particulate CHN Filtration Procedure-Stable Isotope of C and N as well	http://sbc.lternet.edu/external/Ocean/Protocols/Brzezinski_2009-01-01_C_N_filtration.pdf
+110	\N	\N	http://sbc.lternet.edu/external/Ocean/Protocols/Carlson_2011-06-22_Bacterial_Production_protocol.pdf
+111	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/Precipitation/SBCLTER_Precipitation_daily_reference_2009.pdf
+112	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/Precipitation/SBCLTER_Precipitation_Measurement_2009.pdf
+113	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/Precipitation/SBCLTER_Land_Precipitation_Protocol.pdf
+114	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/Precipitation/SBCLTER_SBCPWD_Precipitation_Data_Processing_2009.pdf
+115	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/Precipitation/SBCLTER_SBCPWD_Precipitation_Data_Retrieval_2009.pdf
+116	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/Precipitation/SBCLTER_Precipitation_Data_Processing_2009.pdf
+117	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/SBCLTER_Stream_Discharge_Measurement_2009.pdf
+118	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/SBCLTER_Land_Stream_Discharge_Protocol.pdf
+121	\N	\N	http://sbc.lternet.edu/external/Land/Protocols/SBCLTER_Stream_Discharge_Data_Processing_2009.pdf
+126	mobrien	Ocean Data View User's Guide-Version 3.0	http://sbc.lternet.edu/external/SOFTWARE/OceanDataView/odvGuide.pdf
+127	mobrien	README: Using Ocean Data View with SBC LTER data	http://sbc.lternet.edu/external/SOFTWARE/OceanDataView/README.txt
+128	dreed	Estimates of kelp blade erosion rates	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_NPP/Kelp_blade_loss_protocol_20170901.pdf
+10	kcavanaugh	Kelp Canopy Biomass Landsat 5 (2011-2013)	http://sbc.lternet.edu/external/Reef/Protocols/kelp_biomass_landsat/cavanaugh_2011_kelp_canopy_area_biomass_landsat5.pdf
+25	dreed	SBC LTER Kelp Forest Community Structure Methods - Density of giant kelp	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_Forest_Community_Dynamics/SBC_LTER_protocol_Reed_Kelp_forest_community_Density_giant_kelp_20130524.pdf
+133	dreed	Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California	http://sbc.lternet.edu/external/Reef/Protocols/Kelp_NPP/KelpNPP_20180522.pdf
+\.
+
+
+--
+-- Data for Name: ListMethodSoftware; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."ListMethodSoftware" ("SoftwareID", "Title", "AuthorSurname", "Description", "Version", "URL") FROM stdin;
+\.
+
+
+--
 -- Data for Name: ListMissingCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -3809,6 +4058,33 @@ natserv	NatureServe	http://explorer.natureserve.org/index.htm
 bold	Barcode of Life Data System	http://v3.boldsystems.org/
 wiki	Wikispecies	https://species.wikimedia.org/wiki/Main_Page
 pow	Kew's Plants of the World	http://www.plantsoftheworldonline.org/
+\.
+
+
+--
+-- Data for Name: MethodInstruments; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."MethodInstruments" ("DataSetID", "MethodStepSet", "InstrumentID") FROM stdin;
+\.
+
+
+--
+-- Data for Name: MethodProtocols; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."MethodProtocols" ("DataSetID", "MethodStepSet", "ProtocolID") FROM stdin;
+99021	10	57
+99024	10	55
+99013	10	46
+\.
+
+
+--
+-- Data for Name: MethodSoftware; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."MethodSoftware" ("DataSetID", "MethodStepSet", "SoftwareID") FROM stdin;
 \.
 
 
@@ -4788,11 +5064,27 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributes"
 
 
 --
+-- Name: MethodInstruments PK_DataSetInstrument; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodInstruments"
+    ADD CONSTRAINT "PK_DataSetInstrument" PRIMARY KEY ("DataSetID", "InstrumentID");
+
+
+--
 -- Name: DataSetKeywords PK_DataSetKeywords; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetKeywords"
     ADD CONSTRAINT "PK_DataSetKeywords" PRIMARY KEY ("Keyword", "DataSetID", "ThesaurusID");
+
+
+--
+-- Name: DataSetMethodSteps PK_DataSetMethodSteps; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."DataSetMethodSteps"
+    ADD CONSTRAINT "PK_DataSetMethodSteps" PRIMARY KEY ("DataSetID", "MethodStepSet");
 
 
 --
@@ -4804,11 +5096,27 @@ ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
 
 
 --
+-- Name: MethodProtocols PK_DataSetProtocol; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodProtocols"
+    ADD CONSTRAINT "PK_DataSetProtocol" PRIMARY KEY ("DataSetID", "ProtocolID");
+
+
+--
 -- Name: DataSetSites PK_DataSetSites; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetSites"
     ADD CONSTRAINT "PK_DataSetSites" PRIMARY KEY ("DataSetID", "SiteID");
+
+
+--
+-- Name: MethodSoftware PK_DataSetSoftware; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodSoftware"
+    ADD CONSTRAINT "PK_DataSetSoftware" PRIMARY KEY ("DataSetID", "SoftwareID");
 
 
 --
@@ -4884,6 +5192,14 @@ ALTER TABLE ONLY lter_metabase."EMLFileTypes"
 
 
 --
+-- Name: ListMethodInstruments PK_InstrumentID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodInstruments"
+    ADD CONSTRAINT "PK_InstrumentID" PRIMARY KEY ("InstrumentID");
+
+
+--
 -- Name: ListKeywordThesauri PK_KeywordThesaurus; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4908,10 +5224,10 @@ ALTER TABLE ONLY lter_metabase."ListTaxonomicProviders"
 
 
 --
--- Name: DataSetMethods PK_MethodID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetMethods_deprecated PK_MethodID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."DataSetMethods"
+ALTER TABLE ONLY lter_metabase."DataSetMethods_deprecated"
     ADD CONSTRAINT "PK_MethodID" PRIMARY KEY ("MethodID");
 
 
@@ -4940,11 +5256,27 @@ ALTER TABLE ONLY lter_metabase."ListPeopleID"
 
 
 --
+-- Name: ListMethodProtocols PK_ProtocolID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodProtocols"
+    ADD CONSTRAINT "PK_ProtocolID" PRIMARY KEY ("ProtocolID");
+
+
+--
 -- Name: ListSites PK_SiteRegister; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
 ALTER TABLE ONLY lter_metabase."ListSites"
     ADD CONSTRAINT "PK_SiteRegister" PRIMARY KEY ("SiteID");
+
+
+--
+-- Name: ListMethodSoftware PK_SoftwareID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodSoftware"
+    ADD CONSTRAINT "PK_SoftwareID" PRIMARY KEY ("SoftwareID");
 
 
 --
@@ -4977,6 +5309,30 @@ ALTER TABLE ONLY lter_metabase."ListPeopleID"
 
 ALTER TABLE ONLY lter_metabase."DataSetEntities"
     ADD CONSTRAINT "UQ_DataSet_SortOrder" UNIQUE ("DataSetID", "EntitySortOrder");
+
+
+--
+-- Name: ListMethodInstruments UQ_InstrumentDescription; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodInstruments"
+    ADD CONSTRAINT "UQ_InstrumentDescription" UNIQUE ("Description");
+
+
+--
+-- Name: ListMethodProtocols UQ_Protocol_Title; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodProtocols"
+    ADD CONSTRAINT "UQ_Protocol_Title" UNIQUE ("Title");
+
+
+--
+-- Name: ListMethodSoftware UQ_SoftwareTitleVersion; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodSoftware"
+    ADD CONSTRAINT "UQ_SoftwareTitleVersion" UNIQUE ("Title", "Version");
 
 
 --
@@ -5213,6 +5569,30 @@ ALTER TABLE ONLY lter_metabase."DataSetSites"
 
 
 --
+-- Name: MethodInstruments FK_DataSetInstrument_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodInstruments"
+    ADD CONSTRAINT "FK_DataSetInstrument_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodInstruments FK_DataSetInstrument_InstrumentID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodInstruments"
+    ADD CONSTRAINT "FK_DataSetInstrument_InstrumentID" FOREIGN KEY ("InstrumentID") REFERENCES lter_metabase."ListMethodInstruments"("InstrumentID") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodInstruments FK_DataSetInstrument_MethodStepSet; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodInstruments"
+    ADD CONSTRAINT "FK_DataSetInstrument_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepSet") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepSet") ON UPDATE CASCADE;
+
+
+--
 -- Name: DataSetKeywords FK_DataSetKeywords_DataSet; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -5229,18 +5609,26 @@ ALTER TABLE ONLY lter_metabase."DataSetKeywords"
 
 
 --
--- Name: DataSetMethods FK_DataSetMethod_ProtocolID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetMethodSteps FK_DataSetMethodSteps_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."DataSetMethods"
+ALTER TABLE ONLY lter_metabase."DataSetMethodSteps"
+    ADD CONSTRAINT "FK_DataSetMethodSteps_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID");
+
+
+--
+-- Name: DataSetMethods_deprecated FK_DataSetMethod_ProtocolID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."DataSetMethods_deprecated"
     ADD CONSTRAINT "FK_DataSetMethod_ProtocolID" FOREIGN KEY ("protocolID") REFERENCES lter_metabase."ListProtocols"("protocolID") ON UPDATE CASCADE;
 
 
 --
--- Name: DataSetMethods FK_DataSetMethods_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetMethods_deprecated FK_DataSetMethods_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."DataSetMethods"
+ALTER TABLE ONLY lter_metabase."DataSetMethods_deprecated"
     ADD CONSTRAINT "FK_DataSetMethods_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID") ON UPDATE CASCADE;
 
 
@@ -5261,11 +5649,59 @@ ALTER TABLE ONLY lter_metabase."DataSetPersonnel"
 
 
 --
+-- Name: MethodProtocols FK_DataSetProtocol_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodProtocols"
+    ADD CONSTRAINT "FK_DataSetProtocol_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodProtocols FK_DataSetProtocol_MethodStepSet; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodProtocols"
+    ADD CONSTRAINT "FK_DataSetProtocol_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepSet") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepSet") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodProtocols FK_DataSetProtocol_ProtocolID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodProtocols"
+    ADD CONSTRAINT "FK_DataSetProtocol_ProtocolID" FOREIGN KEY ("ProtocolID") REFERENCES lter_metabase."ListMethodProtocols"("ProtocolID") ON UPDATE CASCADE;
+
+
+--
 -- Name: DataSetSites FK_DataSetSite_SiteCode; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetSites"
     ADD CONSTRAINT "FK_DataSetSite_SiteCode" FOREIGN KEY ("SiteID") REFERENCES lter_metabase."ListSites"("SiteID") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodSoftware FK_DataSetSoftware_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodSoftware"
+    ADD CONSTRAINT "FK_DataSetSoftware_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodSoftware FK_DataSetSoftware_MethodStepSet; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodSoftware"
+    ADD CONSTRAINT "FK_DataSetSoftware_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepSet") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepSet") ON UPDATE CASCADE;
+
+
+--
+-- Name: MethodSoftware FK_DataSetSoftware_SoftwareID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."MethodSoftware"
+    ADD CONSTRAINT "FK_DataSetSoftware_SoftwareID" FOREIGN KEY ("SoftwareID") REFERENCES lter_metabase."ListMethodSoftware"("SoftwareID") ON UPDATE CASCADE;
 
 
 --
@@ -5290,6 +5726,14 @@ ALTER TABLE ONLY lter_metabase."DataSetTaxa"
 
 ALTER TABLE ONLY lter_metabase."DataSetTemporal"
     ADD CONSTRAINT "FK_DataSetTemporal_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID") ON UPDATE CASCADE;
+
+
+--
+-- Name: ListMethodProtocols FK_DataSet_NameID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."ListMethodProtocols"
+    ADD CONSTRAINT "FK_DataSet_NameID" FOREIGN KEY ("NameID") REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
 
 
 --
@@ -5556,11 +6000,19 @@ GRANT SELECT ON TABLE lter_metabase."DataSetKeywords" TO read_only_user;
 
 
 --
--- Name: TABLE "DataSetMethods"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "DataSetMethodSteps"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethods" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."DataSetMethods" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethodSteps" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."DataSetMethodSteps" TO read_only_user;
+
+
+--
+-- Name: TABLE "DataSetMethods_deprecated"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethods_deprecated" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."DataSetMethods_deprecated" TO read_only_user;
 
 
 --
@@ -5676,6 +6128,30 @@ GRANT SELECT ON TABLE lter_metabase."ListKeywords" TO read_only_user;
 
 
 --
+-- Name: TABLE "ListMethodInstruments"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodInstruments" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMethodInstruments" TO read_only_user;
+
+
+--
+-- Name: TABLE "ListMethodProtocols"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodProtocols" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMethodProtocols" TO read_only_user;
+
+
+--
+-- Name: TABLE "ListMethodSoftware"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodSoftware" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListMethodSoftware" TO read_only_user;
+
+
+--
 -- Name: TABLE "ListMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -5729,6 +6205,31 @@ GRANT SELECT ON TABLE lter_metabase."ListTaxa" TO read_only_user;
 
 GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListTaxonomicProviders" TO read_write_user;
 GRANT SELECT ON TABLE lter_metabase."ListTaxonomicProviders" TO read_only_user;
+
+
+--
+-- Name: TABLE "MethodInstruments"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+REVOKE ALL ON TABLE lter_metabase."MethodInstruments" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodInstruments" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."MethodInstruments" TO read_only_user;
+
+
+--
+-- Name: TABLE "MethodProtocols"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodProtocols" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."MethodProtocols" TO read_only_user;
+
+
+--
+-- Name: TABLE "MethodSoftware"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodSoftware" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."MethodSoftware" TO read_only_user;
 
 
 --
@@ -5825,6 +6326,14 @@ GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_w
 
 GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_keyword TO read_write_user;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_keyword TO read_only_user;
+
+
+--
+-- Name: TABLE vw_eml_method_document; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_method_document TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_document TO read_only_user;
 
 
 --
