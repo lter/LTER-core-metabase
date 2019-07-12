@@ -30,3 +30,5 @@ ALTER TABLE lter_metabase."ListPeople" RENAME COLUMN "Phone1" TO "Phone";
 
 ALTER TABLE lter_metabase."ListSites" RENAME COLUMN "SiteDesc" TO "SiteDescription";
 ALTER TABLE lter_metabase."ListSites" RENAME COLUMN unit TO "AltitudeUnit";
+
+ALTER TABLE lter_metabase."ListSites" DROP CONSTRAINT "CK_SiteRegister_SiteType";
