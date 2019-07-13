@@ -245,7 +245,7 @@ CREATE TABLE lter_metabase."DataSetMethodSteps" (
     "Description" text,
     "Method_xml" xml,
     CONSTRAINT "CK_DataSetMethodSteps_DescriptionHasType" CHECK (((("DescriptionType" IS NULL) AND ("Description" IS NULL)) OR (("DescriptionType" IS NOT NULL) AND ("Description" IS NOT NULL)))),
-    CONSTRAINT "CK_DataSetMethodSteps_DescriptionType" CHECK ((("DescriptionType")::text = ANY ((ARRAY['file'::character varying, 'md'::character varying, 'plaintext'::character varying])::text[]))),
+    CONSTRAINT "CK_DataSetMethodSteps_DescriptionType" CHECK ((("DescriptionType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text]))),
     CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ((("Description" IS NOT NULL) OR ("Method_xml" IS NOT NULL)))
 );
 
@@ -273,6 +273,13 @@ CREATE TABLE lter_metabase."DataSetMethods_deprecated" (
 
 
 ALTER TABLE lter_metabase."DataSetMethods_deprecated" OWNER TO %db_owner%;
+
+--
+-- Name: TABLE "DataSetMethods_deprecated"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON TABLE lter_metabase."DataSetMethods_deprecated" IS 'This table deprecated. Obsoleted by DataSetMethodSteps. This deprecated table is left in place during transition until a new VIEW is created.';
+
 
 --
 -- Name: DataSetPersonnel; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -626,10 +633,10 @@ COMMENT ON COLUMN lter_metabase."ListPeopleID"."IdentificationURL" IS 'Full URLs
 
 
 --
--- Name: ListProtocols; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListProtocols_deprecated; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
-CREATE TABLE lter_metabase."ListProtocols" (
+CREATE TABLE lter_metabase."ListProtocols_deprecated" (
     "protocolID" integer NOT NULL,
     author character varying(16),
     title character varying(300),
@@ -637,7 +644,14 @@ CREATE TABLE lter_metabase."ListProtocols" (
 );
 
 
-ALTER TABLE lter_metabase."ListProtocols" OWNER TO %db_owner%;
+ALTER TABLE lter_metabase."ListProtocols_deprecated" OWNER TO %db_owner%;
+
+--
+-- Name: TABLE "ListProtocols_deprecated"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COMMENT ON TABLE lter_metabase."ListProtocols_deprecated" IS 'This table deprecated. Obsoleted by ListMethodProtocols. This deprecated table is left in place during transition until a new VIEW is created.';
+
 
 --
 -- Name: ListSites; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -998,7 +1012,7 @@ CREATE VIEW mb2eml_r.vw_eml_datasetmethod AS
     d."softwareDescription",
     d."softwareVersion"
    FROM ((lter_metabase."DataSetMethods_deprecated" d
-     LEFT JOIN lter_metabase."ListProtocols" p ON (((d."protocolID")::text = (p."protocolID")::text)))
+     LEFT JOIN lter_metabase."ListProtocols_deprecated" p ON (((d."protocolID")::text = (p."protocolID")::text)))
      LEFT JOIN lter_metabase."ListPeople" k ON (((p.author)::text = (k."NameID")::text)))
   ORDER BY d."DataSetID", d."methodDocument";
 
@@ -1469,6 +1483,21 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.dbupdatetime IS 'automatically updates itse
 
 COMMENT ON COLUMN pkg_mgmt.pkg_state.update_date_catalog IS 'Date package last updated in catalog (same as pathquery updatedate)';
 
+
+--
+-- Name: version_tracker_metabase; Type: TABLE; Schema: pkg_mgmt; Owner: an
+--
+
+CREATE TABLE pkg_mgmt.version_tracker_metabase (
+    major_version integer NOT NULL,
+    minor_version integer NOT NULL,
+    patch integer,
+    date_installed timestamp without time zone,
+    comment text
+);
+
+
+ALTER TABLE pkg_mgmt.version_tracker_metabase OWNER TO an;
 
 --
 -- Name: vw_backlog; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
@@ -3416,10 +3445,10 @@ mobrien	1	ORCID	0000-0002-1693-8322
 
 
 --
--- Data for Name: ListProtocols; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+-- Data for Name: ListProtocols_deprecated; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."ListProtocols" ("protocolID", author, title, url) FROM stdin;
+COPY lter_metabase."ListProtocols_deprecated" ("protocolID", author, title, url) FROM stdin;
 8	dreed	MDS MkV Light Sensor Protocol 	http://sbc.lternet.edu/external/Reef/Protocols/Light/MDS_MkV_Light_Sensor_Protocol.pdf
 11	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/kelp_biomass_landsat/SBC_LTER_protocol_Cavanaugh_Bell_landsat5_kelp_biomass.pdf
 13	\N	\N	http://sbc.lternet.edu/external/Reef/Protocols/rodriguez_2014/._rodriguez_2014_macrocystis_frond_turnover_20150403.pdf
@@ -5024,6 +5053,15 @@ COPY pkg_mgmt.pkg_state ("DataSetID", dataset_archive_id, rev, nickname, data_re
 
 
 --
+-- Data for Name: version_tracker_metabase; Type: TABLE DATA; Schema: pkg_mgmt; Owner: an
+--
+
+COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) FROM stdin;
+0	9	22	2019-07-13 14:24:33.57601	21_migration_select_into_missValCode.sql hasn't been applied yet.
+\.
+
+
+--
 -- Name: DataSet IX_DataSet_Accession; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -5288,10 +5326,10 @@ ALTER TABLE ONLY lter_metabase."ListTaxa"
 
 
 --
--- Name: ListProtocols PK_protocolID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListProtocols_deprecated PK_protocolID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ListProtocols"
+ALTER TABLE ONLY lter_metabase."ListProtocols_deprecated"
     ADD CONSTRAINT "PK_protocolID" PRIMARY KEY ("protocolID");
 
 
@@ -5621,7 +5659,7 @@ ALTER TABLE ONLY lter_metabase."DataSetMethodSteps"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetMethods_deprecated"
-    ADD CONSTRAINT "FK_DataSetMethod_ProtocolID" FOREIGN KEY ("protocolID") REFERENCES lter_metabase."ListProtocols"("protocolID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetMethod_ProtocolID" FOREIGN KEY ("protocolID") REFERENCES lter_metabase."ListProtocols_deprecated"("protocolID") ON UPDATE CASCADE;
 
 
 --
@@ -5761,10 +5799,10 @@ ALTER TABLE ONLY lter_metabase."DataSet"
 
 
 --
--- Name: ListProtocols FK_DataSet_author; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListProtocols_deprecated FK_DataSet_author; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ListProtocols"
+ALTER TABLE ONLY lter_metabase."ListProtocols_deprecated"
     ADD CONSTRAINT "FK_DataSet_author" FOREIGN KEY (author) REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
 
 
@@ -6176,11 +6214,11 @@ GRANT SELECT ON TABLE lter_metabase."ListPeopleID" TO read_only_user;
 
 
 --
--- Name: TABLE "ListProtocols"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+-- Name: TABLE "ListProtocols_deprecated"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListProtocols" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."ListProtocols" TO read_only_user;
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListProtocols_deprecated" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListProtocols_deprecated" TO read_only_user;
 
 
 --
