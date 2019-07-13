@@ -10,6 +10,7 @@
     1. set perms 
     1. load controlled content (recommended)
     1. load sample datasets (optional)
+    1. We offer an all-in-one script to do the above called "onebigfile.sql"
 
 
 ## Details
@@ -37,7 +38,7 @@ You will need PostgreSQL accounts to fill these roles.
 ##### 2.1 Edit tokens for db_owner account name
 It should be obvious that you cannot run these SQL scripts directly from the clone; first they must reference existing accounts. You will have to set these values -- definitely for the db_owner account, but not for the others if you follow our recommendations. Scripts are best for this, since DB extensions that appear in this repository will use the account-tokens, and you'll have to reset those for every new piece of SQL. 
 
-E.g., in a linux system, at a minimum you could use sed (with your own directory names of course): 
+E.g., in a linux system, at a minimum you could use sed (with your own directory names instead of my git-clone and local): 
 
 `sed 's/%db_owner%/gastil/g' git-clone/0_create_db.sql > local/create_db.sql`
 
@@ -48,6 +49,11 @@ The `0_create_db.sql` script names the database `lter_core_metabase`. You may pr
 - 0_create_db.sql
 
 #### 4. DB owner: run local scripts in this order:
+- onebigfile.sql
+- ii_description.sql (where ii is the patch number +1 from the last number in onebigfile's version (major.minor.patch)
+
+Alternatively, you could build metabase by running all patches. This would be tedious.
+
 - 1_create_schemas_tables.sql 
 - 2_set_perms.sql 
 - 3_load_controlled_content.sql (recommended)
