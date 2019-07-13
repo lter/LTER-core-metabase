@@ -53,6 +53,21 @@ The `0_create_db.sql` script names the database `lter_core_metabase`. You may pr
 - 3_load_controlled_content.sql (recommended)
 - 4_load_sample_sbc_datasets.sql (optional)
     
-       
-             
+### 5. Install scenarios. 
+
+1. institutional/central server 
+    1. dbadmin acct that is not the db_owner acct (they may/may not be the same person) 
+    2. different accts (people) run different scripts
+    3. at least some accounts probably already exist (because the db_owner is likely to have access to other databases)
+    4. there may be a sandbox db and a production db (eg, sandbox has example content loaded, production does not)
+
+
+2. desktop install 
+    1. dbadmin and owner are probably the the same person  
+    2. multiple ways to install
+          - use a gui with an sql pane and run scripts as for a central server
+          - concat the scripts together and run them as you would a restore (keep in mind that the typical order of a DB dump-restore is not the order of operations in these scripts)
+    4. keep in mind that it is almost impossible to share work this way, which might obviate the use of postgres altogether 
+
+3. optional: notes for install on different OS's (probably orthogonal to the above)
              
