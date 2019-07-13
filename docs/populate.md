@@ -1,6 +1,6 @@
-# Populate LTER-core-metabase
+# Populate LTER-core-metabase for generating EML
 
-Last updated: June 7th 2019
+Last updated: July 13th 2019
 
 See [installation here](docs/quick_start.md).
 
@@ -29,6 +29,8 @@ There are three broad types of tables in `lter_metabase`:
 
 Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. You might need to update tables starting with List or site-specific CVs periodically. You will need to update dataset-specific tables (the rest) with every new dataset or new revision to old datasets.
 
+Tables that start with `Method` are analogous to tables that start with DataSet. See the section on Methods to see several ways to populate the methods.
+
 #### Schema `pkg_mgmt`
 
 TODO
@@ -43,8 +45,20 @@ When describing a new version of a dataset for which a previous version was alre
 
 
 ## Confused what goes where?
-TODO 
+Most of the time tables and column names make it pretty clear where different pieces of metadata is supposed to go. However, for certain pieces it's not so obvious.
 
+Here are some frequently-confused mappings:
+
+Where does <insert EML element> go?
+	- PubDate: DataSet.PubDate
+	- Revision: 
+	- Scope: 
+	- Project: see boilerplate section below
+
+What is <this table column> meant for? Does it populate an EML element?
+	- DataSetTemporal.EntitySortOrder and DataSetSites.EntitySortOrder: `coverage`-type elements can be applied to many levels in EML. Most commonly we specify dataset-wide geographic, temporal, and taxonomic coverage. However, if datasets span a large geographical area with wide-spread clusters of sampling, a blanket bounding box might not be informative. In these cases, it might be better to specify coverage at the entity level. However, modeling for that possibility means much added complexity to metabase. We have adopted the following convention: the default for EntitySortOrder is 0, which denotes dataset-level coverage. Anything other than 0 in that column will denote coverage for that entity number. Note that `MetaEgress` does not currently support this convention; it might however be on the roadmap. 
+	- 
+	
 ### Project information
 boilerplate
 
