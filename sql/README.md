@@ -1,5 +1,11 @@
 # README.md
-Dir contains the install scripts for LTER-core-metabase. See  [Quick Start guide](../docs/quick_start.md). 
+Dir contains incremental scripts for LTER-core-metabase for patches, migration from one table design to another, and moving content from old tables to new tables. For initial install we recommend first running the OneBigFile. When there are migration scripts (or patches) between versions of the OneBigFile, then run those from this directory, starting with the number greater than the patch number in the OneBigFile's revision. See also [Quick Start guide](../docs/quick_start.md). 
+
+Example:
+  - install onebigfile for version 0.9.20
+  - install patches from this branch starting with 21_something.
+
+It is possible, but not reccomended, to build Metabase using all the incremental scripts.
 
 - **0_create_db.sql**
   - creates database named lter_core_metabase
