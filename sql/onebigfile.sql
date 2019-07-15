@@ -1485,7 +1485,7 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.update_date_catalog IS 'Date package last u
 
 
 --
--- Name: version_tracker_metabase; Type: TABLE; Schema: pkg_mgmt; Owner: an
+-- Name: version_tracker_metabase; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
 CREATE TABLE pkg_mgmt.version_tracker_metabase (
