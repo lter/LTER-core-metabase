@@ -13,12 +13,12 @@ This project is in early stages and the database design is still under developme
 
 Quick [visualization of schema](http://tiny.cc/metabaseSchema).
 
-- Perfect for metadata management in LTER sites
+- Good for metadata management in LTER sites
   - Designed for earth, environmental, and ecological sciences metadata
   - Reuse information across datasets and projects
   - Database constraints for more compliant and better quality metadata
 - Companion R package `MetaEgress` to create EML docs quickly and easily
-- (coming) support for EML 2.2
+- Supports EML 2.1, (coming) support for EML 2.2
 
 ### Known limitations
 
@@ -33,12 +33,12 @@ Quick [visualization of schema](http://tiny.cc/metabaseSchema).
 
 ## Usage
 
-- A number of LTER sites use DBeaver, a GUI-based database manager, to view, populate, and update data in LTER-core-metabase. We have written a [guide on using DBeaver for common metabase tasks](docs/dbeaver.md).
+- A number of LTER sites use DBeaver, a GUI-based database manager, to view, populate, and update data in LTER-core-metabase. We have written a [guide on using DBeaver for common DB tasks](docs/dbeaver.md).
 
-- To facilitate collecting metadata from investigators with an eye toward managing it in LTER-core-metabase, BLE-LTER has made a [metadata template](https://utexas.app.box.com/file/457562705154) with instructions and examples.
-
-- [Populate LTER-core-metabase](docs/populate.md)
+- [Populate LTER-core-metabase for EML generation](docs/populate.md)
 
 - [Set up automated backups in Windows](docs/backup.md)
 
 - Use `MetaEgress` to [create EML from LTER-core-metabase](https://github.com/BLE-LTER/MetaEgress/blob/master/docs/articles/usage_example.md)
+
+See the docs folder for a complete list of docs.
