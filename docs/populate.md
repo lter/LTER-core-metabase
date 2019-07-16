@@ -45,7 +45,7 @@ Most of the time tables and column names make it pretty clear where different pi
 
 Here are some frequently-confused mappings:
 
-Where does this go?
+### Where does this go?
 
 - PubDate: `DataSet.PubDate`
 
@@ -55,7 +55,7 @@ Where does this go?
 
 - Project information: see boilerplate section below
 
-What is this table column meant for? Does it populate an EML element?
+### What is this table column meant for? Does it populate an EML element?
 
 - `SortOrder` type columns: to make your entities, or coverage elements to sort in a certain order. NOTE: not yet implemented in `MetaEgress`. Authorship order is preserved as put down in metabase. 
 
@@ -70,6 +70,15 @@ Boilerplate includes pieces of information specific to your site reused across a
  - the `project` tree, including project abstract, personnel, funding information
 
 In previous metabase versions, boilerplate information was stored in a table. As of LTER-core-metabase version 0.9, this information is stored in a flat .xml file (see example boilerplate.xml). We plan to eventually model boilerplate information in LTER-core-metabase; this might entail storing the above pieces in several places especially considering upcoming funding structure in EML 2.2.
+
+### Dataset methods
+
+Note that method-tree-related tables are in active development. Generally, we plan to fully normalize the instrument, software, protocol trees. `DataSetMethods` and `ListProtocols` are two deprecated tables.
+
+Meanwhile, there are two ways to populate an EML methods section from metabase:
+
+- Document-only: only populate the table `DataSetMethodSteps` with a method document filename or plain text, meant to go into /dataset/methods/description. Note that the VIEWs abstraction layer and `MetaEgress` only supports this option as of LTER-core-metabase version 0.9.
+- Normalized with content inserted into EML `MethodSteps`: populate `ListMethods*` tables and `Method*` tables. Tie them all together in `DataSetMethodSteps`.
 
 ## Known wonkinesses and workarounds
 
