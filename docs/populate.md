@@ -45,7 +45,7 @@ Most of the time tables and column names make it pretty clear where different pi
 
 Here are some frequently-confused mappings:
 
-Where does <insert EML element> go?
+Where does this go?
 
 	- PubDate: `DataSet.PubDate`
 
@@ -55,7 +55,7 @@ Where does <insert EML element> go?
 
 	- Project information: see boilerplate section below
 
-What is <this table column> meant for? Does it populate an EML element?
+What is this table column meant for? Does it populate an EML element?
 
 	- `SortOrder` type columns: to make your entities, or coverage elements to sort in a certain order. NOTE: not yet implemented in `MetaEgress`. Authorship order is preserved as put down in metabase. 
 
