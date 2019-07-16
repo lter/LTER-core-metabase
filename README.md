@@ -1,5 +1,5 @@
 # LTER-core-metabase
-Last updated: July 13th, 2019
+Last updated: July 16th, 2019
 
 ## Orientation
 
@@ -7,11 +7,11 @@ LTER-core-metabase is a PostgreSQL-based relational database model designed for 
 
 LTER-core-metabase is also oriented towards production of Ecological Metadata Language (EML) documents. This project is tightly coupled with the [`MetaEgress`](https://github.com/BLE-LTER/MetaEgress) R package: use `MetaEgress` to quickly and easily export EML documents from an installed and populated instance of LTER-core-metabase.
 
-This project is in early alpha stages and the database design is still under development. 
+This project is in early stages and the database design is still under development. 
 
 ### Features
 
-Quick [visualization of schema](http://sbc.lternet.edu/external/InformationManagement/LTER_IMC/tmp_lter_core_metabase/schemaSpy_docs/lter_metabase/relationships.html). Note that this is outdated as of June 7th 2019.
+Quick [visualization of schema](http://tiny.cc/metabaseSchema).
 
 - Perfect for metadata management in LTER sites
   - Designed for earth, environmental, and ecological sciences metadata
