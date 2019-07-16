@@ -89,4 +89,10 @@ echo f | xcopy /s /f "%BACKUP_DIRECTORY_1%\%BACKUP_FILE%" "%BACKUP_DIRECTORY_2%\
 
 echo done
 ```
+# Non-automated backup option
 
+Two less technical options: 
+ 1. use DBeaver or pgAdmin to interactively make a backup. Follow menu options. In pgAdmin this is on the Tools-> Backup menu.
+ 2. from a bash shell, run the pg_dump command, using the same parameters as described above.
+ :: pg_dump" -h localhost -p 5432 -U backup_user -d lter_core_metabase > output_filename
+ You may have named lter_core_metabase something like my_special_metabase. Use your database name.

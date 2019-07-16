@@ -25,6 +25,8 @@ SBC from the 6 other thesauri.
 ## Datasets
 to do
 
+Example datasets are offered to help describe how tables and columns are used. All example datasets have a DataSetID starting with 99 and being a large number. Notice in the script to DELETE example data it is assumed you do not hav any real DataSetID over 9000 starting with 99. 
+
 
 ## Sites
 to do
