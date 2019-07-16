@@ -47,19 +47,19 @@ Here are some frequently-confused mappings:
 
 Where does this go?
 
-	- PubDate: `DataSet.PubDate`
+- PubDate: `DataSet.PubDate`
 
-	- Revision: `DataSet.Revision`
+- Revision: `DataSet.Revision`
 
-	- Package ID scope: see boilerplate section below 
+- Package ID scope: see boilerplate section below 
 
-	- Project information: see boilerplate section below
+- Project information: see boilerplate section below
 
 What is this table column meant for? Does it populate an EML element?
 
-	- `SortOrder` type columns: to make your entities, or coverage elements to sort in a certain order. NOTE: not yet implemented in `MetaEgress`. Authorship order is preserved as put down in metabase. 
+- `SortOrder` type columns: to make your entities, or coverage elements to sort in a certain order. NOTE: not yet implemented in `MetaEgress`. Authorship order is preserved as put down in metabase. 
 
-	- DataSetTemporal.EntitySortOrder and DataSetSites.EntitySortOrder: `coverage`-type elements can be applied to many levels in EML. Most commonly we specify dataset-wide geographic, temporal, and taxonomic coverage. However, if datasets span a large geographical area with wide-spread clusters of sampling, a blanket bounding box might not be informative. In these cases, it might be better to specify coverage at the entity level. However, modeling for that possibility means much added complexity to metabase. We have adopted the following convention: the default for EntitySortOrder is 0, which denotes dataset-level coverage. Anything other than 0 in that column will denote coverage for that entity number. Note that `MetaEgress` does not currently support this convention; it might however be on the roadmap. 
+- DataSetTemporal.EntitySortOrder and DataSetSites.EntitySortOrder: `coverage`-type elements can be applied to many levels in EML. Most commonly we specify dataset-wide geographic, temporal, and taxonomic coverage. However, if datasets span a large geographical area with wide-spread clusters of sampling, a blanket bounding box might not be informative. In these cases, it might be better to specify coverage at the entity level. However, modeling for that possibility means much added complexity to metabase. We have adopted the following convention: the default for EntitySortOrder is 0, which denotes dataset-level coverage. Anything other than 0 in that column will denote coverage for that entity number. Note that `MetaEgress` does not currently support this convention; it might however be on the roadmap. 
 	
 ### Boilerplate information
 
