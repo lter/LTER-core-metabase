@@ -18,5 +18,5 @@ $ ruby to_snake_case lter_metabase
 
 to apply the  changes
 ```
-$ ruby to_snake_case lter_metabase --production
+$ ruby to_snake_case.rb lter_metabase --production
 ````
