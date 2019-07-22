@@ -1497,7 +1497,7 @@ CREATE TABLE pkg_mgmt.version_tracker_metabase (
 );
 
 
-ALTER TABLE pkg_mgmt.version_tracker_metabase OWNER TO read_write_user;
+ALTER TABLE pkg_mgmt.version_tracker_metabase OWNER TO %db_owner%;
 
 --
 -- Name: vw_backlog; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
