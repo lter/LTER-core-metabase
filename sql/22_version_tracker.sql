@@ -8,6 +8,9 @@ CREATE TABLE pkg_mgmt.version_tracker_metabase (
 	"comment" text NULL
 );
 
+ALTER TABLE pkg_mgmt.version_tracker_metabase
+  ADD CONSTRAINT "PK_version_tracker_metabase" PRIMARY KEY (major_version, minor_version, patch);
+
 INSERT INTO pkg_mgmt.version_tracker_metabase
 (major_version, minor_version, patch, date_installed, "comment")
 VALUES(0, 9, 22, now(), '21_migration_select_into_missValCode.sql hasn't been applied yet.');
