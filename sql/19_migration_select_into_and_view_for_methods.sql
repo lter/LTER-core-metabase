@@ -44,22 +44,6 @@
  WHERE "protocolID" IS NOT NULL
  );
  
- 
- 
- -- Maybe easier for the R code if a separate view for using method external .doc files than combining? If so...
-   
-CREATE VIEW mb2eml_r.vw_eml_method_document AS
- SELECT m."DataSetID" as datasetid,
-    m."MethodStepSet" as methodstep_position,
-    --m."DescriptionType" as content_type,
-    m."Description" as "methodDocument"
-    FROM lter_metabase."DataSetMethodSteps" m;
-     -- to do: join to sw, instr, proto
-
-ALTER TABLE mb2eml_r.vw_eml_method_document OWNER TO %db_owner%;
-
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_method_document FROM PUBLIC;
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_method_document FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_method_document TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_document TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_method_document TO %db_owner%;
+-- record this patch has been applied
+INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
+VALUES (0,9,19,now(),'from 19_migration_select_into_and_view_for_methods.sql');
