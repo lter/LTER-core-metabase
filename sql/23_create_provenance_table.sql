@@ -23,3 +23,7 @@ ALTER TABLE lter_metabase."DataSetMethodProvenance"
 	FOREIGN KEY ("DataSetID", "MethodStepID")
 	REFERENCES lter_metabase."DataSetMethodSteps" ("DataSetID", "MethodStepID")
 	ON UPDATE CASCADE;
+	
+-- record this patch has been applied
+INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
+VALUES (0,9,23,now(),'using 23_create_provenance_table.sql');
