@@ -1,6 +1,6 @@
 # Guide to DBeaver
 
-DBeaver is a database manager. Unlike pgAdmin, the database manager shipped with PostgreSQL, DBeaver lets you add rows in its GUI without writing any SQL. This guide walks you through a number of basic tasks commonly encountered in managing LTER-core-metabase.
+DBeaver is a database manager.  DBeaver lets you add rows in its GUI without writing any SQL. This guide walks you through a number of basic tasks commonly encountered in managing LTER-core-metabase.
 
 ## Installation
 
