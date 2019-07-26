@@ -22,6 +22,7 @@
 -- add a uniq constraint to code and explain columns of parent table.
 ALTER TABLE lter_metabase."ListMissingCodes"
   ADD CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" UNIQUE ("MissingValueCode", "MissingValueCodeExplanation");
+  
 COMMENT ON CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON lter_metabase."ListMissingCodes"
   IS 'Needed because the ID could be as simple as an integer and is not inherently connected to the code and explanation.';
 
