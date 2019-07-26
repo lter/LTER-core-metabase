@@ -66,6 +66,13 @@ FROM lter_metabase."DataSetMethodProvenance" m
  * That view column name is NOT an eml element and is not used directly into the eml.
  * That is why it is snake case.
  */
+
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_methodstep_description AS 
+SELECT m."DataSetID" AS datasetid, 
+    m."MethodStepID" AS methodstep_id, 
+    m."Description" AS description,
+    m."DescriptionType" AS description_type
+   FROM lter_metabase."DataSetMethodSteps" m; 
  
 ALTER TABLE mb2eml_r.vw_eml_protocols OWNER TO %db_owner%;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_protocols TO read_write_user;
@@ -85,50 +92,13 @@ GRANT ALL ON TABLE mb2eml_r.vw_eml_software TO %db_owner%;
 ALTER TABLE mb2eml_r.vw_eml_provenance OWNER TO %db_owner%;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_provenance TO read_write_user;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_provenance TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_provenance TO %db_owner%;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_provenance TO %db_owner%;  
 
--- for when an external Word doc holds methodStep text
-CREATE OR REPLACE VIEW mb2eml_r.vw_eml_method_document AS 
-SELECT m."DataSetID" AS datasetid, 
-    m."MethodStepID" AS methodstep_position, 
-    m."Description" AS "methodDocument"
-   FROM lter_metabase."DataSetMethodSteps" m
-   WHERE m."DescriptionType" like 'file';
    
-/* That view was already created in patch 19_ but is moved here since it belongs with these items
- * and needed its WHERE clause.
- */
-
--- for when methodStep/description/para is plaintext. Goes into a <para>, thus the column name.
-CREATE OR REPLACE VIEW mb2eml_r.vw_eml_method_plaintext AS 
-SELECT m."DataSetID" AS datasetid, 
-    m."MethodStepID" AS methodstep_position, 
-    m."Description" AS "para"
-   FROM lter_metabase."DataSetMethodSteps" m
-   WHERE m."DescriptionType" like 'plaintext';
-   
-   -- for when methodStep/description is markdown which can contain title, para(s) and other textType elements.
-CREATE OR REPLACE VIEW mb2eml_r.vw_eml_method_markdown AS 
-SELECT m."DataSetID" AS datasetid, 
-    m."MethodStepID" AS methodstep_position, 
-    m."Description" AS "description"
-   FROM lter_metabase."DataSetMethodSteps" m
-   WHERE m."DescriptionType" like 'md';
-   
-ALTER TABLE mb2eml_r.vw_eml_method_document OWNER TO %db_owner%;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_document TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_document TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_method_document TO %db_owner%;
-
-ALTER TABLE mb2eml_r.vw_eml_method_plaintext OWNER TO %db_owner%;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_plaintext TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_plaintext TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_method_plaintext TO %db_owner%;
-
-ALTER TABLE mb2eml_r.vw_eml_method_markdown OWNER TO %db_owner%;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_markdown TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_method_markdown TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_method_markdown TO %db_owner%;
+ALTER TABLE mb2eml_r.vw_eml_methodstep_description OWNER TO %db_owner%;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_methodstep_description TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_methodstep_description TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_methodstep_description TO %db_owner%;
 
 -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
