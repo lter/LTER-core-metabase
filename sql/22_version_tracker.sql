@@ -13,4 +13,4 @@ ALTER TABLE pkg_mgmt.version_tracker_metabase
 
 INSERT INTO pkg_mgmt.version_tracker_metabase
 (major_version, minor_version, patch, date_installed, "comment")
-VALUES(0, 9, 22, now(), '21_migration_select_into_missValCode.sql hasn't been applied yet.');
+VALUES(0, 9, 22, now(), 'apply 22_version_tracker');
