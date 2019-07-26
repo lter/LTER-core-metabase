@@ -23,6 +23,11 @@ ALTER TABLE lter_metabase."DataSetMethodProvenance"
 	FOREIGN KEY ("DataSetID", "MethodStepID")
 	REFERENCES lter_metabase."DataSetMethodSteps" ("DataSetID", "MethodStepID")
 	ON UPDATE CASCADE;
+
+ALTER TABLE lter_metabase."DataSetMethodProvenance" OWNER TO %db_owner%;
+GRANT SELECT ON TABLE lter_metabase."DataSetMethodProvenance" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."DataSetMethodProvenance" TO read_only_user;
+GRANT ALL ON TABLE lter_metabase."DataSetMethodProvenance" TO %db_owner%;
 	
 -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
