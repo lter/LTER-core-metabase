@@ -8,7 +8,7 @@ ALTER TABLE lter_metabase."DataSetMethodInstruments" RENAME "MethodStepSet"  TO 
 ALTER TABLE lter_metabase."DataSetMethodSoftware" RENAME "MethodStepSet"  TO "MethodStepID";
 
 
-CREATE OR REPLACE VIEW mb2eml2.vw_eml_protocols AS
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_protocols AS
 SELECT m."DataSetID" AS dataset_id,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	l."NameID" AS "surName",
@@ -26,7 +26,7 @@ ON m."ProtocolID"=l."ProtocolID"
  * then sname case names such as methodstep_id or data_source_packageId are used.
  */
  
-CREATE OR REPLACE VIEW mb2eml2.vw_eml_instruments AS
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_instruments AS
 SELECT m."DataSetID" AS dataset_id,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	l."Description" AS "instrument"
@@ -38,7 +38,7 @@ ON m."InstrumentID"=l."InstrumentID"
  * The description goes directly into the instrument element. 
  */
  
-CREATE OR REPLACE VIEW mb2eml2.vw_eml_software AS
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_software AS
 SELECT m."DataSetID" AS dataset_id,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	l."Title" AS "title",
@@ -55,7 +55,7 @@ ON m."SoftwareID"=l."SoftwareID"
  * software/abstract is not a common xpath.
  */
 
-CREATE OR REPLACE VIEW mb2eml2.vw_eml_provenance AS
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_provenance AS
 SELECT m."DataSetID" AS dataset_id,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	m."SourcePackageID" AS "data_source_packageId"
