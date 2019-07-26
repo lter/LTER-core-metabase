@@ -2,7 +2,7 @@ CREATE TABLE lter_metabase."ListTaxonomicProviders" (
 	"ProviderID" varchar(20) NOT NULL,
 	"ProviderName" varchar(100) NOT NULL,
 	"ProviderURL" varchar(250) NULL,
-	CONSTRAINT "PK_ListTaxonomicAuthorities" PRIMARY KEY ("ProviderID")
+	CONSTRAINT "PK_ListTaxonomicProviders" PRIMARY KEY ("ProviderID")
 );
 
 COPY lter_metabase."ListTaxonomicProviders" ("ProviderID", "ProviderName", "ProviderURL") FROM stdin;
@@ -24,7 +24,7 @@ ALTER TABLE lter_metabase."ListTaxa" RENAME COLUMN "TaxonomicAuthority" TO "Taxo
 
 ALTER TABLE lter_metabase."ListTaxa" ALTER COLUMN "TaxonRankValue" SET NOT NULL;
 
-ALTER TABLE lter_metabase."ListTaxa" ADD CONSTRAINT "FK_ListTaxa_AuthorityID" FOREIGN KEY ("TaxonomicProviderID") REFERENCES lter_metabase."ListTaxonomicAuthorities"("ProviderID") ON UPDATE CASCADE;
+ALTER TABLE lter_metabase."ListTaxa" ADD CONSTRAINT "FK_ListTaxa_ProviderID" FOREIGN KEY ("TaxonomicProviderID") REFERENCES lter_metabase."ListTaxonomicProviders"("ProviderID") ON UPDATE CASCADE;
 
 ALTER TABLE lter_metabase."DataSetTaxa" RENAME COLUMN "TaxonomicAuthority" TO "TaxonomicProviderID";
 
