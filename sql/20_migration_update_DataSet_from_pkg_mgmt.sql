@@ -19,4 +19,4 @@ WHERE lter_metabase."DataSet"."DataSetID"=s."DataSetID"
 UPDATE lter_metabase."DataSet"
 SET "ShortName" = s.nickname
 FROM pkg_mgmt.pkg_state s
-WHERE lter_metabase."DataSet"."DataSetID"=s."DataSetID"
+WHERE lter_metabase."DataSet"."DataSetID"=s."DataSetID";
