@@ -75,19 +75,7 @@ ALTER TABLE pkg_mgmt.maintenance_changehistory
 	
 -- alter dataset view
 
-DROP VIEW mb2eml_r.vw_eml_dataset;
 
-CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset
-AS SELECT d."DataSetID" AS datasetid,
-    d."Revision" AS revision_number,
-    d."Title" AS title,
-    d."Abstract" AS abstract,
-    d."ShortName" AS shortname,
-    d."UpdateFrequency" AS update_frequency,
-    d."MaintenanceDescription" AS maintenance_desc,
-    d."PubDate" as pubdate
-   FROM lter_metabase."DataSet" d
-  ORDER BY d."DataSetID";
 
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_changehistory AS
 	SELECT m."DataSetID" AS datasetid, 
@@ -126,11 +114,3 @@ REVOKE ALL ON TABLE mb2eml_r.vw_eml_changehistory FROM %db_owner%;
 GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_changehistory TO read_write_user;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_changehistory TO read_only_user;
 GRANT ALL ON TABLE mb2eml_r.vw_eml_changehistory TO %db_owner%;
-
-ALTER TABLE mb2eml_r.vw_eml_dataset OWNER TO %db_owner%;
-
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_dataset FROM PUBLIC;
-REVOKE ALL ON TABLE mb2eml_r.vw_eml_dataset FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_dataset TO read_write_user;
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_dataset TO read_only_user;
-GRANT ALL ON TABLE mb2eml_r.vw_eml_dataset TO %db_owner%;
