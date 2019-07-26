@@ -1,5 +1,5 @@
 # LTER-core-metabase
-Last updated: July 16th, 2019
+This README.md was last updated: July 26, 2019
 
 ## Orientation
 
@@ -7,7 +7,7 @@ LTER-core-metabase is a PostgreSQL-based relational database model designed for 
 
 LTER-core-metabase is also oriented towards production of Ecological Metadata Language (EML) documents. This project is tightly coupled with the [`MetaEgress`](https://github.com/BLE-LTER/MetaEgress) R package: use `MetaEgress` to quickly and easily export EML documents from an installed and populated instance of LTER-core-metabase.
 
-This project is in early stages and the database design is still under development. 
+The database design is still in active development. We encorage anyone to give it a test drive, but please keep in contact with us for advice prior to installation for use in production. 
 
 ### Features
 
