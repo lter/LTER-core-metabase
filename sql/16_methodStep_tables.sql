@@ -171,7 +171,7 @@ REVOKE ALL ON TABLE lter_metabase."MethodInstruments" FROM PUBLIC;
 REVOKE ALL ON TABLE lter_metabase."MethodInstruments" FROM %db_owner%;
 GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."MethodInstruments" TO read_write_user;
 GRANT SELECT ON TABLE lter_metabase."MethodInstruments" TO read_only_user;
-GRANT ALL ON TABLE lter_metabase."MethodSoftware" TO %db_owner%;
+GRANT ALL ON TABLE lter_metabase."MethodInstruments" TO %db_owner%;
 
 
 
