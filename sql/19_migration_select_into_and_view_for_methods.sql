@@ -43,7 +43,10 @@
  FROM lter_metabase."DataSetMethods"
  WHERE "protocolID" IS NOT NULL
  );
+
  
+/* An comments out because version tracker the table isn't created until patch 22
 -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
 VALUES (0,9,19,now(),'from 19_migration_select_into_and_view_for_methods.sql');
+*/
