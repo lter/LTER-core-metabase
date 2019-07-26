@@ -12,6 +12,28 @@ ALTER TABLE lter_metabase."DataSet" DROP COLUMN "Status";
 
 ALTER TABLE lter_metabase."DataSet" ALTER COLUMN "PubDate" TYPE date USING "PubDate"::date;
 
+DROP VIEW mb2eml_r.vw_eml_dataset;
+
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset
+AS SELECT d."DataSetID" AS datasetid,
+    d."Revision" AS revision_number,
+    d."Title" AS title,
+    d."Abstract" AS abstract,
+    d."ShortName" AS shortname,
+    d."UpdateFrequency" AS update_frequency,
+    d."MaintenanceDescription" AS maintenance_desc,
+    d."PubDate" as pubdate
+   FROM lter_metabase."DataSet" d
+  ORDER BY d."DataSetID";
+
+ALTER TABLE mb2eml_r.vw_eml_dataset OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_dataset FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_dataset FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_dataset TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_dataset TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_dataset TO %db_owner%;
+
 -- DataSetAttributes
 
 ALTER TABLE lter_metabase."DataSetAttributes" RENAME COLUMN minimum TO "BoundsMinimum";
