@@ -1124,7 +1124,7 @@ CREATE VIEW mb2eml_r.vw_eml_software AS
 ALTER TABLE mb2eml_r.vw_eml_software OWNER TO %db_owner%;
 
 --
--- Name: vw_eml_taxonomy; Type: VIEW; Schema: mb2eml_r; Owner: an
+-- Name: vw_eml_taxonomy; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
 CREATE VIEW mb2eml_r.vw_eml_taxonomy AS
@@ -1141,7 +1141,7 @@ CREATE VIEW mb2eml_r.vw_eml_taxonomy AS
   ORDER BY d."DataSetID";
 
 
-ALTER TABLE mb2eml_r.vw_eml_taxonomy OWNER TO an;
+ALTER TABLE mb2eml_r.vw_eml_taxonomy OWNER TO %db_owner%;
 
 --
 -- Name: vw_eml_temporalcoverage; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
