@@ -48,3 +48,10 @@ Rename the dump to `onebigfile.sql` and commit it to the master branch in the `s
 
 1. If you have doubt you have captured the end state of the db, the most safe process is to install the previous onebigfile again, apply the patch file, dump, and diff the two dumps. That is not usually necessary. 
 1. Note the onebigfile.sql must be made using pg_dump from the same version of postgres to be comparable to past and future onebigfile commits. As of July 2019 we are using postgres 11 for this. 
+
+## Revisions
+
+Congrats, you have contributed to the LTER-core-metabase project! What if you find a mistake? What if you change your mind on what a column should be called? It happens to us all the time. So what do you do?
+
+- Immediately after committing: never edit the OBF or patch by hand and just commit it. Always execute the change in a live database to validate the SQL. 
+- If some time has elapsed: do not go back and edit the patch. Make a new patch for your changes. 
