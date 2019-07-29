@@ -42,3 +42,7 @@ Quick [visualization of schema](http://tiny.cc/metabaseSchema).
 - Use `MetaEgress` to [create EML from LTER-core-metabase](https://github.com/BLE-LTER/MetaEgress/blob/master/docs/articles/usage_example.md)
 
 See the docs folder for a complete list of docs.
+
+## For contributors
+
+See the [contributing guide](CONTRIBUTING.md). 
