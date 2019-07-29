@@ -5022,7 +5022,7 @@ COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, dat
 0	9	22	2019-07-26 16:21:35.646383	apply 22_version_tracker
 0	9	23	2019-07-26 16:21:35.658483	using 23_create_provenance_table.sql
 0	9	24	2019-07-26 16:21:35.667965	from 24_method_step_views_and_methodstepID_col_name.sql
-0   9   22  2019-07-26 16:21:35.667965  apply 25_drop_deprecated
+0	9	25	2019-07-26 16:21:35.667965	applied 25_drop_deprecated
 \.
 
 
