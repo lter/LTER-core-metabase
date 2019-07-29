@@ -41,3 +41,7 @@ ALTER TABLE mb2eml_r.vw_eml_attributes OWNER TO %db_owner%;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributes TO read_write_user;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributes TO read_only_user;
 GRANT ALL ON TABLE mb2eml_r.vw_eml_attributes TO %db_owner%;
+                                                                 
+-- record this patch has been applied
+INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
+VALUES (0,9,25,now(),'from 25_drop_deprecated_method_missing.sql');
