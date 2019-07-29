@@ -22,11 +22,10 @@ ALWAYS follow these steps at the beginning of a coding session.
 cat onebigfile.sql | sed 's/%db_owner%/your_username/g' > local_temporary_onebigfile.sql
 ```
 4. Make a new empty database. Name it whatever you want. Set the owner to the role you are using. 
-1. Execute your local edited copy of onebigfile on this database. It should execute with no errors (or only one about the owner of the language plpsql). At this point you should have a working live database with the latest version of LTER-core-metabase. How to do this using psql:
+5. Execute your local edited copy of onebigfile on this database. It should execute with no errors (or only one about the owner of the language plpsql). At this point you should have a working live database with the latest version of LTER-core-metabase. How to do this using psql: (If postgres is running on your local desktop, your_db_host is localhost.)
 ```
 psql -U your_username -h your_db_host name_of_db < local_temporary_onebigfile.sql
 ```
-If postgres is running on your local desktop, your_db_host is localhost.
 6. Make your changes to the database live. You can do this in a GUI like DBeaver and IMPORTANTLY cache the SQL executed in a separate text, or write your SQL in a text editor and execute it on the development DB.
 1. Once testing is done, add a row by executing an INSERT statement to the version tracker table following this template. Substitute appropriate version numbers, your patch number, and comment. Include the INSERT statement at the bottom of the .sql text file.
 ```
