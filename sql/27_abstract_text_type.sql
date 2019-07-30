@@ -27,6 +27,11 @@ CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset AS
    FROM lter_metabase."DataSet" d
   ORDER BY d."DataSetID";
 
+ALTER TABLE mb2eml_r.vw_eml_dataset OWNER TO %db_owner%;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_dataset TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_dataset TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_dataset TO %db_owner%;
+
   -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
 VALUES (0,9,27,now(),'applied 27_abstract_text_type.sql');
