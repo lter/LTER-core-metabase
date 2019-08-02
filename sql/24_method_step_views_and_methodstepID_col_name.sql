@@ -9,7 +9,7 @@ ALTER TABLE lter_metabase."DataSetMethodSoftware" RENAME "MethodStepSet"  TO "Me
 
 
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_protocols AS
-SELECT m."DataSetID" AS dataset_id,
+SELECT m."DataSetID" AS datasetid,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	l."NameID" AS "surName",
 	l."Title" AS title,
@@ -22,12 +22,12 @@ ON m."ProtocolID"=l."ProtocolID"
  * 
  * These views' output columns are using eml element names such as surName, title, url 
  * for content that goes directly into an element. 
- * When the content is used in business logic, not content, such as dataset_id and methodstep_id,
+ * When the content is used in business logic, not content, such as datasetid and methodstep_id,
  * then sname case names such as methodstep_id or data_source_packageId are used.
  */
  
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_instruments AS
-SELECT m."DataSetID" AS dataset_id,
+SELECT m."DataSetID" AS datasetid,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	l."Description" AS "instrument"
 FROM lter_metabase."DataSetMethodInstruments" m
@@ -39,7 +39,7 @@ ON m."InstrumentID"=l."InstrumentID"
  */
  
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_software AS
-SELECT m."DataSetID" AS dataset_id,
+SELECT m."DataSetID" AS datasetid,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	l."Title" AS "title",
 	l."AuthorSurname" AS "surName", -- software/creator/individualName/surName
@@ -56,7 +56,7 @@ ON m."SoftwareID"=l."SoftwareID"
  */
 
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_provenance AS
-SELECT m."DataSetID" AS dataset_id,
+SELECT m."DataSetID" AS datasetid,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
 	m."SourcePackageID" AS "data_source_packageId"
 FROM lter_metabase."DataSetMethodProvenance" m
