@@ -52,7 +52,7 @@ AS SELECT d."DataSetID" AS datasetid,
      join lter_metabase."ListTaxonomicProviders" p on d."TaxonomicProviderID"::text = p."ProviderID"::text
   ORDER BY d."DataSetID";
  
- ALTER TABLE lter_metabase."ListTaxonomicProviders" OWNER TO %db_owner%;
+ ALTER TABLE mb2eml_r.vw_eml_taxonomy OWNER TO %db_owner%;
 
 REVOKE ALL ON TABLE mb2eml_r.vw_eml_taxonomy FROM PUBLIC;
 REVOKE ALL ON TABLE mb2eml_r.vw_eml_taxonomy FROM %db_owner%;
