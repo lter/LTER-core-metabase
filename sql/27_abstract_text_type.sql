@@ -1,17 +1,21 @@
 -- Add variable content type for abstract to table and view.
 
-ALTER TABLE lter_metabase."DataSet" ADD COLUMN "AbstractType" character varying(10);
+ALTER TABLE lter_metabase."DataSet" 
+  ADD COLUMN "AbstractType" character varying(10);
 
 -- Column cannot be null before adding NOT NULL to it. All example data (so far) is type file.
 UPDATE lter_metabase."DataSet"
 SET "AbstractType" = 'file'
 WHERE "Abstract" like 'abstract.%.docx';
 
-ALTER TABLE lter_metabase."DataSet" ALTER COLUMN "AbstractType" SET NOT NULL;
+ALTER TABLE lter_metabase."DataSet" 
+  ALTER COLUMN "AbstractType" SET NOT NULL;
+
 COMMENT ON COLUMN lter_metabase."DataSet"."AbstractType" IS 'Indicates which type of content Abstract column contains (plaintext, md, file).';
 
-CONSTRAINT "CK_DataSet_AbstractType" 
-CHECK ("AbstractType"::text = ANY (ARRAY['file'::character varying::text, 'md'::character varying::text, 'plaintext'::character varying::text])),
+ALTER TABLE lter_metabase."DataSet" 
+  ADD CONSTRAINT "CK_DataSet_AbstractType" 
+    CHECK ("AbstractType"::text = ANY (ARRAY['file'::character varying::text, 'md'::character varying::text, 'plaintext'::character varying::text]));
 
 DROP VIEW mb2eml_r.vw_eml_dataset; -- because changes output columns, cannot merely REPLACE.
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset AS 
