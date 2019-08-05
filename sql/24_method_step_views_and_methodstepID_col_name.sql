@@ -11,12 +11,14 @@ ALTER TABLE lter_metabase."DataSetMethodSoftware" RENAME "MethodStepSet"  TO "Me
 CREATE OR REPLACE VIEW mb2eml_r.vw_eml_protocols AS
 SELECT m."DataSetID" AS datasetid,
 	m."MethodStepID" AS methodstep_id, -- collects and sorts sets of method items
-	l."NameID" AS "surName",
+	p."GivenName" AS givenname,
+	p."MiddleName" AS givenname2,
+	p."SurName" AS surname,
 	l."Title" AS title,
 	l."URL" AS url
-FROM lter_metabase."DataSetMethodProtocols" m
-JOIN lter_metabase."ListMethodProtocols" l
-ON m."ProtocolID"=l."ProtocolID"
+FROM lter_metabase."ListMethodProtocols" l
+ LEFT JOIN lter_metabase."DataSetMethodProtocols" m ON m."ProtocolID"=l."ProtocolID"
+ LEFT JOIN lter_metabase."ListPersonnel" p ON l."NameID"=p."NameID"
 ;
 /*  naming convention here:
  * 
