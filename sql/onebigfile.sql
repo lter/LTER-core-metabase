@@ -97,6 +97,7 @@ CREATE TABLE lter_metabase."DataSet" (
     "UpdateFrequency" character varying(50),
     "MaintenanceDescription" character varying(500),
     "AbstractType" character varying(10) NOT NULL,
+    "BoilerplateSetting" character varying(20) DEFAULT 'default'::character varying NOT NULL,
     CONSTRAINT "CK_DataSet_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text])))
 );
 
@@ -768,6 +769,25 @@ CREATE TABLE lter_metabase."ListTaxonomicProviders" (
 ALTER TABLE lter_metabase."ListTaxonomicProviders" OWNER TO %db_owner%;
 
 --
+-- Name: boilerplate; Type: TABLE; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+CREATE TABLE mb2eml_r.boilerplate (
+    bp_setting character varying(20) NOT NULL,
+    scope character varying(20) NOT NULL,
+    system character varying(20) NOT NULL,
+    access xml,
+    distribution xml,
+    publisher_nameid character varying(20),
+    contact_nameid character varying(20),
+    metadata_provider_nameid character varying(20),
+    project xml
+);
+
+
+ALTER TABLE mb2eml_r.boilerplate OWNER TO %db_owner%;
+
+--
 -- Name: vw_custom_units; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -874,6 +894,90 @@ CREATE VIEW mb2eml_r.vw_eml_attributes AS
 ALTER TABLE mb2eml_r.vw_eml_attributes OWNER TO %db_owner%;
 
 --
+-- Name: vw_eml_boilerplate; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+CREATE VIEW mb2eml_r.vw_eml_boilerplate AS
+ SELECT boilerplate.bp_setting,
+    boilerplate.scope,
+    boilerplate.system,
+    boilerplate.access,
+    boilerplate.distribution,
+    boilerplate.project
+   FROM mb2eml_r.boilerplate;
+
+
+ALTER TABLE mb2eml_r.vw_eml_boilerplate OWNER TO %db_owner%;
+
+--
+-- Name: vw_eml_bp_people; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+CREATE VIEW mb2eml_r.vw_eml_bp_people AS
+ SELECT b.bp_setting,
+    'publisher'::text AS bp_role,
+    p."GivenName" AS givenname,
+    p."MiddleName" AS givenname2,
+    p."SurName" AS surname,
+    p."Organization" AS organization,
+    p."Address1" AS address1,
+    p."Address2" AS address2,
+    p."Address3" AS address3,
+    p."City" AS city,
+    p."State" AS state,
+    p."Country" AS country,
+    p."ZipCode" AS zipcode,
+    p."Phone" AS phone1,
+    i."IdentificationSystem" AS userid_type,
+    i."IdentificationURL" AS userid
+   FROM ((lter_metabase."ListPeople" p
+     JOIN mb2eml_r.boilerplate b ON (((b.publisher_nameid)::text = (p."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)))
+UNION
+ SELECT b.bp_setting,
+    'metadata_provider'::text AS bp_role,
+    p."GivenName" AS givenname,
+    p."MiddleName" AS givenname2,
+    p."SurName" AS surname,
+    p."Organization" AS organization,
+    p."Address1" AS address1,
+    p."Address2" AS address2,
+    p."Address3" AS address3,
+    p."City" AS city,
+    p."State" AS state,
+    p."Country" AS country,
+    p."ZipCode" AS zipcode,
+    p."Phone" AS phone1,
+    i."IdentificationSystem" AS userid_type,
+    i."IdentificationURL" AS userid
+   FROM ((lter_metabase."ListPeople" p
+     JOIN mb2eml_r.boilerplate b ON (((b.metadata_provider_nameid)::text = (p."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)))
+UNION
+ SELECT b.bp_setting,
+    'contact'::text AS bp_role,
+    p."GivenName" AS givenname,
+    p."MiddleName" AS givenname2,
+    p."SurName" AS surname,
+    p."Organization" AS organization,
+    p."Address1" AS address1,
+    p."Address2" AS address2,
+    p."Address3" AS address3,
+    p."City" AS city,
+    p."State" AS state,
+    p."Country" AS country,
+    p."ZipCode" AS zipcode,
+    p."Phone" AS phone1,
+    i."IdentificationSystem" AS userid_type,
+    i."IdentificationURL" AS userid
+   FROM ((lter_metabase."ListPeople" p
+     JOIN mb2eml_r.boilerplate b ON (((b.contact_nameid)::text = (p."NameID")::text)))
+     LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)));
+
+
+ALTER TABLE mb2eml_r.vw_eml_bp_people OWNER TO %db_owner%;
+
+--
 -- Name: maintenance_changehistory; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -962,7 +1066,8 @@ CREATE VIEW mb2eml_r.vw_eml_dataset AS
     d."ShortName" AS shortname,
     d."UpdateFrequency" AS maintenanceupdatefrequency,
     d."MaintenanceDescription" AS maintenance_description,
-    d."PubDate" AS pubdate
+    d."PubDate" AS pubdate,
+    d."BoilerplateSetting" AS bp_setting
    FROM lter_metabase."DataSet" d
   ORDER BY d."DataSetID";
 
@@ -1772,11 +1877,11 @@ ALTER TABLE pkg_mgmt.vw_temporal OWNER TO %db_owner%;
 -- Data for Name: DataSet; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abstract", "ShortName", "UpdateFrequency", "MaintenanceDescription", "AbstractType") FROM stdin;
-99013	21	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	Reef bottom water temperature	\N	\N	file
-99024	17	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	Kelp - algal weights and CHN	\N	\N	file
-99054	4	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	Satellite kelp canopy biomass	\N	\N	file
-99021	11	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	Beach wrack IV 2005-06	\N	\N	file
+COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abstract", "ShortName", "UpdateFrequency", "MaintenanceDescription", "AbstractType", "BoilerplateSetting") FROM stdin;
+99013	21	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	Reef bottom water temperature	\N	\N	file	default
+99024	17	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	Kelp - algal weights and CHN	\N	\N	file	default
+99054	4	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	Satellite kelp canopy biomass	\N	\N	file	default
+99021	11	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	Beach wrack IV 2005-06	\N	\N	file	default
 \.
 
 
@@ -2118,6 +2223,8 @@ COPY lter_metabase."DataSetKeywords" ("DataSetID", "Keyword", "ThesaurusID") FRO
 --
 
 COPY lter_metabase."DataSetMethodInstruments" ("DataSetID", "MethodStepID", "InstrumentID") FROM stdin;
+99021	10	1
+99021	10	2
 \.
 
 
@@ -2129,6 +2236,7 @@ COPY lter_metabase."DataSetMethodProtocols" ("DataSetID", "MethodStepID", "Proto
 99021	10	57
 99024	10	55
 99013	10	46
+99021	10	35
 \.
 
 
@@ -2137,6 +2245,8 @@ COPY lter_metabase."DataSetMethodProtocols" ("DataSetID", "MethodStepID", "Proto
 --
 
 COPY lter_metabase."DataSetMethodProvenance" ("DataSetID", "MethodStepID", "SourcePackageID") FROM stdin;
+99021	10	knb-lter-ble.1.5
+99021	10	knb-lter-sbc.6003.3
 \.
 
 
@@ -2145,6 +2255,9 @@ COPY lter_metabase."DataSetMethodProvenance" ("DataSetID", "MethodStepID", "Sour
 --
 
 COPY lter_metabase."DataSetMethodSoftware" ("DataSetID", "MethodStepID", "SoftwareID") FROM stdin;
+99021	10	1
+99021	10	2
+99021	20	3
 \.
 
 
@@ -2156,6 +2269,7 @@ COPY lter_metabase."DataSetMethodSteps" ("DataSetID", "MethodStepID", "Descripti
 99021	10	file	method.21.10.docx	\N
 99024	10	file	method.24.10.docx	\N
 99013	10	file	method.13.10.docx	\N
+99021	20	file	method.21.20.docx	\N
 \.
 
 
@@ -3392,6 +3506,8 @@ allometry	none	theme
 --
 
 COPY lter_metabase."ListMethodInstruments" ("InstrumentID", "Description") FROM stdin;
+1	My keyboard.
+2	My two eyeballs.
 \.
 
 
@@ -3510,6 +3626,9 @@ COPY lter_metabase."ListMethodProtocols" ("ProtocolID", "NameID", "Title", "URL"
 --
 
 COPY lter_metabase."ListMethodSoftware" ("SoftwareID", "Title", "AuthorSurname", "Description", "Version", "URL") FROM stdin;
+1	The Programming Language Called R	LottaLuminaries	The Programming Language Formerly Called S is now named R. 	3.6.0	https://www.r-project.org/
+2	High and Mighty Excel	MrMicrosoft	Tried, tested, and true.	19	https://microsoft.com
+3	Good Ole Paint	MrMicrosoft	Oh, what shall my life be without ye?	999.000.1	https://microsoft.com
 \.
 
 
@@ -4093,6 +4212,16 @@ pow	Kew's Plants of the World	http://www.plantsoftheworldonline.org/
 
 
 --
+-- Data for Name: boilerplate; Type: TABLE DATA; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+COPY mb2eml_r.boilerplate (bp_setting, scope, system, access, distribution, publisher_nameid, contact_nameid, metadata_provider_nameid, project) FROM stdin;
+default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  
+non-default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  
+\.
+
+
+--
 -- Data for Name: cv_cra; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4221,6 +4350,8 @@ short_term_study
 --
 
 COPY pkg_mgmt.maintenance_changehistory ("DataSetID", revision_number, revision_notes, change_scope, change_date, "NameID") FROM stdin;
+99021	1	First	Metadata	2019-08-27	mobrien
+99021	2	second	Metadata	2019-08-27	mobrien
 \.
 
 
@@ -5037,6 +5168,7 @@ COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, dat
 0	9	24	2019-08-02 14:14:41.337056	from 24_method_step_views_and_methodstepID_col_name.sql
 0	9	25	2019-08-02 14:14:41.352391	apply 25_drop_deprecated
 0	9	27	2019-08-02 14:14:41.356958	applied 27_abstract_text_type.sql
+0	9	30	2019-09-09 17:09:37.416947	apply 30_create_boilerplate.sql
 \.
 
 
@@ -5373,6 +5505,14 @@ ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
     ADD CONSTRAINT pk_emlattributecodedefinition_pk PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "Code");
+
+
+--
+-- Name: boilerplate pk_boilerplate; Type: CONSTRAINT; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY mb2eml_r.boilerplate
+    ADD CONSTRAINT pk_boilerplate PRIMARY KEY (bp_setting);
 
 
 --
@@ -5849,6 +5989,30 @@ ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
 
 
 --
+-- Name: boilerplate fk_boilerplate_contact_nameid; Type: FK CONSTRAINT; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY mb2eml_r.boilerplate
+    ADD CONSTRAINT fk_boilerplate_contact_nameid FOREIGN KEY (contact_nameid) REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
+
+
+--
+-- Name: boilerplate fk_boilerplate_metadata_provider_nameid; Type: FK CONSTRAINT; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY mb2eml_r.boilerplate
+    ADD CONSTRAINT fk_boilerplate_metadata_provider_nameid FOREIGN KEY (metadata_provider_nameid) REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
+
+
+--
+-- Name: boilerplate fk_boilerplate_publisher_nameid; Type: FK CONSTRAINT; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY mb2eml_r.boilerplate
+    ADD CONSTRAINT fk_boilerplate_publisher_nameid FOREIGN KEY (publisher_nameid) REFERENCES lter_metabase."ListPeople"("NameID") ON UPDATE CASCADE;
+
+
+--
 -- Name: pkg_core_area FK_cra; Type: FK CONSTRAINT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6240,6 +6404,14 @@ GRANT SELECT ON TABLE lter_metabase."ListTaxonomicProviders" TO read_only_user;
 
 
 --
+-- Name: TABLE boilerplate; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.boilerplate TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.boilerplate TO read_only_user;
+
+
+--
 -- Name: TABLE vw_custom_units; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6269,6 +6441,22 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributecodedefinition TO read_only_user;
 
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributes TO read_write_user;
 GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributes TO read_only_user;
+
+
+--
+-- Name: TABLE vw_eml_boilerplate; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_boilerplate TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_boilerplate TO read_only_user;
+
+
+--
+-- Name: TABLE vw_eml_bp_people; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_bp_people TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_bp_people TO read_only_user;
 
 
 --
