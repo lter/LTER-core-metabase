@@ -122,6 +122,29 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_bp_people TO read_only_user;
 GRANT ALL ON TABLE mb2eml_r.vw_eml_bp_people TO %db_owner%;
 
 
+ALTER TABLE lter_metabase."DataSet" 
+	ADD COLUMN "BoilerplateSetting" character varying(20) NOT NULL;
+
+ALTER TABLE lter_metabase."DataSet"
+	ADD CONSTRAINT "FK_boilerplate_setting" 
+	FOREIGN KEY (boilerplate_setting) REFERENCES mb2eml_r.boilerplate (boilerplate_setting) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE NO ACTION;
+
+CREATE OR REPLACE VIEW mb2eml_r.vw_eml_dataset
+AS SELECT d."DataSetID" AS datasetid,
+    d."Revision" AS revision_number,
+    d."Title" AS title,
+    d."AbstractType" AS abstract_type,
+    d."Abstract" AS abstract,
+    d."ShortName" AS shortname,
+    d."UpdateFrequency" AS maintenanceupdatefrequency,
+    d."MaintenanceDescription" AS maintenance_description,
+    d."PubDate" AS pubdate
+    d."BoilerplateSetting" as bp_setting
+   FROM lter_metabase."DataSet" d
+  ORDER BY d."DataSetID";
+
+
 -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
 VALUES (0,9,29,now(),'apply 29_create_boilerplate.sql');
