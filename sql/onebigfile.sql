@@ -781,7 +781,8 @@ CREATE TABLE mb2eml_r.boilerplate (
     publisher_nameid character varying(20),
     contact_nameid character varying(20),
     metadata_provider_nameid character varying(20),
-    project xml
+    project xml,
+    license character varying(5000)
 );
 
 
@@ -903,7 +904,8 @@ CREATE VIEW mb2eml_r.vw_eml_boilerplate AS
     boilerplate.system,
     boilerplate.access,
     boilerplate.distribution,
-    boilerplate.project
+    boilerplate.project,
+    boilerplate.license
    FROM mb2eml_r.boilerplate;
 
 
@@ -929,7 +931,8 @@ CREATE VIEW mb2eml_r.vw_eml_bp_people AS
     p."ZipCode" AS zipcode,
     p."Phone" AS phone1,
     i."IdentificationSystem" AS userid_type,
-    i."IdentificationURL" AS userid
+    i."IdentificationURL" AS userid,
+    p."Email" AS email
    FROM ((lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON (((b.publisher_nameid)::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)))
@@ -949,7 +952,8 @@ UNION
     p."ZipCode" AS zipcode,
     p."Phone" AS phone1,
     i."IdentificationSystem" AS userid_type,
-    i."IdentificationURL" AS userid
+    i."IdentificationURL" AS userid,
+    p."Email" AS email
    FROM ((lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON (((b.metadata_provider_nameid)::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)))
@@ -969,7 +973,8 @@ UNION
     p."ZipCode" AS zipcode,
     p."Phone" AS phone1,
     i."IdentificationSystem" AS userid_type,
-    i."IdentificationURL" AS userid
+    i."IdentificationURL" AS userid,
+    p."Email" AS email
    FROM ((lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON (((b.contact_nameid)::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)));
@@ -4215,9 +4220,9 @@ pow	Kew's Plants of the World	http://www.plantsoftheworldonline.org/
 -- Data for Name: boilerplate; Type: TABLE DATA; Schema: mb2eml_r; Owner: %db_owner%
 --
 
-COPY mb2eml_r.boilerplate (bp_setting, scope, system, access, distribution, publisher_nameid, contact_nameid, metadata_provider_nameid, project) FROM stdin;
-default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  
-non-default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  
+COPY mb2eml_r.boilerplate (bp_setting, scope, system, access, distribution, publisher_nameid, contact_nameid, metadata_provider_nameid, project, license) FROM stdin;
+default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  	\N
+non-default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  	\N
 \.
 
 
