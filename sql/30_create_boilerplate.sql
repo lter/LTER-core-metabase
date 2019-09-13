@@ -8,6 +8,7 @@ CREATE TABLE mb2eml_r.boilerplate (
 	contact_nameid character varying(20),
 	metadata_provider_nameid character varying(20),
 	project xml,
+	license character varying (5000)
 	CONSTRAINT "pk_boilerplate" PRIMARY KEY(bp_setting),
 	CONSTRAINT "fk_boilerplate_publisher_nameid" FOREIGN KEY (publisher_nameid)
       REFERENCES lter_metabase."ListPeople" ("NameID") MATCH SIMPLE
@@ -36,7 +37,8 @@ CREATE OR REPLACE VIEW mb2eml_r.vw_eml_boilerplate AS
 	system as system,
 	access as access,
 	distribution as distribution,
-	project as project
+	project as project,
+	license as license
 	FROM mb2eml_r.boilerplate;
 
 ALTER TABLE mb2eml_r.vw_eml_boilerplate OWNER TO %db_owner%;
@@ -147,4 +149,4 @@ AS SELECT d."DataSetID" AS datasetid,
 
 -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
-VALUES (0,9,29,now(),'apply 29_create_boilerplate.sql');
+VALUES (0,9,30,now(),'apply 30_create_boilerplate.sql');
