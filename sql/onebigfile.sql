@@ -859,7 +859,8 @@ CREATE VIEW mb2eml_r.vw_eml_associatedparty AS
     p."Email" AS email,
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
-    p."Position" AS "position"
+    p."Position" AS "position",
+    p."WebPage" AS online_url
    FROM ((lter_metabase."DataSetPersonnel" d
      LEFT JOIN lter_metabase."ListPeople" p ON (((d."NameID")::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((d."NameID")::text = (i."NameID")::text)))
@@ -961,7 +962,8 @@ CREATE VIEW mb2eml_r.vw_eml_bp_people AS
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
     p."Email" AS email,
-    p."Position" AS "position"
+    p."Position" AS "position",
+    p."WebPage" AS online_url
    FROM ((lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON (((b.publisher_nameid)::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)))
@@ -983,7 +985,8 @@ UNION
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
     p."Email" AS email,
-    p."Position" AS "position"
+    p."Position" AS "position",
+    p."WebPage" AS online_url
    FROM ((lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON (((b.metadata_provider_nameid)::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)))
@@ -1005,7 +1008,8 @@ UNION
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
     p."Email" AS email,
-    p."Position" AS "position"
+    p."Position" AS "position",
+    p."WebPage" AS online_url
    FROM ((lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON (((b.contact_nameid)::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((i."NameID")::text = (p."NameID")::text)));
@@ -1080,7 +1084,8 @@ CREATE VIEW mb2eml_r.vw_eml_creator AS
     p."Email" AS email,
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
-    p."Position" AS "position"
+    p."Position" AS "position",
+    p."WebPage" AS online_url
    FROM ((lter_metabase."DataSetPersonnel" d
      LEFT JOIN lter_metabase."ListPeople" p ON (((d."NameID")::text = (p."NameID")::text)))
      LEFT JOIN lter_metabase."ListPeopleID" i ON (((d."NameID")::text = (i."NameID")::text)))
