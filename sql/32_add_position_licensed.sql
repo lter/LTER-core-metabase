@@ -23,7 +23,8 @@ AS SELECT b.bp_setting,
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
     p."Email" AS email,
-    p."Position" as position
+    p."Position" as position,
+    p."WebPage" as online_url
    FROM lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON b.publisher_nameid::text = p."NameID"::text
      LEFT JOIN lter_metabase."ListPeopleID" i ON i."NameID"::text = p."NameID"::text
@@ -45,7 +46,8 @@ UNION
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
     p."Email" AS email,
-    p."Position" as position
+    p."Position" as position,
+    p."WebPage" as online_url
    FROM lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON b.metadata_provider_nameid::text = p."NameID"::text
      LEFT JOIN lter_metabase."ListPeopleID" i ON i."NameID"::text = p."NameID"::text
@@ -67,7 +69,8 @@ UNION
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
     p."Email" AS email,
-    p."Position" as position
+    p."Position" as position,
+    p."WebPage" as online_url
    FROM lter_metabase."ListPeople" p
      JOIN mb2eml_r.boilerplate b ON b.contact_nameid::text = p."NameID"::text
      LEFT JOIN lter_metabase."ListPeopleID" i ON i."NameID"::text = p."NameID"::text;
@@ -93,7 +96,8 @@ AS SELECT d."DataSetID" AS datasetid,
     p."Email" AS email,
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
-    p."Position" as position
+    p."Position" as position,
+    p."WebPage" as online_url
    FROM lter_metabase."DataSetPersonnel" d
      LEFT JOIN lter_metabase."ListPeople" p ON d."NameID"::text = p."NameID"::text
      LEFT JOIN lter_metabase."ListPeopleID" i ON d."NameID"::text = i."NameID"::text
@@ -119,7 +123,8 @@ AS SELECT d."DataSetID" AS datasetid,
     p."Email" AS email,
     i."IdentificationSystem" AS userid_type,
     i."IdentificationURL" AS userid,
-    p."Position" as position
+    p."Position" as position,
+    p."WebPage" as online_url
    FROM lter_metabase."DataSetPersonnel" d
      LEFT JOIN lter_metabase."ListPeople" p ON d."NameID"::text = p."NameID"::text
      LEFT JOIN lter_metabase."ListPeopleID" i ON d."NameID"::text = i."NameID"::text
@@ -158,4 +163,4 @@ GRANT ALL ON TABLE mb2eml_r.vw_eml_boilerplate TO %db_owner%;
 
   -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
-VALUES (0,9,32,now(),'applied 31_add_position_licensed.sql');
+VALUES (0,9,32,now(),'applied 32_add_position_licensed.sql');
