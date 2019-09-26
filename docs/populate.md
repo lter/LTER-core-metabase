@@ -1,6 +1,6 @@
 # Populate LTER-core-metabase for generating EML
 
-Last updated: July 13th 2019
+Last updated: September 26th 2019
 
 See [installation here](docs/quick_start.md).
 
@@ -30,7 +30,7 @@ Tables that start with `Method` are analogous to tables that start with DataSet.
 
 ## How to document datasets in `lter_metabase`
 
-Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. You might need to update tables starting with List or site-specific CVs periodically. You will need to update dataset-specific tables (the rest) with every new dataset or new revision to old datasets.
+Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. You might need to update tables starting with List or site-specific CVs periodically. You will need to update dataset-specific tables (the rest, starting with DataSet) with every new dataset or new revision to old datasets.
 
 ## How to update datasets
 
