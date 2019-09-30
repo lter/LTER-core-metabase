@@ -58,8 +58,8 @@ Case 2: Dataset redesign or non-routine changes
 - Or message one of the friendly Metabasers on slack since there's lots of ways a dataset can evolve!
 
 In either case, 
-2. Increment `DataSet.Revision`
-3. Update `DataSet.pubDate`
+1. Increment `DataSet.Revision`
+1. Update `DataSet.pubDate`
 
 ## Confused what goes where?
 Most of the time tables and column names make it pretty clear where different pieces of metadata is supposed to go. We have als pepper the database with comments on columns where we think there might be confusion. However, for certain pieces it's not so obvious.
