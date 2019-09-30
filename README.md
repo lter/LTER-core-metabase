@@ -1,13 +1,13 @@
 # LTER-core-metabase
-This README.md was last updated: July 26, 2019
+This README.md was last updated: September 30, 2019
 
 ## Orientation
 
 LTER-core-metabase is a PostgreSQL-based relational database model designed for the management of ecological metadata. This metadata database model is based on usage patterns by sites in the U.S. Long Term Ecological Research (LTER) Network. See [Metabase history](docs/history.md) for more on the project's development history.
 
-LTER-core-metabase is also oriented towards production of Ecological Metadata Language (EML) documents. This project is tightly coupled with the [`MetaEgress`](https://github.com/BLE-LTER/MetaEgress) R package: use `MetaEgress` to quickly and easily export EML documents from an installed and populated instance of LTER-core-metabase.
+LTER-core-metabase is primarily used to produce and maintain Ecological Metadata Language (EML) documents. The [`MetaEgress`](https://github.com/BLE-LTER/MetaEgress) R package is designed for use with LTER-core-metabase. Use `MetaEgress` to quickly and easily export EML documents from an installed and populated instance of LTER-core-metabase.
 
-The database design is still in active development. We encorage anyone to give it a test drive, but please keep in contact with us for advice prior to installation for use in production. 
+Although this release is ready for use, the database design team continues active development. We encorage anyone to give it a test drive, but please keep in contact with us for advice prior to installation for use in production.  
 
 ### Features
 
