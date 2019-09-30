@@ -5,12 +5,15 @@
 2.  your DB admin's tasks
     1. set up roles
     1. create DB (make you the owner)
-3. your tasks, as the DB owner - run scripts in this order
-    1. create tables 
-    1. set privileges
-    1. load controlled content (recommended)
-    1. load sample datasets (optional)
-    1. We offer an one-stop-stop script to do the above called "onebigfile.sql". 
+3. your tasks, as the DB owner - 
+    1. EITHER: run script onebigfile.sql
+        1. This is reccomended in all but special cases. Much simpler!
+    1. OR: run scripts in this order
+        1. create tables 
+        1. set privileges
+        1. load controlled content (recommended)
+        1. load sample datasets (optional)
+     
 
 
 ## Step-by-step
@@ -49,6 +52,7 @@ New, from-scratch install:
 - ii_description.sql (where ii is the patch number +1 from the last number in onebigfile's version (major.minor.patch)
 
 Alternatively, you could build metabase by running all sequentially numbered patches. This would be tedious.
+There are some delete scripts offered (see maintenance branch) if you prefer to build your own parent tables or want to omit example datasets.
     
 ### 5. Install scenarios. 
 
