@@ -2,7 +2,7 @@
 
 Last updated: September 26th 2019
 
-See [installation here](docs/quick_start.md).
+See [installation here](quick_start.md).
 
 This guide walks you through populating LTER-core-metabase for generating EML, and addresses frequently encountered problems.
 
