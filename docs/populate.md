@@ -36,7 +36,28 @@ Generally, you will only need to populate tables starting with EML once at the b
 
 When describing a new version of a dataset for which a previous version was already described in the database, you overwrite existing values with updated values. In other words, you only store the metadata for the updated/new version. You won't be able to generate EML for the old data and old metadata (unless you change everything back to the old version in your database tables).
 
-1. Update corresponding tables with new metadata. E.g. add a new row in **DataSetAttributes** if there's a new column in data, but update the old row if the column name has changed.
+Two cases:
+1. Routine time series update (format of data remains the same; new data is appended to pre-existing tables)
+2. Dataset redesign (format of data changes: different rows or adding a table)
+
+Case 1: Routine time series update
+- In table `DataSetTemporal`, increase column `EndDate`.
+- In table `DataSetEntities`, 
+	- increase column `EntityRecords` NOTE
+	- update column `FileName`
+	- increase column `FileSize` NOTE
+	- update column `Checksum` NOTE
+	
+NOTE: If using MetaEgress or another external program which examines data files and inserts file-related metadata directly into the EML, you may choose to skip storing that metadata in metabase.
+
+Case 2: Dataset redesign or non-routine changes
+- New dataTable(s) or otherEntities go in table `DataSetEntities` as a new row
+- New or modified rows in dataTables go in rows of table `DataSetAttributes`
+- New or modified taxonomy goes in `DataSetTaxa` if using pre-defined taxa, or `ListTaxa` if new.
+- New or modified geographicCoverage goes in table `DataSetSites` if pre-defined, or `ListSites` if new.
+- Or message one of the friendly Metabasers on slack since there's lots of ways a dataset can evolve!
+
+In either case, 
 2. Increment `DataSet.Revision`
 3. Update `DataSet.pubDate`
 
