@@ -4,7 +4,7 @@ Last updated: September 26th 2019
 
 See [installation here](quick_start.md).
 
-This guide walks you through populating LTER-core-metabase for generating EML, and addresses frequently encountered problems.
+This guide walks you through populating LTER-core-metabase for generating EML, and addresses frequently encountered problems. (CV means "controlled vocabulary" as in parent table, not as in the LTER Controlled Vocabulary Thesaurus.)
 
 ## What to do with each schema
 
@@ -20,17 +20,35 @@ The overall database design contains these schemas. They are designed for separa
 
 There are three broad types of tables in `lter_metabase`:
 
-- `EML`-prefixed tables: contain controlled vocabularies specified by the EML schema, or network-level CVs to which sites rarely add, such as units.
+- `EML`-prefixed tables: contain controlled vocabularies specified by the EML schema, or network-level CVs to which sites rarely add, such as units. Examples:
+	- `EMLFileTypes`
+	- `EMLKeywordTypes`
+	- `EMLMeasurementScaleDomains`
+	- `EMLMeasurementScales`
+	- `EMLNumberTypes`
+	- `EMLStorageTypes`
+	- `EMLUnitDictionary`
+	- `EMLUnitTypes`
 
 - `List`-prefixed tables: contain controlled vocabularies specific to a site such as personnel and sampling sites.
+	- `ListKeywordThesauri`
+	- `ListKeywords`
+	- `ListMethodInstruments`
+	- `ListMethodProtocols`
+	- `ListMethodSoftware`
+	- `ListMissingCodes`
+	- `ListPeople`
+	- `ListSites`
+	- `ListTaxa`
+	- `ListTaxonomicProviders`
 
 - `DataSet`-prefixed tables: contain information used to create or update specific datasets.
+	- (Tables are listed below in population order for new datasets.)
 
-Tables that start with `Method` are analogous to tables that start with DataSet. See the section on Methods to see several ways to populate the methods.
+- `DataSetMethod`-prefixed tables pertain to method content. See the section on Methods to see several ways to populate the methods.
 
-## How to document datasets in `lter_metabase`
 
-Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. You might need to update tables starting with List or site-specific CVs periodically. You will need to update dataset-specific tables (the rest, starting with DataSet) with every new dataset or new revision to old datasets.
+Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. Tables starting with List contain site-specific CVs which tend to need additions occasionally. You will need to update dataset-specific tables (table names starting with DataSet) for each new dataset.
 
 ## How to update datasets
 
@@ -60,6 +78,28 @@ Case 2: Dataset redesign or non-routine changes
 In either case, 
 1. Increment `DataSet.Revision`
 1. Update `DataSet.pubDate`
+
+## How to create new datasets
+
+For simplicity, lets assume the parent tables (EMLStuff and ListStuff) are already populated. Most of the DataSetStuff tables are cross-reference tables, selecting an item from a parent table and attaching it to a dataset, or at dataTable of that dataset, or an attribute of a dataTable of that dataset. 
+
+1. `DataSet`: enter one new row for the new dataset. This must be done first. 
+1. `DataSetEntities` must be filled before
+	1. `DataSetAttributes` which must be filled before these which are optional and in any order:
+		1. `DataSetAttributeEnumeration`
+		1. `DataSetAttributeMissingCodes`
+1. `DataSetMethodSteps` must be filled before these which are optional and in any order:
+	1. `DataSetMethodInstruments`
+	1. `DataSetMethodProtocols`
+	1. `DataSetMethodProvenance`
+	1. `DataSetMethodSoftware`
+1. These may be filled any time after `DataSet`, and in any order:
+	1. `DataSetKeywords`
+	1. `DataSetPersonnel`
+	1. `DataSetSites`
+	1. `DataSetTaxa`
+	1. `DataSetTemporal`
+
 
 ## Confused what goes where?
 Most of the time tables and column names make it pretty clear where different pieces of metadata is supposed to go. We have als pepper the database with comments on columns where we think there might be confusion. However, for certain pieces it's not so obvious.
