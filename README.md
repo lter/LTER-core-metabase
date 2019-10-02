@@ -43,6 +43,8 @@ Quick [visualization of schema](http://tiny.cc/metabaseSchema).
 
 See the docs folder for a complete list of docs.
 
+A separate project called **EML2MB** takes a collection of pre-existing EML documents, reads the contents from xml and writes in database bulk upload format (similar to a csv). This is for Metabase users who already have many datasets described in EML and want to initially populate a new installatin of Metabase. (This was done in 2013 by SBC and MCR LTER and is being adapted to lter-core-metabase.) When the EML2MB git repo is ready for release, the link will appear here, planned for fall 2019.
+
 ## For contributors
 
 See the [contributing guide](CONTRIBUTING.md). 
