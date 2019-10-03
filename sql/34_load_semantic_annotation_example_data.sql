@@ -53,10 +53,10 @@ COPY "EMLSemanticAnnotationTerms" ("TermID", "TermLabel", "TermURI") FROM stdin;
 ENVO_01000058	Kelp Forest	http://purl.obolibrary.org/obo/ENVO_01000058
 ECSO_00001180	Carbon Biomass Density	http://purl.dataone.org/odo/ECSO_00001180
 ECSO_00000639	carbon to nitrogen molar ratio	http://purl.dataone.org/odo/ECSO_00000639
-ECSO_00002043	date and time of measurement\n\n	http://purl.dataone.org/odo/ECSO_00002043
+ECSO_00002043	date and time of measurement	http://purl.dataone.org/odo/ECSO_00002043
 ECSO_00002040	time of measurement	http://purl.dataone.org/odo/ECSO_00002040
 ECSO_00002051	date	http://purl.dataone.org/odo/ECSO_00002051
-ECSO_00002050	year of measurement\n\n	http://purl.dataone.org/odo/ECSO_00002050
+ECSO_00002050	year of measurement	http://purl.dataone.org/odo/ECSO_00002050
 ECSO_00002130	latitude coordinate	http://purl.dataone.org/odo/ECSO_00002130
 ECSO_00002132	longitude coordinate	http://purl.dataone.org/odo/ECSO_00002132
 \.
@@ -66,3 +66,6 @@ ECSO_00002132	longitude coordinate	http://purl.dataone.org/odo/ECSO_00002132
 -- PostgreSQL database dump complete
 --
 
+  -- record this patch has been applied
+INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
+VALUES (1,0,34,now(),'applied 34_load_semantic_annotation_example_data.sql');
