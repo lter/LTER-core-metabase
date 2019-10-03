@@ -1,11 +1,15 @@
 # README.md
-Dir contains incremental scripts for LTER-core-metabase for patches, migration from one table design to another, and moving content from old tables to new tables. For initial install we recommend first running the OneBigFile. When there are migration scripts (or patches) between versions of the OneBigFile, then run those from this directory, starting with the number greater than the patch number in the OneBigFile's revision. See also [Quick Start guide](../docs/quick_start.md). 
+Dir contains incremental scripts for LTER-core-metabase for patches, migration from one table design to another, and moving content from old tables to new tables. For initial install we recommend first running the OneBigFile in the master branch. When there are migration scripts (or patches) between versions of the OneBigFile, then run those from this directory, starting with the number greater than the patch number in the OneBigFile's revision. See also [Quick Start guide](../docs/quick_start.md). 
 
 Example:
   - install onebigfile for version 0.9.20
   - install patches from this branch starting with 21_something.
 
-It is possible, but not reccomended, to build Metabase using all the incremental scripts.
+It is possible, but not reccomended, to build Metabase using all the incremental scripts. Executing all the patches in sequence on an empty database should, in theory, produce a database identical to one made from an up-to-date onebigfile. Exceptions are these situations:
+
+- Patches have been written, but are not yet committed into the latest version of OBF. We try to disambiguate OBF versions by appending the latest patch committed to it, e.g. OBF33 would have the 33_ patch in it. 
+- Some patches are sequentially numbered, but are optional and are not committed to OBF. "Delete" scripts to delete example data, etc.
+- We goofed up somewhere. 
 
 - **0_create_db.sql**
   - creates database named lter_core_metabase
