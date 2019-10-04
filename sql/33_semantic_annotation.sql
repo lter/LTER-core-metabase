@@ -11,12 +11,16 @@ CREATE SCHEMA semantic_annotation;
  (
   "TermID"    character varying(40), -- example envo1234 or ecso014004 
   "TermLabel" character varying(200), -- expect never to need more than 100.
-  -- "TermSource" character(4), -- Seems extraneous. Dependent on URI. Where the term came from. Basically ENVO or ECSO. I suggest omit this column.
   "TermURI"   text, -- unless pg has a special data type for URIs? Expect unlikely to need more than 100 char. 
   CONSTRAINT "pk_semantic_annotation_TermID" PRIMARY KEY ("TermID"),
   CONSTRAINT "uq_semantic_annotation_TermURI" UNIQUE ("TermURI")
 );
 
+ALTER TABLE semantic_annotation."EMLSemanticAnnotationTerms"
+  ADD CONSTRAINT ck_semantic_annotation_no_lead_trail_whitespace
+  CHECK ("TermID" like btrim("TermID") AND "TermLabel" like btrim("TermLabel") AND "TermURI" like btrim("TermURI"));
+COMMENT ON CONSTRAINT ck_semantic_annotation_no_lead_trail_whitespace ON semantic_annotation."EMLSemanticAnnotationTerms"
+  IS 'Ensure no extra characters get entered as is common when pasting from ECSO.';
 
 -- ListSemanticOntologies: Ontology
 /* 
@@ -36,6 +40,9 @@ CREATE TABLE semantic_annotation."EMLObjectProperties" -- like "of Characteristi
   CONSTRAINT "uq_objectPropertyURI" UNIQUE ("ObjectPropertyURI")
 );
 
+ALTER TABLE semantic_annotation."EMLObjectProperties"
+  ADD CONSTRAINT ck_object_properties_no_lead_trail_whitespace
+  CHECK ("ObjectPropertyID" like btrim("ObjectPropertyID") AND "ObjectPropertyLabel" like btrim("ObjectPropertyLabel") AND "ObjectPropertyURI" like btrim("ObjectPropertyURI"));
 
 -- Xref tables:
 -- DataSetAnnotations: DataSetID, PropertyTermID, ValueTermID
@@ -44,7 +51,7 @@ CREATE TABLE semantic_annotation."DataSetAnnotation"
 (
   "DataSetID"   integer,
   "TermID"      character varying(40),
-  "ObjectPropertyID"    character varying(200),
+  "ObjectPropertyID"    character varying(200) DEFAULT 'IAO_0000136', -- IAO_0000136 = "is about"
   CONSTRAINT "pk_DataSetAnnotation_DataSetID_TermID" PRIMARY KEY ("DataSetID","TermID"),
   CONSTRAINT "fk_SA_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet" ("DataSetID")
   MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION,
@@ -65,7 +72,7 @@ CREATE TABLE semantic_annotation."DataSetAttributeAnnotation"
   "EntitySortOrder" integer,
   "ColumnPosition"  smallint, -- alternatively, AttributeName.
   "TermID"      character varying(40),
-  "ObjectPropertyID"    character varying(200),
+  "ObjectPropertyID"    character varying(200) DEFAULT 'containsMeasurementsOfType',
   CONSTRAINT "pk_DataSetAttributeAnnotation_DataSetID_TermID" PRIMARY KEY ("DataSetID","EntitySortOrder","ColumnPosition","TermID"),
   CONSTRAINT "fk_SAA_DataSetID" FOREIGN KEY ("DataSetID","EntitySortOrder","ColumnPosition") REFERENCES lter_metabase."DataSetAttributes" ("DataSetID","EntitySortOrder","ColumnPosition")
   MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION,
@@ -81,7 +88,7 @@ CREATE TABLE semantic_annotation."DataSetAttributeAnnotation"
 -- The place to put the snippet, identified by a (di,ei,ai) if for an attribute or just (di) for a dataset.
 -- Choose either the UNION option to have one VIEW, or two separate VIEWs.
 
---CREATE VIEW mb2eml_r.vw_eml_semantic_annotation -- TODO An do you want this in mb2eml_r or in semantic_annotation schema?
+--CREATE VIEW mb2eml_r.vw_eml_semantic_annotation -- TODO move to mb2eml_r later once sa schema part of distribution.
 CREATE VIEW semantic_annotation.vw_eml_semantic_annotation
 AS
 (
@@ -133,5 +140,5 @@ AS
 
   -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
-VALUES (0,9,33,now(),'applied 33_semantic_annotation.sql');
+VALUES (0,9,33,now(),'applied 33_semantic_annotation.sql revision 2019-10-03');
 
