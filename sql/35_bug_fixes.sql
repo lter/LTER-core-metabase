@@ -58,3 +58,8 @@ where "Description" not like 'method.990%';
 ALTER TABLE lter_metabase."DataSet" 
 	ALTER COLUMN "PubDate"
 	DROP DEFAULT;
+
+
+  -- record this patch has been applied
+INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
+VALUES (1,0,35,now(),'applied 35_bug_fixes.sql');
