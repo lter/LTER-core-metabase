@@ -1,6 +1,10 @@
 -- Draft of db tables for semantic annotation    September 2019 An and Gastil
 
 CREATE SCHEMA semantic_annotation;
+grant usage on schema semantic_annotation to %db_owner%;
+grant usage on schema semantic_annotation to read_only_user;
+grant usage on schema semantic_annotation to read_write_user;
+
 
 -- Parent control tables:
 /*  
@@ -70,7 +74,7 @@ CREATE TABLE semantic_annotation."DataSetAttributeAnnotation"
 (
   "DataSetID"   integer,
   "EntitySortOrder" integer,
-  "ColumnPosition"  smallint, -- alternatively, AttributeName.
+  "ColumnPosition"  int, -- alternatively, AttributeName.
   "TermID"      character varying(40),
   "ObjectPropertyID"    character varying(200) DEFAULT 'containsMeasurementsOfType',
   CONSTRAINT "pk_DataSetAttributeAnnotation_DataSetID_TermID" PRIMARY KEY ("DataSetID","EntitySortOrder","ColumnPosition","TermID"),
@@ -88,30 +92,35 @@ CREATE TABLE semantic_annotation."DataSetAttributeAnnotation"
 -- The place to put the snippet, identified by a (di,ei,ai) if for an attribute or just (di) for a dataset.
 -- Choose either the UNION option to have one VIEW, or two separate VIEWs.
 
---CREATE VIEW mb2eml_r.vw_eml_semantic_annotation -- TODO move to mb2eml_r later once sa schema part of distribution.
-CREATE VIEW semantic_annotation.vw_eml_semantic_annotation
+--CREATE VIEW mb2eml_r.vw_eml_semantic_annotation -- TODO move to semantic_annotation later once sa schema part of distribution.
+CREATE or replace VIEW semantic_annotation.vw_eml_semantic_annotation
 AS
 (
     SELECT 
-    a."DataSetID", 
-    a."EntitySortOrder", 
-    a."ColumnPosition",                           -- or An do you prefer to use a."AttributeName"?
+    a."DataSetID" as datasetid, 
+    a."EntitySortOrder" as entity_position, 
+    d."ColumnName" as "attributeName",
+    a."ColumnPosition" as column_position,                       -- or An do you prefer to use a."AttributeName"?
     o."ObjectPropertyLabel" AS propertyuri_label, -- propertyURI_label
     o."ObjectPropertyURI" AS propertyuri,         -- propertyURI
     t."TermLabel" AS valueuri_label,              -- valueURI_label
     t."TermURI" AS valueuri                       -- valueURI 
     FROM semantic_annotation."DataSetAttributeAnnotation" a
+    INNER JOIN lter_metabase."DataSetAttributes" d
+    ON d."DataSetID" = a."DataSetID" AND d."EntitySortOrder" = a."EntitySortOrder" and d."ColumnPosition" = a."ColumnPosition"
     INNER JOIN semantic_annotation."EMLSemanticAnnotationTerms" t
     ON t."TermID"=a."TermID"
     INNER JOIN semantic_annotation."EMLObjectProperties" o
     ON o."ObjectPropertyID"=a."ObjectPropertyID"
+
     
     UNION
     
     SELECT 
-    d."DataSetID", 
-    0 AS "EntitySortOrder", 
-    0 AS "ColumnPosition",                        -- or "AttributeName"
+    d."DataSetID" as datasetid, 
+    0 as entity_position,
+    '0' as "attributeName",
+    0 as column_position,                    -- or "AttributeName"
     o."ObjectPropertyLabel" AS propertyuri_label, -- propertyURI_label
     o."ObjectPropertyURI" AS propertyuri,         -- propertyURI
     t."TermLabel" AS valueuri_label,              -- valueURI_label
@@ -121,6 +130,7 @@ AS
     ON t."TermID"=d."TermID"
     INNER JOIN semantic_annotation."EMLObjectProperties" o
     ON o."ObjectPropertyID"=d."ObjectPropertyID"
+    ORDER BY datasetid, entity_position, column_position
 );
 
 /*  Example EML Snippet
@@ -137,6 +147,46 @@ AS
  * value is like Mass for atts
  * 
  *  */
+
+ALTER TABLE semantic_annotation.vw_eml_semantic_annotation OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE semantic_annotation.vw_eml_semantic_annotation FROM PUBLIC;
+REVOKE ALL ON TABLE semantic_annotation.vw_eml_semantic_annotation FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE semantic_annotation.vw_eml_semantic_annotation TO read_write_user;
+GRANT SELECT ON TABLE semantic_annotation.vw_eml_semantic_annotation TO read_only_user;
+GRANT ALL ON TABLE semantic_annotation.vw_eml_semantic_annotation TO %db_owner%;
+
+ALTER TABLE semantic_annotation."DataSetAttributeAnnotation" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE semantic_annotation."DataSetAttributeAnnotation" FROM PUBLIC;
+REVOKE ALL ON TABLE semantic_annotation."DataSetAttributeAnnotation" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE semantic_annotation."DataSetAttributeAnnotation" TO read_write_user;
+GRANT SELECT ON TABLE semantic_annotation."DataSetAttributeAnnotation" TO read_only_user;
+GRANT ALL ON TABLE semantic_annotation."DataSetAttributeAnnotation" TO %db_owner%;
+
+ALTER TABLE semantic_annotation."DataSetAnnotation" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE semantic_annotation."DataSetAnnotation" FROM PUBLIC;
+REVOKE ALL ON TABLE semantic_annotation."DataSetAnnotation" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE semantic_annotation."DataSetAnnotation" TO read_write_user;
+GRANT SELECT ON TABLE semantic_annotation."DataSetAnnotation" TO read_only_user;
+GRANT ALL ON TABLE semantic_annotation."DataSetAnnotation" TO %db_owner%;
+
+ALTER TABLE semantic_annotation."EMLObjectProperties" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE semantic_annotation."EMLObjectProperties" FROM PUBLIC;
+REVOKE ALL ON TABLE semantic_annotation."EMLObjectProperties" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE semantic_annotation."EMLObjectProperties" TO read_write_user;
+GRANT SELECT ON TABLE semantic_annotation."EMLObjectProperties" TO read_only_user;
+GRANT ALL ON TABLE semantic_annotation."EMLObjectProperties" TO %db_owner%;
+
+ALTER TABLE semantic_annotation."EMLSemanticAnnotationTerms" OWNER TO %db_owner%;
+
+REVOKE ALL ON TABLE semantic_annotation."EMLSemanticAnnotationTerms" FROM PUBLIC;
+REVOKE ALL ON TABLE semantic_annotation."EMLSemanticAnnotationTerms" FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE semantic_annotation."EMLSemanticAnnotationTerms" TO read_write_user;
+GRANT SELECT ON TABLE semantic_annotation."EMLSemanticAnnotationTerms" TO read_only_user;
+GRANT ALL ON TABLE semantic_annotation."EMLSemanticAnnotationTerms" TO %db_owner%;
 
   -- record this patch has been applied
 INSERT INTO pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, date_installed, comment) 
