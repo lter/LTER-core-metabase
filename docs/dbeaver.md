@@ -5,7 +5,7 @@ DBeaver is a database manager.  DBeaver lets you add rows in its GUI without wri
 ## Installation
 
 1. Install Postgres for Windows using the **EnterpriseDB installer**.
-2. Install **DBeaver**. 
+2. Install **DBeaver**.
 3. Run DBeaver and connect to your Postgres instance.
 
 ## Backup a database to SQL file
@@ -14,14 +14,13 @@ DBeaver is a database manager.  DBeaver lets you add rows in its GUI without wri
 2. Select schemas to include and click **Next**.
 3. For Format, choose **Plain**.
 
-
 **Optional:** You might choose to make the backup **without ownership or privilege statements**. This makes it easier to restore to a different server. However, note that the user restoring the database from SQL backup will become the new owner.
 
-3.5. Place a check next to these boxes:
+4. Place a check next to these boxes:
     1. Do not backup privileges (GRANT/REVOKE)
     2. Discard objects owner
 
-4. Click **Start**.
+5. Click **Start**.
 
 ## Restore a database from a SQL export
 
@@ -36,9 +35,8 @@ Use these steps to restore a database from a database backup saved as a SQL file
 
 1. Navigate to a table, right-click on it, then click **Import Data**.
 2. With **CSV** selected, click **Next**.
-3. For Input files, in the Source column, click **<none>** to open a file browser.
+3. For Input files, in the Source column, click **none** to open a file browser.
 4. Browse to the CSV file and click **Open**.
 5. Click **Next** and preview the data if desired.
 6. Click **Next**, **Next**, and **Finish**.
 7. Open the table (or refresh the window if the table was already open) to see the data.
-

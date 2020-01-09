@@ -24,7 +24,7 @@ Quick [visualization of schema](http://tiny.cc/metabaseSchema).
 
 - LTER-core-metabase design records revision history to the dataset. However, it is only designed to describe the most recent version of the dataset. In other words, updating metadata means overwriting rows, not adding them.
 
-- LTER-core-metabase can store geographic information in rectangles or points, but not polygons of arbitrary shape.  If required, you can archive a shapefile or other geospatial dataset as an `otherEntity` along the other data entities in the data package.
+- LTER-core-metabase can store geographic information in rectangles or points, but not polygons of arbitrary shape.  If required, you can archive a shapefile or other geospatial dataset as an `otherEntity` alongside the other data entities in the data package.
  
 ## Installation
 
