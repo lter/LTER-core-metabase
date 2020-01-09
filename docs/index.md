@@ -28,7 +28,7 @@ See also [populate](populate.md).
 
 When describing a new version of a dataset for which a previous version was already described in the database, you overwrite existing values with updated values. In other words, you only store the metadata for the updated/new version. You won't be able to generate EML for the old data and old metadata (unless you change everything back to the old version in your database tables).
 
-1. Increment the revision number in **DataSet**.
+1. Increment the revision number in **DataSet**, and update the published date, PubDate.
 1. Note, do not add a new row for the new version in the **pkg_state** table (in schema pkg_mgmt.)
 1. Update the published date, update_date_catalog, in **pkg_state** after uploading the dataset to the
    archive.
