@@ -98,7 +98,8 @@ CREATE TABLE lter_metabase."DataSet" (
     "MaintenanceDescription" character varying(500),
     "AbstractType" character varying(10) NOT NULL,
     "BoilerplateSetting" character varying(20) DEFAULT 'default'::character varying NOT NULL,
-    CONSTRAINT "CK_DataSet_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text])))
+    CONSTRAINT "CK_DataSetMethodSteps_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text, ('docbook'::character varying)::text]))),
+    CONSTRAINT "CK_DataSet_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text, ('docbook'::character varying)::text])))
 );
 
 
@@ -263,8 +264,8 @@ CREATE TABLE lter_metabase."DataSetMethod" (
     "Description" text,
     "Method_xml" xml,
     CONSTRAINT "CK_DataSetMethodSteps_DescriptionHasType" CHECK (((("DescriptionType" IS NULL) AND ("Description" IS NULL)) OR (("DescriptionType" IS NOT NULL) AND ("Description" IS NOT NULL)))),
-    CONSTRAINT "CK_DataSetMethodSteps_DescriptionType" CHECK ((("DescriptionType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text]))),
-    CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ((("Description" IS NOT NULL) OR ("Method_xml" IS NOT NULL)))
+    CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ((("Description" IS NOT NULL) OR ("Method_xml" IS NOT NULL))),
+    CONSTRAINT "CK_DataSetMethod_DescriptionType" CHECK ((("DescriptionType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text, ('docbook'::character varying)::text])))
 );
 
 
@@ -701,7 +702,7 @@ CREATE TABLE lter_metabase."ListSites" (
     "NBoundLat" double precision,
     "AltitudeMin" double precision,
     "AltitudeMax" double precision,
-    "AltitudeUnit" character varying(10),
+    "AltitudeUnit" character varying(100),
     CONSTRAINT "CK_SiteRegister_ShapeType" CHECK ((("ShapeType")::text = ANY (ARRAY[('point'::character varying)::text, ('rectangle'::character varying)::text, ('polygon'::character varying)::text, ('polyline'::character varying)::text, ('vector'::character varying)::text])))
 );
 
@@ -4428,10 +4429,10 @@ COPY pkg_mgmt.pkg_sort ("DataSetID", network_type, is_signature, is_core, tempor
 --
 
 COPY pkg_mgmt.pkg_state ("DataSetID", dataset_archive_id, rev, nickname, data_receipt_date, status, synth_readiness, staging_dir, eml_draft_path, notes, pub_notes, who2bug, dir_internal_final, dbupdatetime, update_date_catalog) FROM stdin;
-99013	knb-lter-sbc.13	21	Reef bottom water temperature	2017-12-01	cataloged	integration	reef_bottom_temperature	project.13		\N	lkui	research/Reef/Final/Data/Bottom_Temperature/	2019-08-02 14:14:40.664528	2017-12-07
-99024	knb-lter-sbc.24	17	Kelp - algal weights and CHN	2017-12-20	cataloged	integration	reef_kelp_algal_weight_CHN	project.24	replaced method, july 2013	\N	lkui	research/Reef/Final/Data/Kelp_NPP/CHN	2019-08-02 14:14:40.664528	2017-12-20
 99054	knb-lter-sbc.99054	4	Satellite kelp canopy biomass	2013-10-25	deprecated	integration	satellite_kelp_canopy_1	cavanaugh_satellite_kelp_canopy_1/2014_update	test dataset for pasta.	metacat is at rev 3 and pasta at rev 2, docs are the same.	tbell, kcavanaugh	\N	2019-08-02 14:14:40.664528	2012-02-14
-99021	knb-lter-sbc.22	11	Beach wrack IV 2005-06	2013-04-05	cataloged	download	beach_wrack_IV	beach_wrack_IV	table #1: wrack, only macrocystis so far. may have other species added table #2 to be added: porewater.	\N	jdugan	\N	2019-08-02 14:14:40.664528	2010-06-14
+99013	knb-lter-sbc.99013	21	Reef bottom water temperature	2017-12-01	cataloged	integration	reef_bottom_temperature	project.13		\N	lkui	research/Reef/Final/Data/Bottom_Temperature/	2020-01-09 13:24:33.236161	2017-12-07
+99024	knb-lter-sbc.99024	17	Kelp - algal weights and CHN	2017-12-20	cataloged	integration	reef_kelp_algal_weight_CHN	project.24	replaced method, july 2013	\N	lkui	research/Reef/Final/Data/Kelp_NPP/CHN	2020-01-09 13:24:33.236161	2017-12-20
+99021	knb-lter-sbc.99022	11	Beach wrack IV 2005-06	2013-04-05	cataloged	download	beach_wrack_IV	beach_wrack_IV	table #1: wrack, only macrocystis so far. may have other species added table #2 to be added: porewater.	\N	jdugan	\N	2020-01-09 13:24:33.236161	2010-06-14
 \.
 
 
@@ -4449,6 +4450,9 @@ COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, dat
 0	9	31	2019-09-19 16:35:59.432108	applied 31_add_cols_filesize_cksum.sql
 0	9	32	2019-09-19 16:35:59.432108	applied 32_add_position_licensed.sql
 1	0	35	2019-10-10 16:54:24.566056	applied 35_bug_fixes.sql
+1	0	38	2020-01-09 13:24:33.242279	applied 38_pkg_state_data_archive_id_correction_to_examples.sql
+1	0	39	2020-01-09 13:24:43.173911	apply 39_add_docbook_descriptiontype.sql
+1	0	40	2020-01-09 13:31:43.632442	applied 40_widen_altitude_unit_limit.sql
 \.
 
 
@@ -5775,8 +5779,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_entities TO read_only_user;
 -- Name: TABLE vw_eml_geographiccoverage; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_only_user;
 GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_only_user;
 
 
 --
