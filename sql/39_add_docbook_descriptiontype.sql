@@ -2,11 +2,11 @@
 
 -- Allows 'docbook' to be specified as a DescriptionType/AbstractType
 
-ALTER TABLE lter_metabase."DataSetMethodSteps"
+ALTER TABLE lter_metabase."DataSetMethod"
     DROP CONSTRAINT "CK_DataSetMethodSteps_DescriptionType";
 
-ALTER TABLE lter_metabase."DataSetMethodSteps"
-    ADD CONSTRAINT "CK_DataSetMethodSteps_DescriptionType" 
+ALTER TABLE lter_metabase."DataSetMethod"
+    ADD CONSTRAINT "CK_DataSetMethod_DescriptionType" 
     CHECK ((("DescriptionType")::text = ANY (ARRAY[('file'::character varying)::text, 
         ('md'::character varying)::text, 
         ('plaintext'::character varying)::text,
@@ -16,7 +16,7 @@ ALTER TABLE lter_metabase."DataSet"
     DROP CONSTRAINT "CK_DataSet_AbstractType";
 
 ALTER TABLE lter_metabase."DataSet"
-    ADD CONSTRAINT "CK_DataSetMethodSteps_AbstractType" 
+    ADD CONSTRAINT "CK_DataSet_AbstractType" 
     CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, 
         ('md'::character varying)::text, 
         ('plaintext'::character varying)::text,
