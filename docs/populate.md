@@ -1,13 +1,12 @@
 # Populate LTER-core-metabase for generating EML
 
-Last updated: September 26th 2019
+Last updated: January 10th, 2020
 
 See [installation here](quick_start.md).
 
-This guide walks you through populating LTER-core-metabase for generating
-Ecological Metadata Language (EML) documents, and addresses frequently encountered problems. (CV means
-"controlled vocabulary" as in parent table, not as in the LTER Controlled
-Vocabulary Thesaurus.)
+This guide walks you through populating LTER-core-metabase for generating EML, and addresses frequently encountered problems. 
+
+CV means "controlled vocabulary" as in parent table, not as in the LTER Controlled Vocabulary Thesaurus.
 
 ## What to do with each schema
 
@@ -19,9 +18,11 @@ The overall database design contains these schemas. They are designed for separa
 
 - `pkg_mgmt`: intended for internal metadata management, data package inventory and tracking by LTER information managers.
 
-## Schema `lter_metabase`
+- `semantic_annotation`: contains tables for annotating datasets and attributes.
 
-There are three broad types of tables in `lter_metabase`:
+# Schema `lter_metabase`
+
+There are four (but really only three) broad types of tables in `lter_metabase`:
 
 - `EML`-prefixed tables: contain controlled vocabularies specified by the EML schema, or network-level CVs to which sites rarely add, such as units. Examples:
   - `EMLFileTypes`
@@ -52,7 +53,8 @@ There are three broad types of tables in `lter_metabase`:
   Methods to see several ways to describe methods used to create the ecological
   datasets described by this database.
 
-Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. Tables starting with List contain site-specific CVs which tend to need additions occasionally. You will need to update dataset-specific tables (table names starting with DataSet) for each new dataset.
+
+Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. Tables starting with List contain site-specific CVs which tend to need additions occasionally. You will need to update dataset-specific tables (table names starting with DataSet) to add a new dataset or to revise existing datasets.
 
 ### How to update datasets
 
@@ -90,18 +92,18 @@ In either case,
 
 ### How to create new datasets
 
-For simplicity, lets assume the parent tables (EMLStuff and ListStuff) are already populated. Most of the DataSetStuff tables are cross-reference tables, selecting an item from a parent table and attaching it to a dataset, or a dataTable of that dataset, or an attribute of a dataTable of that dataset.
+For simplicity, let's assume the parent tables (EMLStuff and ListStuff) are already populated. Most of the DataSetStuff tables are cross-reference tables, selecting an item from a parent table and attaching it to a dataset, or at dataTable of that dataset, or an attribute of a dataTable of that dataset. 
 
-1. `DataSet`: enter one new row for the new dataset. This must be done first.
-1. `DataSetEntities` must be filled before:
-    1. `DataSetAttributes` which must be filled before these which are optional and in any order:
-        1. `DataSetAttributeEnumeration`
-        1. `DataSetAttributeMissingCodes`
-1. `DataSetMethodSteps` must be filled before these which are optional and in any order:
-    1. `DataSetMethodInstruments`
-    1. `DataSetMethodProtocols`
-    1. `DataSetMethodProvenance`
-    1. `DataSetMethodSoftware`
+1. `DataSet`: enter one new row for the new dataset. This must be done first. 
+1. `DataSetEntities` must be filled before
+	1. `DataSetAttributes` which must be filled before these, which are optional and in any order:
+		1. `DataSetAttributeEnumeration`
+		1. `DataSetAttributeMissingCodes`
+1. `DataSetMethodSteps` must be filled before these, which are optional and in any order:
+	1. `DataSetMethodInstruments`
+	1. `DataSetMethodProtocols`
+	1. `DataSetMethodProvenance`
+	1. `DataSetMethodSoftware`
 1. These may be filled any time after `DataSet`, and in any order:
     1. `DataSetKeywords`
     1. `DataSetPersonnel`
@@ -111,7 +113,8 @@ For simplicity, lets assume the parent tables (EMLStuff and ListStuff) are alrea
 
 ### Confused what goes where?
 
-Most of the time tables and column names make it pretty clear where different pieces of metadata are supposed to go. We have also peppered the database with comments on columns where we think there might be confusion. However, for certain pieces it's not so obvious.
+## Confused what goes where?
+Most of the time tables and column names make it pretty clear where different pieces of metadata is supposed to go. We have peppered the database with comments on columns where we think there might be confusion. However, for certain pieces it's not so obvious.
 
 #### Where does this go?
 
@@ -119,9 +122,9 @@ Most of the time tables and column names make it pretty clear where different pi
 
 - Revision number of a dataset: `DataSet.Revision`
 
-- Package ID scope: see boilerplate section below
+- Package ID scope: i.e. the "knb-lter-ble" part in a complete valid package ID "knb-lter-ble.2.1". For this see boilerplate section below.
 
-- Project information: see boilerplate section below
+- Project information: see boilerplate section below.
 
 #### What is this table column meant for? Does it populate an EML element?
 
