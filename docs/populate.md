@@ -2,12 +2,34 @@
 
 Last updated: January 10th, 2020
 
+<!-- MarkdownTOC -->
+
+- [What to do with each schema](#what-to-do-with-each-schema)
+- [Schema `lter_metabase`](#schema-lter_metabase)
+	- [How to update datasets](#how-to-update-datasets)
+	- [How to create new datasets](#how-to-create-new-datasets)
+- [Confused what goes where?](#confused-what-goes-where)
+		- [Where does this go?](#where-does-this-go)
+		- [What is this table column meant for? Does it populate an EML element?](#what-is-this-table-column-meant-for-does-it-populate-an-eml-element)
+		- [Boilerplate information](#boilerplate-information)
+		- [Dataset methods](#dataset-methods)
+- [Schema `mb2eml_r`](#schema-mb2eml_r)
+- [Schema `pkg_mgmt`](#schema-pkg_mgmt)
+- [Schema `schema_annotation`](#schema-schema_annotation)
+	- [Known wonkinesses and workarounds](#known-wonkinesses-and-workarounds)
+		- [Issues specific to DBeaver](#issues-specific-to-dbeaver)
+		- [General notes](#general-notes)
+
+<!-- /MarkdownTOC -->
+
+
 See [installation here](quick_start.md).
 
 This guide walks you through populating LTER-core-metabase for generating EML, and addresses frequently encountered problems. 
 
 CV means "controlled vocabulary" as in parent table, not as in the LTER Controlled Vocabulary Thesaurus.
 
+<a id="what-to-do-with-each-schema"></a>
 ## What to do with each schema
 
 The overall database design contains these schemas. They are designed for separate purposes and are mostly self-contained for each of those tasks.
@@ -20,6 +42,7 @@ The overall database design contains these schemas. They are designed for separa
 
 - `semantic_annotation`: contains tables for annotating datasets and attributes.
 
+<a id="schema-lter_metabase"></a>
 # Schema `lter_metabase`
 
 There are four (but really only three) broad types of tables in `lter_metabase`:
@@ -56,6 +79,7 @@ There are four (but really only three) broad types of tables in `lter_metabase`:
 
 Generally, you will only need to populate tables starting with EML once at the beginning and/or use the pre-loaded CVs that come with LTER-core-metabase. Tables starting with List contain site-specific CVs which tend to need additions occasionally. You will need to update dataset-specific tables (table names starting with DataSet) to add a new dataset or to revise existing datasets.
 
+<a id="how-to-update-datasets"></a>
 ### How to update datasets
 
 When describing a new version of a dataset for which a previous version was already described in the database, you overwrite existing values with updated values. In other words, you only store the metadata for the updated/new version. You won't be able to generate EML for the old data and old metadata (unless you change everything back to the old version in your database tables).
@@ -90,6 +114,7 @@ In either case,
 1. Increment `DataSet.Revision`
 1. Update `DataSet.pubDate`
 
+<a id="how-to-create-new-datasets"></a>
 ### How to create new datasets
 
 For simplicity, let's assume the parent tables (EMLStuff and ListStuff) are already populated. Most of the DataSetStuff tables are cross-reference tables, selecting an item from a parent table and attaching it to a dataset, or at dataTable of that dataset, or an attribute of a dataTable of that dataset. 
@@ -111,27 +136,33 @@ For simplicity, let's assume the parent tables (EMLStuff and ListStuff) are alre
     1. `DataSetTaxa`
     1. `DataSetTemporal`
 
-### Confused what goes where?
-
+<a id="confused-what-goes-where"></a>
 ## Confused what goes where?
 Most of the time tables and column names make it pretty clear where different pieces of metadata is supposed to go. We have peppered the database with comments on columns where we think there might be confusion. However, for certain pieces it's not so obvious.
 
+<a id="where-does-this-go"></a>
 #### Where does this go?
 
 - Publication date of a dataset: `DataSet.PubDate`
 
 - Revision number of a dataset: `DataSet.Revision`
 
+- Maintenance description and update frequency: `DataSet.MaintenanceDescription` and `DataSet.UpdateFrequency`. Note that the latter is subject to a EML-imposed controlled vocabulary.
+
+- Maintenance change history (i.e. what changes from one revision to the next): `pkg_mgmt.maintenance_changehistory`. 
+
 - Package ID scope: i.e. the "knb-lter-ble" part in a complete valid package ID "knb-lter-ble.2.1". For this see boilerplate section below.
 
 - Project information: see boilerplate section below.
 
+<a id="what-is-this-table-column-meant-for-does-it-populate-an-eml-element"></a>
 #### What is this table column meant for? Does it populate an EML element?
 
 - `SortOrder` type columns: to make your entities, or coverage elements to sort in a certain order. NOTE: not yet implemented in `MetaEgress`. Authorship order is preserved as entered in metabase.
 
 - `DataSetTemporal.EntitySortOrder` and `DataSetSites.EntitySortOrder`: In EML, `coverage`-type elements can be applied to many levels. Most commonly we specify dataset-wide geographic, temporal, and taxonomic coverage. However, if datasets span a large geographical area with wide-spread clusters of sampling, a blanket bounding box might not be informative. In these cases, it might be better to specify coverage at the entity level. However, modeling for that possibility means much added complexity to metabase. We have adopted the following convention: the default for EntitySortOrder is 0, which denotes dataset-level coverage. Anything other than 0 in that column will denote coverage for that entity number. Note that `MetaEgress` does not currently support this convention; it might however in the future.
 
+<a id="boilerplate-information"></a>
 #### Boilerplate information
 
 Boilerplate refers to information specific to your project or LTER site that is
@@ -162,6 +193,7 @@ document. Scope is required. Note that `contact`, `metadata provider`, and `publ
 
 NOTE: `MetaEgress` will not read in other fields not listed above.
 
+<a id="dataset-methods"></a>
 #### Dataset methods
 
 Metabase can describe dataset collection and sampling methods, instruments, software, protocols, and
@@ -175,8 +207,30 @@ other aspects related to how data were generated. There are two ways to populate
 Note that the VIEWs abstraction layer and `MetaEgress` support both approaches
 (minimal, document-only, and normalized, modelled).
 
+<a id="schema-mb2eml_r"></a>
+# Schema `mb2eml_r`
+
+Nothing to do here. The only table is `boilerplate`. See section above. Everything else is VIEWs for `MetaEgress`.
+
+<a id="schema-pkg_mgmt"></a>
+# Schema `pkg_mgmt`
+
+There are a lot of tables in this schema; however as of 2020-01-10, we have not critically reviewed these tables for
+their usefulness beyond SBC/MCR LTER. 
+
+The only table whose information can be exposed to EML via `MetaEgress` is `pkg_mgmt.maintenance_changehistory`. 
+
+Another table of note is `version_tracker_metabase`. This tracks changes to the schema of your installation of LTER-core-metabase itself. Due to the evolving nature of the schema, any one installation of metabase will eventually need to be updated with patches. It's our team practice to write an INSERT statement to this table in each patch, and so by executing the patches on your installation, this table records the patches and the time installed.
+
+<a id="schema-schema_annotation"></a>
+# Schema `schema_annotation`
+
+This schema contains tables to annotate your datasets and table attributes with semantic annotations from established ontologies. The same rules of thumb about table prefixes and population order from before apply here. 
+
+<a id="known-wonkinesses-and-workarounds"></a>
 ### Known wonkinesses and workarounds
 
+<a id="issues-specific-to-dbeaver"></a>
 #### Issues specific to DBeaver
 
 The pilcrow/paragraph symbol/backwards P. Not sure how these materialize in DBeaver but they do. If present, exported metadata doesn't look any different, but if present in "filename" type columns, files cannot be located. Cannot be deleted by itself, so re-enter the whole field.
@@ -185,6 +239,7 @@ Blanks in DBeaver are NOT the same as NULLs. Be careful when copying and
 pasting. Constraints/conditions that require NULLs will not work correctly. If
 pasting whole columns from Excel, you need to right-click/Edit/Set to NULL in DBeaver manually.
 
+<a id="general-notes"></a>
 #### General notes
 
 Remove all hyperlinks in Word documents linked to in abstracts and methods documents.
