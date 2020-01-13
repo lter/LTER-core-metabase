@@ -15,7 +15,7 @@ Last updated: January 10th, 2020
 		- [Dataset methods](#dataset-methods)
 - [Schema `mb2eml_r`](#schema-mb2eml_r)
 - [Schema `pkg_mgmt`](#schema-pkg_mgmt)
-- [Schema `schema_annotation`](#schema-schema_annotation)
+- [Schema `semantic_annotation`](#schema-semantic_annotation)
 	- [Known wonkinesses and workarounds](#known-wonkinesses-and-workarounds)
 		- [Issues specific to DBeaver](#issues-specific-to-dbeaver)
 		- [General notes](#general-notes)
@@ -222,10 +222,14 @@ The only table whose information can be exposed to EML via `MetaEgress` is `pkg_
 
 Another table of note is `version_tracker_metabase`. This tracks changes to the schema of your installation of LTER-core-metabase itself. Due to the evolving nature of the schema, any one installation of metabase will eventually need to be updated with patches. It's our team practice to write an INSERT statement to this table in each patch, and so by executing the patches on your installation, this table records the patches and the time installed.
 
-<a id="schema-schema_annotation"></a>
-# Schema `schema_annotation`
+<a id="schema-semantic_annotation"></a>
+# Schema `semantic_annotation`
 
-This schema contains tables to annotate your datasets and table attributes with semantic annotations from established ontologies. The same rules of thumb about table prefixes and population order from before apply here. 
+This schema contains tables to annotate your datasets and table attributes with semantic annotations from established ontologies. The same rules of thumb about table prefixes and population order from before apply here, i.e. fill out `EMLAnnotationTerms` and `EMLObjectProperties` first before `DataSetAnnotations` and `DataSetAttributeAnnotations`. 
+
+`EMLAnnotationTerms` are meant to contain terms that are concepts, measurements, etc, e.g. "temperature", "current speed". Recommended ontologies: ESCO, ENVO, SWEET. 
+
+`EMLObjectProperties` are meant to contain terms that denote relationships between terms, e.g. "isAbout" or "containsMeasurementsOf". Recommended ontologies: OBOE.
 
 <a id="known-wonkinesses-and-workarounds"></a>
 ### Known wonkinesses and workarounds
