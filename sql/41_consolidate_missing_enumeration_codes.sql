@@ -26,11 +26,11 @@ ALTER TABLE lter_metabase."DataSetAttributeEnumeration"
 	ADD COLUMN "CodeID" character varying(20);
 
 -- update codeid col with join from listcodes
-UPDATE lter_metabase."DataSetAttributeEnumeration"
-	SET "CodeID" = lter_metabase."ListCodes"."CodeID"
-	FROM lter_metabase."DataSetAttributeEnumeration" d 
-	INNER JOIN lter_metabase."ListCodes" l
-	ON d."Code" = l."Code" 
+UPDATE lter_metabase."DataSetAttributeEnumeration" d
+	SET "CodeID" = l."CodeID"
+	FROM lter_metabase."ListCodes" l
+	where
+	d."Code" = l."Code" 
 	AND d."Definition" = l."CodeExplanation";
 
 -- drop view
