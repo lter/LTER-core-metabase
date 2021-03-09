@@ -4,15 +4,14 @@ ALTER TABLE lter_metabase."ListCodes" RENAME "MissingValueCodeID" TO "CodeID";
 ALTER TABLE lter_metabase."ListCodes" RENAME "MissingValueCode" TO "Code";
 ALTER TABLE lter_metabase."ListCodes" RENAME "MissingValueCodeExplanation" TO "CodeExplanation";
 
---The code is max 20 characters so cannot use column names.
---Two codes: VALID and QM are re-used so I appended the length of their definition, just to
--- get these into the table. Then you can manually edit as desired.
+-- The code is max 20 characters so cannot use column names.
+-- AQUE is re-used so the length of its definition is appended, just to
+-- get these entries into the table. Then you can manually edit as desired.
 
 INSERT INTO lter_metabase."ListCodes"
 SELECT 
 CASE "Code" 
-  when 'VALID' then max('enum.'||"Code"||length("Definition")::text)
-  when 'QM' then max('enum.'||"Code"||length("Definition")::text)
+  when 'AQUE' then max('enum.'||"Code"||length("Definition")::text)
   else max('enum.'||"Code")
 END AS "CodeID",
 "Code", "Definition" AS "CodeExplanation"
