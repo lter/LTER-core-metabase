@@ -141,8 +141,7 @@ CREATE TABLE lter_metabase."DataSetAttributeEnumeration" (
     "DataSetID" integer NOT NULL,
     "EntitySortOrder" integer NOT NULL,
     "ColumnName" character varying(200) NOT NULL,
-    "Code" character varying(200) NOT NULL,
-    "Definition" character varying(1024) NOT NULL
+    "CodeID" character varying(20) NOT NULL
 );
 
 
@@ -545,6 +544,19 @@ CREATE TABLE lter_metabase."EMLUnitTypes" (
 ALTER TABLE lter_metabase."EMLUnitTypes" OWNER TO %db_owner%;
 
 --
+-- Name: ListCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."ListCodes" (
+    "CodeID" character varying(20) NOT NULL,
+    "Code" character varying(200) NOT NULL,
+    "CodeExplanation" character varying(1024) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."ListCodes" OWNER TO %db_owner%;
+
+--
 -- Name: ListKeywordThesauri; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -613,19 +625,6 @@ CREATE TABLE lter_metabase."ListMethodSoftware" (
 
 
 ALTER TABLE lter_metabase."ListMethodSoftware" OWNER TO %db_owner%;
-
---
--- Name: ListMissingCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
---
-
-CREATE TABLE lter_metabase."ListMissingCodes" (
-    "MissingValueCodeID" character varying(20) NOT NULL,
-    "MissingValueCode" character varying(200) NOT NULL,
-    "MissingValueCodeExplanation" character varying(1024) NOT NULL
-);
-
-
-ALTER TABLE lter_metabase."ListMissingCodes" OWNER TO %db_owner%;
 
 --
 -- Name: ListPeople; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -878,9 +877,10 @@ CREATE VIEW mb2eml_r.vw_eml_attributecodedefinition AS
  SELECT d."DataSetID" AS datasetid,
     d."EntitySortOrder" AS entity_position,
     d."ColumnName" AS "attributeName",
-    d."Code" AS code,
-    d."Definition" AS definition
-   FROM lter_metabase."DataSetAttributeEnumeration" d
+    l."Code" AS code,
+    l."CodeExplanation" AS definition
+   FROM (lter_metabase."DataSetAttributeEnumeration" d
+     LEFT JOIN lter_metabase."ListCodes" l ON (((d."CodeID")::text = (l."CodeID")::text)))
   ORDER BY d."DataSetID", d."EntitySortOrder";
 
 
@@ -1228,10 +1228,10 @@ CREATE VIEW mb2eml_r.vw_eml_missingcodes AS
  SELECT d."DataSetID" AS datasetid,
     d."EntitySortOrder" AS entity_position,
     d."ColumnName" AS "attributeName",
-    e."MissingValueCode" AS code,
-    e."MissingValueCodeExplanation" AS definition
+    e."Code" AS code,
+    e."CodeExplanation" AS definition
    FROM (lter_metabase."DataSetAttributeMissingCodes" d
-     JOIN lter_metabase."ListMissingCodes" e ON (((d."MissingValueCodeID")::text = (e."MissingValueCodeID")::text)))
+     JOIN lter_metabase."ListCodes" e ON (((d."MissingValueCodeID")::text = (e."CodeID")::text)))
   ORDER BY d."DataSetID";
 
 
@@ -1935,34 +1935,34 @@ COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abst
 -- Data for Name: DataSetAttributeEnumeration; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", "Code", "Definition") FROM stdin;
-99013	1	site_code	ABUR	Arroyo Burro
-99013	1	site_code	AHND	Arroyo Hondo
-99013	1	site_code	AQUE	Arroyo Quemado
-99013	1	site_code	BULL	Bulito
-99013	1	site_code	CARP	Carpinteria
-99013	1	site_code	GOLB	Goleta Bay
-99013	1	site_code	IVEE	Isla Vista
-99013	1	site_code	MOHK	Mohawk
-99013	1	site_code	NAPL	Naples
-99013	1	site_code	SCDI	Santa Cruz Island, Diablo 
-99013	1	site_code	SCTW	Santa Cruz Island, Twin Harbor West Reef
-99013	1	frondcondition	growing	Frond is still growing
-99013	1	frondcondition	terminal	Frond has reached terminal size
-99021	1	Site	ABUR	Arroyo Burro
-99021	1	Site	MOHK	Mohawk
-99021	1	Site	AQUE	Arroyo Quemado.
-99021	2	Site	ABUR	Arroyo Burro
-99021	2	Site	MOHK	Mohawk
-99021	2	Site	AQUE	Arroyo Quemado.
-99021	3	Site	ABUR	Arroyo Burro
-99021	3	Site	MOHK	Mohawk
-99021	3	Site	AQUE	Arroyo Quemado.
-99024	1	SITE	ABUR	Arroyo Burro
-99024	1	SITE	AQUE	Arroyo Quemado
-99024	1	SITE	MOHK	Mohawk
-99024	1	Replicate	1	Sample replicate 1
-99024	1	Replicate	2	Sample replicate 2
+COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", "CodeID") FROM stdin;
+99013	1	site_code	enum.ABUR
+99013	1	site_code	enum.AHND
+99013	1	site_code	enum.AQUE14
+99013	1	site_code	enum.BULL
+99013	1	site_code	enum.CARP
+99013	1	site_code	enum.GOLB
+99013	1	site_code	enum.IVEE
+99013	1	site_code	enum.MOHK
+99013	1	site_code	enum.NAPL
+99013	1	site_code	enum.SCDI
+99013	1	site_code	enum.SCTW
+99013	1	frondcondition	enum.growing
+99013	1	frondcondition	enum.terminal
+99021	1	Site	enum.ABUR
+99021	1	Site	enum.MOHK
+99021	1	Site	enum.AQUE15
+99021	2	Site	enum.ABUR
+99021	2	Site	enum.MOHK
+99021	2	Site	enum.AQUE15
+99021	3	Site	enum.ABUR
+99021	3	Site	enum.MOHK
+99021	3	Site	enum.AQUE15
+99024	1	SITE	enum.ABUR
+99024	1	SITE	enum.AQUE14
+99024	1	SITE	enum.MOHK
+99024	1	Replicate	enum.1
+99024	1	Replicate	enum.2
 \.
 
 
@@ -2862,6 +2862,34 @@ molePerMeterSquaredPerSecond	molePerMeterSquaredPerSecond	amount	\N
 
 
 --
+-- Data for Name: ListCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."ListCodes" ("CodeID", "Code", "CodeExplanation") FROM stdin;
+1	-99999	no information available
+2	-99999	value not recorded or not available
+3	-99999	not available, or not collected
+4	-998	no measurement available, satellite view obscured by clouds
+enum.ABUR	ABUR	Arroyo Burro
+enum.NAPL	NAPL	Naples
+enum.AQUE15	AQUE	Arroyo Quemado.
+enum.GOLB	GOLB	Goleta Bay
+enum.SCTW	SCTW	Santa Cruz Island, Twin Harbor West Reef
+enum.SCDI	SCDI	Santa Cruz Island, Diablo 
+enum.CARP	CARP	Carpinteria
+enum.terminal	terminal	Frond has reached terminal size
+enum.1	1	Sample replicate 1
+enum.IVEE	IVEE	Isla Vista
+enum.2	2	Sample replicate 2
+enum.AQUE14	AQUE	Arroyo Quemado
+enum.MOHK	MOHK	Mohawk
+enum.AHND	AHND	Arroyo Hondo
+enum.BULL	BULL	Bulito
+enum.growing	growing	Frond is still growing
+\.
+
+
+--
 -- Data for Name: ListKeywordThesauri; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -3679,18 +3707,6 @@ COPY lter_metabase."ListMethodSoftware" ("SoftwareID", "Title", "AuthorSurname",
 
 
 --
--- Data for Name: ListMissingCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."ListMissingCodes" ("MissingValueCodeID", "MissingValueCode", "MissingValueCodeExplanation") FROM stdin;
-1	-99999	no information available
-2	-99999	value not recorded or not available
-3	-99999	not available, or not collected
-4	-998	no measurement available, satellite view obscured by clouds
-\.
-
-
---
 -- Data for Name: ListPeople; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4453,6 +4469,7 @@ COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, dat
 1	0	38	2020-01-09 13:24:33.242279	applied 38_pkg_state_data_archive_id_correction_to_examples.sql
 1	0	39	2020-01-09 13:24:43.173911	apply 39_add_docbook_descriptiontype.sql
 1	0	40	2020-01-09 13:31:43.632442	applied 40_widen_altitude_unit_limit.sql
+1	0	41	2021-03-09 08:33:29.043446	applied 41_consolidate_missing_enumeration_codes.sql
 \.
 
 
@@ -4470,6 +4487,14 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
 
 ALTER TABLE ONLY lter_metabase."DataSet"
     ADD CONSTRAINT "PK_DataSet" PRIMARY KEY ("DataSetID");
+
+
+--
+-- Name: DataSetAttributeEnumeration PK_DataSetAttributeEnumeration; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
+    ADD CONSTRAINT "PK_DataSetAttributeEnumeration" PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "CodeID");
 
 
 --
@@ -4657,11 +4682,11 @@ ALTER TABLE ONLY lter_metabase."ListTaxonomicProviders"
 
 
 --
--- Name: ListMissingCodes PK_MissingCodesList_MissingValueCodeID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListCodes PK_MissingCodesList_MissingValueCodeID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ListMissingCodes"
-    ADD CONSTRAINT "PK_MissingCodesList_MissingValueCodeID" PRIMARY KEY ("MissingValueCodeID");
+ALTER TABLE ONLY lter_metabase."ListCodes"
+    ADD CONSTRAINT "PK_MissingCodesList_MissingValueCodeID" PRIMARY KEY ("CodeID");
 
 
 --
@@ -4737,18 +4762,18 @@ ALTER TABLE ONLY lter_metabase."ListMethodInstruments"
 
 
 --
--- Name: ListMissingCodes UQ_ListMissingCodes_Code_Explanation; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListCodes UQ_ListMissingCodes_Code_Explanation; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ListMissingCodes"
-    ADD CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" UNIQUE ("MissingValueCode", "MissingValueCodeExplanation");
+ALTER TABLE ONLY lter_metabase."ListCodes"
+    ADD CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" UNIQUE ("Code", "CodeExplanation");
 
 
 --
--- Name: CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON "ListMissingCodes"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON "ListCodes"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COMMENT ON CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON lter_metabase."ListMissingCodes" IS 'Needed because the ID could be as simple as an integer and is not inherently connected to the code and explanation.';
+COMMENT ON CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON lter_metabase."ListCodes" IS 'Needed because the ID could be as simple as an integer and is not inherently connected to the code and explanation.';
 
 
 --
@@ -4773,14 +4798,6 @@ ALTER TABLE ONLY lter_metabase."ListMethodSoftware"
 
 ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
     ADD CONSTRAINT "pk_MeasurementScaleDomains" PRIMARY KEY ("MeasurementScaleDomainID");
-
-
---
--- Name: DataSetAttributeEnumeration pk_emlattributecodedefinition_pk; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
---
-
-ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
-    ADD CONSTRAINT pk_emlattributecodedefinition_pk PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "Code");
 
 
 --
@@ -4990,6 +5007,14 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributes"
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributes"
     ADD CONSTRAINT "DataSetAttributes_FK_units" FOREIGN KEY ("Unit") REFERENCES lter_metabase."EMLUnitDictionary"(id) ON UPDATE CASCADE;
+
+
+--
+-- Name: DataSetAttributeEnumeration FK_DataSetAttributeEnumeration_ListCodes; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
+    ADD CONSTRAINT "FK_DataSetAttributeEnumeration_ListCodes" FOREIGN KEY ("CodeID") REFERENCES lter_metabase."ListCodes"("CodeID");
 
 
 --
@@ -5205,7 +5230,7 @@ ALTER TABLE ONLY lter_metabase."DataSet"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
-    ADD CONSTRAINT "FK_DatasetMissingCode_MissingValueCodeID" FOREIGN KEY ("MissingValueCodeID") REFERENCES lter_metabase."ListMissingCodes"("MissingValueCodeID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DatasetMissingCode_MissingValueCodeID" FOREIGN KEY ("MissingValueCodeID") REFERENCES lter_metabase."ListCodes"("CodeID") ON UPDATE CASCADE;
 
 
 --
@@ -5592,6 +5617,14 @@ GRANT SELECT ON TABLE lter_metabase."EMLUnitTypes" TO read_only_user;
 
 
 --
+-- Name: TABLE "ListCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListCodes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListCodes" TO read_only_user;
+
+
+--
 -- Name: TABLE "ListKeywordThesauri"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -5629,14 +5662,6 @@ GRANT SELECT ON TABLE lter_metabase."ListMethodProtocols" TO read_only_user;
 
 GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodSoftware" TO read_write_user;
 GRANT SELECT ON TABLE lter_metabase."ListMethodSoftware" TO read_only_user;
-
-
---
--- Name: TABLE "ListMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMissingCodes" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."ListMissingCodes" TO read_only_user;
 
 
 --
