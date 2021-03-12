@@ -28,8 +28,8 @@ AS
     d."Revision" as revision, 
     l."Bibtex" as bibtex,
     d."RelationshipType" as relationship
-    FROM lter_metabase."DataSetPublications" d INNER JOIN lter_metabase."ListPublications" l
-    ON d."PublicationID" = d."PublicationID"
+    FROM lter_metabase."DataSetPublications" d LEFT JOIN lter_metabase."ListPublications" l
+    ON d."PublicationID" = l."PublicationID"
     ORDER BY datasetid
 );
 
