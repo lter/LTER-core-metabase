@@ -20,7 +20,7 @@ CREATE TABLE lter_metabase."DataSetPublications"
         ('referencePublication'::character varying)::text])))
 );
 
-CREATE or replace VIEW lter_metabase.vw_eml_publications
+CREATE or replace VIEW mb2eml_r.vw_eml_publications
 AS
 (
     SELECT 
@@ -33,13 +33,13 @@ AS
     ORDER BY datasetid
 );
 
-ALTER TABLE lter_metabase.vw_eml_publications OWNER TO %db_owner%;
+ALTER TABLE mb2eml_r.vw_eml_publications OWNER TO %db_owner%;
 
-REVOKE ALL ON TABLE lter_metabase.vw_eml_publications FROM PUBLIC;
-REVOKE ALL ON TABLE lter_metabase.vw_eml_publications FROM %db_owner%;
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase.vw_eml_publications TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase.vw_eml_publications TO read_only_user;
-GRANT ALL ON TABLE lter_metabase.vw_eml_publications TO %db_owner%;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_publications FROM PUBLIC;
+REVOKE ALL ON TABLE mb2eml_r.vw_eml_publications FROM %db_owner%;
+GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_publications TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_publications TO read_only_user;
+GRANT ALL ON TABLE mb2eml_r.vw_eml_publications TO %db_owner%;
 
 ALTER TABLE lter_metabase."ListPublications" OWNER TO %db_owner%;
 
