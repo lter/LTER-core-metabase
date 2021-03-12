@@ -2,8 +2,7 @@ CREATE TABLE lter_metabase."ListPublications"
 (
   "PublicationID"  integer,
   "Bibtex"      character varying(2000),
-  CONSTRAINT "pk_ListPublications" PRIMARY KEY ("PublicationID"),
-  MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION,
+  CONSTRAINT "pk_ListPublications" PRIMARY KEY ("PublicationID")
 );
 
 
@@ -14,27 +13,23 @@ CREATE TABLE lter_metabase."DataSetPublications"
   "PublicationID"  integer,
   "RelationshipType"      character varying(40),
   CONSTRAINT "pk_DataSetPublications" PRIMARY KEY ("DataSetID","PublicationID"),
-  CONSTRAINT "fk_DataSetPublications_DatasetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet" ("DataSetID")
-  MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION,
-  CONSTRAINT "fk_DataSetPublications_PublicationID" FOREIGN KEY ("PublicationID") REFERENCES lter_metabase."ListPublications" ("PublicationID")
-  MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION,
+  CONSTRAINT "fk_DataSetPublications_DatasetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet" ("DataSetID"),
+  CONSTRAINT "fk_DataSetPublications_PublicationID" FOREIGN KEY ("PublicationID") REFERENCES lter_metabase."ListPublications" ("PublicationID"),
   CONSTRAINT "fk_SAA_ObjPropID" CHECK ((("RelationshipType")::text = ANY (ARRAY[('literatureCited'::character varying)::text, 
         ('usageCitation'::character varying)::text, 
-        ('referencePublication'::character varying)::text)));
-  MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION
+        ('referencePublication'::character varying)::text])))
 );
 
 CREATE or replace VIEW lter_metabase.vw_eml_publications
 AS
 (
     SELECT 
-    a."DataSetID" as datasetid, 
-    a."Revision" as revision, 
+    d."DataSetID" as datasetid, 
+    d."Revision" as revision, 
     l."Bibtex" as bibtex,
     d."RelationshipType" as relationship
-    FROM lter_metabase."DataSetPublications" d
-    INNER JOIN lter_metabase."ListPublications" l
-    ON d."PublicationID" = a."PublicationID"
+    FROM lter_metabase."DataSetPublications" d INNER JOIN lter_metabase."ListPublications" l
+    ON d."PublicationID" = d."PublicationID"
     ORDER BY datasetid
 );
 
