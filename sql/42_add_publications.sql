@@ -1,6 +1,6 @@
 CREATE TABLE lter_metabase."ListPublications"
 (
-  "PublicationID"  integer,
+  "PublicationID"  character varying(20),
   "Bibtex"      character varying(2000),
   CONSTRAINT "pk_ListPublications" PRIMARY KEY ("PublicationID")
 );
