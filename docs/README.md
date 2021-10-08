@@ -4,7 +4,7 @@ Quick links:
 
 - [History of LTER metabase designs](history.md)
 - [Installation](quick_start.md)
-- [Collect metadata from investigators]()
+- Collect metadata from investigators
 - [Populate LTER-core-metabase for EML generation](populate.md)
 - [Guide on using DBeaver for common metabase tasks](dbeaver.md)
 - [Set up automated backups in Windows](backup.md)

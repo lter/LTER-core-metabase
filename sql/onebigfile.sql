@@ -91,14 +91,15 @@ CREATE TABLE lter_metabase."DataSet" (
     "DataSetID" integer NOT NULL,
     "Revision" integer,
     "Title" character varying(300) NOT NULL,
-    "PubDate" date DEFAULT now(),
+    "PubDate" date,
     "Abstract" character varying(5000) NOT NULL,
     "ShortName" character varying(200),
     "UpdateFrequency" character varying(50),
     "MaintenanceDescription" character varying(500),
     "AbstractType" character varying(10) NOT NULL,
     "BoilerplateSetting" character varying(20) DEFAULT 'default'::character varying NOT NULL,
-    CONSTRAINT "CK_DataSet_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text])))
+    CONSTRAINT "CK_DataSetMethodSteps_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text, ('docbook'::character varying)::text]))),
+    CONSTRAINT "CK_DataSet_AbstractType" CHECK ((("AbstractType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text, ('docbook'::character varying)::text])))
 );
 
 
@@ -140,8 +141,7 @@ CREATE TABLE lter_metabase."DataSetAttributeEnumeration" (
     "DataSetID" integer NOT NULL,
     "EntitySortOrder" integer NOT NULL,
     "ColumnName" character varying(200) NOT NULL,
-    "Code" character varying(200) NOT NULL,
-    "Definition" character varying(1024) NOT NULL
+    "CodeID" character varying(20) NOT NULL
 );
 
 
@@ -253,6 +253,24 @@ CREATE TABLE lter_metabase."DataSetKeywords" (
 ALTER TABLE lter_metabase."DataSetKeywords" OWNER TO %db_owner%;
 
 --
+-- Name: DataSetMethod; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."DataSetMethod" (
+    "DataSetID" integer NOT NULL,
+    "MethodStepID" integer NOT NULL,
+    "DescriptionType" character varying(10),
+    "Description" text,
+    "Method_xml" xml,
+    CONSTRAINT "CK_DataSetMethodSteps_DescriptionHasType" CHECK (((("DescriptionType" IS NULL) AND ("Description" IS NULL)) OR (("DescriptionType" IS NOT NULL) AND ("Description" IS NOT NULL)))),
+    CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ((("Description" IS NOT NULL) OR ("Method_xml" IS NOT NULL))),
+    CONSTRAINT "CK_DataSetMethod_DescriptionType" CHECK ((("DescriptionType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text, ('docbook'::character varying)::text])))
+);
+
+
+ALTER TABLE lter_metabase."DataSetMethod" OWNER TO %db_owner%;
+
+--
 -- Name: DataSetMethodInstruments; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -310,24 +328,6 @@ CREATE TABLE lter_metabase."DataSetMethodSoftware" (
 
 
 ALTER TABLE lter_metabase."DataSetMethodSoftware" OWNER TO %db_owner%;
-
---
--- Name: DataSetMethodSteps; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
---
-
-CREATE TABLE lter_metabase."DataSetMethodSteps" (
-    "DataSetID" integer NOT NULL,
-    "MethodStepID" integer NOT NULL,
-    "DescriptionType" character varying(10),
-    "Description" text,
-    "Method_xml" xml,
-    CONSTRAINT "CK_DataSetMethodSteps_DescriptionHasType" CHECK (((("DescriptionType" IS NULL) AND ("Description" IS NULL)) OR (("DescriptionType" IS NOT NULL) AND ("Description" IS NOT NULL)))),
-    CONSTRAINT "CK_DataSetMethodSteps_DescriptionType" CHECK ((("DescriptionType")::text = ANY (ARRAY[('file'::character varying)::text, ('md'::character varying)::text, ('plaintext'::character varying)::text]))),
-    CONSTRAINT "CK_DataSetMethodSteps_text_or_xml" CHECK ((("Description" IS NOT NULL) OR ("Method_xml" IS NOT NULL)))
-);
-
-
-ALTER TABLE lter_metabase."DataSetMethodSteps" OWNER TO %db_owner%;
 
 --
 -- Name: DataSetPersonnel; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -544,6 +544,19 @@ CREATE TABLE lter_metabase."EMLUnitTypes" (
 ALTER TABLE lter_metabase."EMLUnitTypes" OWNER TO %db_owner%;
 
 --
+-- Name: ListCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
+--
+
+CREATE TABLE lter_metabase."ListCodes" (
+    "CodeID" character varying(20) NOT NULL,
+    "Code" character varying(200) NOT NULL,
+    "CodeExplanation" character varying(1024) NOT NULL
+);
+
+
+ALTER TABLE lter_metabase."ListCodes" OWNER TO %db_owner%;
+
+--
 -- Name: ListKeywordThesauri; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -612,19 +625,6 @@ CREATE TABLE lter_metabase."ListMethodSoftware" (
 
 
 ALTER TABLE lter_metabase."ListMethodSoftware" OWNER TO %db_owner%;
-
---
--- Name: ListMissingCodes; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
---
-
-CREATE TABLE lter_metabase."ListMissingCodes" (
-    "MissingValueCodeID" character varying(20) NOT NULL,
-    "MissingValueCode" character varying(200) NOT NULL,
-    "MissingValueCodeExplanation" character varying(1024) NOT NULL
-);
-
-
-ALTER TABLE lter_metabase."ListMissingCodes" OWNER TO %db_owner%;
 
 --
 -- Name: ListPeople; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
@@ -701,7 +701,7 @@ CREATE TABLE lter_metabase."ListSites" (
     "NBoundLat" double precision,
     "AltitudeMin" double precision,
     "AltitudeMax" double precision,
-    "AltitudeUnit" character varying(10),
+    "AltitudeUnit" character varying(100),
     CONSTRAINT "CK_SiteRegister_ShapeType" CHECK ((("ShapeType")::text = ANY (ARRAY[('point'::character varying)::text, ('rectangle'::character varying)::text, ('polygon'::character varying)::text, ('polyline'::character varying)::text, ('vector'::character varying)::text])))
 );
 
@@ -877,9 +877,10 @@ CREATE VIEW mb2eml_r.vw_eml_attributecodedefinition AS
  SELECT d."DataSetID" AS datasetid,
     d."EntitySortOrder" AS entity_position,
     d."ColumnName" AS "attributeName",
-    d."Code" AS code,
-    d."Definition" AS definition
-   FROM lter_metabase."DataSetAttributeEnumeration" d
+    l."Code" AS code,
+    l."CodeExplanation" AS definition
+   FROM (lter_metabase."DataSetAttributeEnumeration" d
+     LEFT JOIN lter_metabase."ListCodes" l ON (((d."CodeID")::text = (l."CodeID")::text)))
   ORDER BY d."DataSetID", d."EntitySortOrder";
 
 
@@ -1214,7 +1215,7 @@ CREATE VIEW mb2eml_r.vw_eml_methodstep_description AS
     m."MethodStepID" AS methodstep_id,
     m."Description" AS description,
     m."DescriptionType" AS description_type
-   FROM lter_metabase."DataSetMethodSteps" m;
+   FROM lter_metabase."DataSetMethod" m;
 
 
 ALTER TABLE mb2eml_r.vw_eml_methodstep_description OWNER TO %db_owner%;
@@ -1227,10 +1228,10 @@ CREATE VIEW mb2eml_r.vw_eml_missingcodes AS
  SELECT d."DataSetID" AS datasetid,
     d."EntitySortOrder" AS entity_position,
     d."ColumnName" AS "attributeName",
-    e."MissingValueCode" AS code,
-    e."MissingValueCodeExplanation" AS definition
+    e."Code" AS code,
+    e."CodeExplanation" AS definition
    FROM (lter_metabase."DataSetAttributeMissingCodes" d
-     JOIN lter_metabase."ListMissingCodes" e ON (((d."MissingValueCodeID")::text = (e."MissingValueCodeID")::text)))
+     JOIN lter_metabase."ListCodes" e ON (((d."MissingValueCodeID")::text = (e."CodeID")::text)))
   ORDER BY d."DataSetID";
 
 
@@ -1923,10 +1924,10 @@ ALTER TABLE pkg_mgmt.vw_temporal OWNER TO %db_owner%;
 --
 
 COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abstract", "ShortName", "UpdateFrequency", "MaintenanceDescription", "AbstractType", "BoilerplateSetting") FROM stdin;
-99013	21	SBC LTER: TEST: Water temperature at the bottom	\N	abstract.99013.docx	Reef bottom water temperature	\N	\N	file	default
-99024	17	SBC LTER: TEST: kelp CHN	\N	abstract.99024.docx	Kelp - algal weights and CHN	\N	\N	file	default
-99054	4	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	\N	abstract.99054.docx	Satellite kelp canopy biomass	\N	\N	file	default
-99021	11	SBC LTER: TEST: NPP dataset with 3 tables	\N	abstract.99021.docx	Beach wrack IV 2005-06	\N	\N	file	default
+99013	21	SBC LTER: TEST: Water temperature at the bottom	2019-08-07	abstract.99013.docx	Reef bottom water temperature	annually	Ongoing time series.	file	default
+99021	11	SBC LTER: TEST: NPP dataset with 3 tables	2016-09-08	abstract.99021.docx	Beach wrack IV 2005-06	notPlanned	Completed timeseries. No future data updates anticpated.	file	default
+99024	17	SBC LTER: TEST: kelp CHN	2019-01-15	abstract.99024.docx	Kelp - algal weights and CHN	annually	Ongoing time series. Data updates may be delayed by analysis.	file	default
+99054	4	SBC LTER: TEST: Giant kelp canopy biomass from Landsat, 1982 - 2011	2014-01-14	abstract.99054.docx	Satellite kelp canopy biomass	notPlanned	Completed timeseries. No future data updates anticpated.	file	default
 \.
 
 
@@ -1934,34 +1935,34 @@ COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abst
 -- Data for Name: DataSetAttributeEnumeration; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", "Code", "Definition") FROM stdin;
-99013	1	site_code	ABUR	Arroyo Burro
-99013	1	site_code	AHND	Arroyo Hondo
-99013	1	site_code	AQUE	Arroyo Quemado
-99013	1	site_code	BULL	Bulito
-99013	1	site_code	CARP	Carpinteria
-99013	1	site_code	GOLB	Goleta Bay
-99013	1	site_code	IVEE	Isla Vista
-99013	1	site_code	MOHK	Mohawk
-99013	1	site_code	NAPL	Naples
-99013	1	site_code	SCDI	Santa Cruz Island, Diablo 
-99013	1	site_code	SCTW	Santa Cruz Island, Twin Harbor West Reef
-99013	1	frondcondition	growing	Frond is still growing
-99013	1	frondcondition	terminal	Frond has reached terminal size
-99021	1	Site	ABUR	Arroyo Burro
-99021	1	Site	MOHK	Mohawk
-99021	1	Site	AQUE	Arroyo Quemado.
-99021	2	Site	ABUR	Arroyo Burro
-99021	2	Site	MOHK	Mohawk
-99021	2	Site	AQUE	Arroyo Quemado.
-99021	3	Site	ABUR	Arroyo Burro
-99021	3	Site	MOHK	Mohawk
-99021	3	Site	AQUE	Arroyo Quemado.
-99024	1	SITE	ABUR	Arroyo Burro
-99024	1	SITE	AQUE	Arroyo Quemado
-99024	1	SITE	MOHK	Mohawk
-99024	1	Replicate	1	Sample replicate 1
-99024	1	Replicate	2	Sample replicate 2
+COPY lter_metabase."DataSetAttributeEnumeration" ("DataSetID", "EntitySortOrder", "ColumnName", "CodeID") FROM stdin;
+99013	1	site_code	enum.ABUR
+99013	1	site_code	enum.AHND
+99013	1	site_code	enum.AQUE14
+99013	1	site_code	enum.BULL
+99013	1	site_code	enum.CARP
+99013	1	site_code	enum.GOLB
+99013	1	site_code	enum.IVEE
+99013	1	site_code	enum.MOHK
+99013	1	site_code	enum.NAPL
+99013	1	site_code	enum.SCDI
+99013	1	site_code	enum.SCTW
+99013	1	frondcondition	enum.growing
+99013	1	frondcondition	enum.terminal
+99021	1	Site	enum.ABUR
+99021	1	Site	enum.MOHK
+99021	1	Site	enum.AQUE15
+99021	2	Site	enum.ABUR
+99021	2	Site	enum.MOHK
+99021	2	Site	enum.AQUE15
+99021	3	Site	enum.ABUR
+99021	3	Site	enum.MOHK
+99021	3	Site	enum.AQUE15
+99024	1	SITE	enum.ABUR
+99024	1	SITE	enum.AQUE14
+99024	1	SITE	enum.MOHK
+99024	1	Replicate	enum.1
+99024	1	Replicate	enum.2
 \.
 
 
@@ -2264,6 +2265,18 @@ COPY lter_metabase."DataSetKeywords" ("DataSetID", "Keyword", "ThesaurusID") FRO
 
 
 --
+-- Data for Name: DataSetMethod; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."DataSetMethod" ("DataSetID", "MethodStepID", "DescriptionType", "Description", "Method_xml") FROM stdin;
+99021	10	file	method.99021.10.docx	\N
+99024	10	file	method.99024.10.docx	\N
+99013	10	file	method.99013.10.docx	\N
+99021	20	file	method.99021.20.docx	\N
+\.
+
+
+--
 -- Data for Name: DataSetMethodInstruments; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -2303,18 +2316,6 @@ COPY lter_metabase."DataSetMethodSoftware" ("DataSetID", "MethodStepID", "Softwa
 99021	10	1
 99021	10	2
 99021	20	3
-\.
-
-
---
--- Data for Name: DataSetMethodSteps; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."DataSetMethodSteps" ("DataSetID", "MethodStepID", "DescriptionType", "Description", "Method_xml") FROM stdin;
-99021	10	file	method.21.10.docx	\N
-99024	10	file	method.24.10.docx	\N
-99013	10	file	method.13.10.docx	\N
-99021	20	file	method.21.20.docx	\N
 \.
 
 
@@ -2857,6 +2858,34 @@ massDensityRate	massDensityRate	mass	-1
 amountOfSubstanceFlux	amountOfSubstanceFlux	amount	-1
 radioactivity	radioactivity	time	-1
 molePerMeterSquaredPerSecond	molePerMeterSquaredPerSecond	amount	\N
+\.
+
+
+--
+-- Data for Name: ListCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
+--
+
+COPY lter_metabase."ListCodes" ("CodeID", "Code", "CodeExplanation") FROM stdin;
+1	-99999	no information available
+2	-99999	value not recorded or not available
+3	-99999	not available, or not collected
+4	-998	no measurement available, satellite view obscured by clouds
+enum.ABUR	ABUR	Arroyo Burro
+enum.NAPL	NAPL	Naples
+enum.AQUE15	AQUE	Arroyo Quemado.
+enum.GOLB	GOLB	Goleta Bay
+enum.SCTW	SCTW	Santa Cruz Island, Twin Harbor West Reef
+enum.SCDI	SCDI	Santa Cruz Island, Diablo 
+enum.CARP	CARP	Carpinteria
+enum.terminal	terminal	Frond has reached terminal size
+enum.1	1	Sample replicate 1
+enum.IVEE	IVEE	Isla Vista
+enum.2	2	Sample replicate 2
+enum.AQUE14	AQUE	Arroyo Quemado
+enum.MOHK	MOHK	Mohawk
+enum.AHND	AHND	Arroyo Hondo
+enum.BULL	BULL	Bulito
+enum.growing	growing	Frond is still growing
 \.
 
 
@@ -3678,18 +3707,6 @@ COPY lter_metabase."ListMethodSoftware" ("SoftwareID", "Title", "AuthorSurname",
 
 
 --
--- Data for Name: ListMissingCodes; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
---
-
-COPY lter_metabase."ListMissingCodes" ("MissingValueCodeID", "MissingValueCode", "MissingValueCodeExplanation") FROM stdin;
-1	-99999	no information available
-2	-99999	value not recorded or not available
-3	-99999	not available, or not collected
-4	-998	no measurement available, satellite view obscured by clouds
-\.
-
-
---
 -- Data for Name: ListPeople; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4261,8 +4278,8 @@ pow	Kew's Plants of the World	http://www.plantsoftheworldonline.org/
 --
 
 COPY mb2eml_r.boilerplate (bp_setting, scope, system, access, distribution, publisher_nameid, contact_nameid, metadata_provider_nameid, project, intellectual_rights, licensed) FROM stdin;
-default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  	\N	\N
-non-default	knb-lter-ble	ble	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	dreed	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  	\N	\N
+default	knb-lter-sbc	sbc	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	sbclter	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  	<intellectualRights>\r\n      <para>\r\n  This data package is released to the “public domain” under Creative\r\n  Commons CC0 1.0 “No Rights Reserved”\r\n  (see: https://creativecommons.org/publicdomain/zero/1.0/). It is\r\n  considered professional etiquette to provide attribution of the\r\n  original work if this data package is shared or utilized in whole or\r\n  by individual components. A generic citation is provided for this data\r\n  package on the website of the repository where these data were\r\n  obtained in the summary metadata page.\r\n</para>\r\n      <para>\r\n  Communication (and collaboration) with the creators of this data\r\n  package is recommended to prevent duplicate research or publication.\r\n  The Data User is urged to contact the authors of these data if any\r\n  questions about methodology or results occur. The Data User should\r\n  realize that these data may be actively used by others for ongoing\r\n  research and that coordination may be necessary to prevent duplication\r\n  or inappropriate use. The Data User should realize that\r\n  misinterpretation may occur if data are used outside of the context of\r\n  the original study. The Data User should be aware that periodic\r\n  updates of this data package may be available from the website and it\r\n  is the responsibility of the Data User to check for new versions of\r\n  the data.\r\n</para>\r\n      <para>\r\n  While substantial efforts are made to ensure the accuracy of data and\r\n  associated documentation, complete accuracy cannot be guaranteed. This\r\n  data package (with its components) is made available “as is” and with\r\n  no warranty of accuracy or fitness for use. The creators of this data\r\n  package and the repository where these data were obtained shall not be\r\n  liable for any damages resulting from misinterpretation, use or misuse\r\n  of the data package or its components. Thank you.\r\n</para>\r\n    </intellectualRights>	\N
+non-default	knb-lter-sbc	sbc	<access system="https://pasta.lternet.edu" scope="document" order="allowFirst" authSystem="https://pasta.lternet.edu/authentication">\r\n    <allow>\r\n      <principal>uid=BLE,o=LTER,dc=ecoinformatics,dc=org</principal>\r\n      <permission>all</permission>\r\n    </allow>\r\n    <allow>\r\n      <principal>public</principal>\r\n      <permission>read</permission>\r\n    </allow>\r\n  </access>	<distribution>\r\n      <online>\r\n        <url function="information">https://ble.lternet.edu</url>\r\n      </online>\r\n    </distribution>	sbclter	sbclter	sbclter	<project>\r\n      <title>your lter spelled out</title>\r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>PI name</givenName>\r\n          <surName>PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>PI address1</deliveryPoint>\r\n          <deliveryPoint>PI address2</deliveryPoint>\r\n          <city>PI city</city>\r\n          <administrativeArea>PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>PI@abc.edu</electronicMailAddress>\r\n        <role>Principal Investigator</role>\r\n      </personnel>    \r\n      <personnel>\r\n        <individualName>\r\n          <salutation>Dr.</salutation>\r\n          <givenName>Co-PI name</givenName>\r\n          <surName>Co-PI surname</surName>\r\n        </individualName>\r\n        <address> \r\n          <deliveryPoint>Co-PI address1</deliveryPoint>\r\n          <deliveryPoint>Co-PI address2</deliveryPoint>\r\n          <city>Co-PI city</city>\r\n          <administrativeArea>Co-PI state</administrativeArea>\r\n          <postalCode>78758</postalCode>\r\n          <country>United States</country>\r\n        </address>\r\n        <phone phonetype="voice">615-867-5309</phone>\r\n        <electronicMailAddress>Co-PI@abc.edu</electronicMailAddress>\r\n        <role>Co-Principal Investigator</role>\r\n      </personnel>  \r\n           <abstract>\r\n        <section>\r\n          <para>Abstract about your LTER site.</para>\r\n        </section>\r\n      </abstract>\r\n      <funding>\r\n        <section>\r\n          <para>BLE is funded by the National Science Foundation under award 123456.</para>\r\n        </section>\r\n      </funding>\r\n    </project>  	<intellectualRights>\r\n      <para>\r\n  This data package is released to the “public domain” under Creative\r\n  Commons CC0 1.0 “No Rights Reserved”\r\n  (see: https://creativecommons.org/publicdomain/zero/1.0/). It is\r\n  considered professional etiquette to provide attribution of the\r\n  original work if this data package is shared or utilized in whole or\r\n  by individual components. A generic citation is provided for this data\r\n  package on the website of the repository where these data were\r\n  obtained in the summary metadata page.\r\n</para>\r\n      <para>\r\n  Communication (and collaboration) with the creators of this data\r\n  package is recommended to prevent duplicate research or publication.\r\n  The Data User is urged to contact the authors of these data if any\r\n  questions about methodology or results occur. The Data User should\r\n  realize that these data may be actively used by others for ongoing\r\n  research and that coordination may be necessary to prevent duplication\r\n  or inappropriate use. The Data User should realize that\r\n  misinterpretation may occur if data are used outside of the context of\r\n  the original study. The Data User should be aware that periodic\r\n  updates of this data package may be available from the website and it\r\n  is the responsibility of the Data User to check for new versions of\r\n  the data.\r\n</para>\r\n      <para>\r\n  While substantial efforts are made to ensure the accuracy of data and\r\n  associated documentation, complete accuracy cannot be guaranteed. This\r\n  data package (with its components) is made available “as is” and with\r\n  no warranty of accuracy or fitness for use. The creators of this data\r\n  package and the repository where these data were obtained shall not be\r\n  liable for any damages resulting from misinterpretation, use or misuse\r\n  of the data package or its components. Thank you.\r\n</para>\r\n    </intellectualRights>	\N
 \.
 
 
@@ -4405,265 +4422,8 @@ COPY pkg_mgmt.maintenance_changehistory ("DataSetID", revision_number, revision_
 --
 
 COPY pkg_mgmt.pkg_core_area ("DataSetID", "Core_area") FROM stdin;
-3	dp
-6	in
-6	om
-6	dp
-9	om
-10	in
-10	om
-12	pd
-14	pd
-15	pd
-17	pd
-18	pd
-19	pd
-21	pd
-21	pp
-23	om
-23	in
-25	dp
-25	om
-26	dp
-26	pd
-27	dp
-27	pd
-28	dp
-28	pd
-29	dp
-29	pd
-30	dp
-30	pd
-32	in
-33	dp
-34	dp
-34	pd
-35	dp
-36	dp
-36	pp
-37	pp
-38	pd
-39	pd
-40	om
-41	om
-45	in
-45	om
-45	pd
-45	pp
-46	pd
-47	pd
-48	pd
-49	dp
-49	pd
-50	dp
-50	pd
-51	dp
-51	pd
-52	pd
-53	pd
-54	om
-55	pd
-55	pp
-56	pd
-57	pp
-58	dp
-58	pp
-59	dp
-59	pd
-60	pd
-61	pd
-66	in
-66	pd
-68	dp
-69	dp
-70	dp
-71	dp
-73	pd
-74	om
-75	dp
-77	pd
-77	dp
-83	pd
-85	om
-85	pp
-86	pd
-87	in
-88	dp
-90	dp
-90	pd
-91	pd
-92	pd
-93	dp
-97	pd
-99	pd
-100	dp
-100	pd
-101	pd
-102	pd
-103	pd
-104	pd
-105	pd
-107	pd
-108	om
-108	pp
-109	in
-110	pd
-111	dp
-111	pd
-112	pp
-112	pd
-112	om
-113	pd
-1001	om
-1001	in
-1001	pp
-1002	om
-1002	in
-1002	pp
-1003	om
-1003	in
-1003	pp
-1004	om
-1004	in
-1004	pp
-1006	om
-1006	in
-1006	pp
-1007	om
-1007	in
-1007	pp
-1008	om
-1008	in
-1008	pp
-1009	om
-1009	in
-1009	pp
-1010	om
-1010	in
-1010	pp
-1011	om
-1011	in
-1011	pp
-1012	om
-1012	in
-1012	pp
-1013	om
-1013	in
-1013	pp
-1014	om
-1014	in
-1014	pp
-1015	om
-1015	in
-1015	pp
-1016	om
-1016	in
-1016	pp
-1101	in
-1102	in
-1103	in
-1104	in
-1105	in
-1106	in
-1107	in
-1108	in
-1109	in
-1110	in
-1111	in
-1112	in
-1113	in
-1114	in
-1115	in
-1201	in
-1202	in
-1203	in
-1204	in
-1205	in
-1206	in
-1207	in
-1208	in
-1209	in
-1210	in
-1211	in
-1212	in
-1213	in
-1214	in
-1215	in
-1216	in
-2001	in
-2002	in
-2003	in
-2004	in
-2005	in
-2007	in
-2008	in
-3001	in
-3002	in
-3003	in
-3004	in
-3005	in
-3006	in
-3007	in
-3008	in
-3009	in
-3010	in
-3011	in
-3012	in
-3013	in
-3014	in
-3015	in
-3016	in
-3017	in
-3018	in
-4001	dp
-4002	dp
-4003	dp
-4004	dp
-4005	dp
-4006	dp
-4007	dp
-4008	dp
-4009	dp
-4010	dp
-4011	dp
-4012	dp
-5001	dp
 99013	dp
 99024	pp
-5002	dp
-5003	dp
-5004	dp
-5005	dp
-5006	dp
-5007	dp
-5008	dp
-5009	dp
-5010	dp
-5011	dp
-5012	dp
-5013	dp
-5014	dp
-5015	dp
-5016	dp
-5017	dp
-5018	dp
-5019	dp
-5020	dp
-5021	dp
-5022	dp
-5023	dp
-5024	dp
-5025	dp
-5026	dp
-5027	dp
-5028	dp
-6001	dp
-6002	dp
-6003	dp
-6004	dp
-114	om
-115	pp
-1116	in
 99021	om
 \.
 
@@ -4673,257 +4433,7 @@ COPY pkg_mgmt.pkg_core_area ("DataSetID", "Core_area") FROM stdin;
 --
 
 COPY pkg_mgmt.pkg_sort ("DataSetID", network_type, is_signature, is_core, temporal_type, spatial_extent, spatiotemporal, is_thesis, is_reference, is_exogenous, spatial_type, management_type, in_pasta, dbupdatetime) FROM stdin;
-1	\N	\N	\N	non_temporal	\N	\N	\N	\N	t	\N	non_templated	\N	2019-08-02 14:14:40.677897
-10	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-100	\N	\N	\N	short_term_study	region	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-1001	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1003	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1004	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1005	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1006	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1007	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1008	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1009	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-101	\N	\N	\N	short_term_study	region	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1010	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1011	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1012	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1013	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1014	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1015	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1016	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-102	\N	\N	\N	short_term_study	region	\N	\N	\N	\N	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1101	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1102	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1103	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1104	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1105	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1106	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1107	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1108	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1109	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1110	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1111	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1112	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1113	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1114	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1115	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1116	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-12	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1201	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1202	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1203	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1204	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1205	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1206	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1207	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1208	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1209	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1210	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1211	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1212	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1213	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1214	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1215	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-1216	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-14	\N	\N	\N	completed_timeseries	region	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-15	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-17	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-18	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-19	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2001	\N	\N	\N	completed_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2002	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2003	\N	\N	\N	completed_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2004	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2005	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2007	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-2008	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-23	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-25	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-26	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-27	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-28	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-29	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-3	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-30	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-3001	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3002	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3003	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3004	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3005	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3006	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3007	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3008	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3009	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-11	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1002	\N	\N	\N	short_term_study	LTER_site_subset	\N	f	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-3010	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3011	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
 99024	I	t	t	ongoing_timeseries	LTER_site_subset	dsdt	f	f	f	multi_site	non_templated	t	2019-08-02 14:14:40.677897
-3012	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3013	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3014	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3015	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3016	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3017	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-3018	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-32	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	t	\N	non_templated	\N	2019-08-02 14:14:40.677897
-33	\N	\N	\N	ongoing_timeseries	\N	\N	\N	t	t	\N	non_templated	\N	2019-08-02 14:14:40.677897
-34	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-36	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-37	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-40	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-4001	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4002	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4003	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4004	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4005	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4006	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4007	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4008	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4009	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4010	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4011	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-4012	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-41	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-43	\N	\N	\N	short_term_study	\N	\N	\N	t	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-44	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-49	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-5	\N	\N	\N	non_temporal	\N	\N	\N	\N	t	\N	non_templated	\N	2019-08-02 14:14:40.677897
-5001	\N	\N	\N	ongoing_timeseries	single_point	dsct	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5002	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5003	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5004	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5005	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5006	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5007	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5008	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5009	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5010	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5011	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5012	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5013	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5014	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5015	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-5016	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5017	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5018	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5019	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5020	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5021	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5022	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5023	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5024	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5025	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5026	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5027	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-5028	\N	\N	\N	ongoing_timeseries	single_point	\N	\N	\N	f	\N	templated	t	2019-08-02 14:14:40.677897
-51	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-52	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-53	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-55	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-56	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-59	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-6	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-6001	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-6002	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-6003	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-6004	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-61	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-62	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-63	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-64	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-65	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-66	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-67	\N	\N	\N	ongoing_timeseries	\N	\N	\N	t	\N	\N	\N	\N	2019-08-02 14:14:40.677897
-68	\N	\N	\N	short_term_study	LTER_site_subset	csdt	\N	t	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-39	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-46	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-47	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-48	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-35	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	t	\N	non_templated	\N	2019-08-02 14:14:40.677897
-31	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-42	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-45	\N	\N	\N	short_term_study	\N	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-50	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-57	\N	\N	\N	short_term_study	\N	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-58	\N	\N	\N	ongoing_timeseries	\N	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-60	\N	\N	\N	short_term_study	\N	\N	t	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-69	\N	\N	\N	short_term_study	LTER_site_subset	csdt	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-7	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-70	\N	\N	\N	short_term_study	LTER_site_subset	csdt	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-71	\N	\N	\N	short_term_study	LTER_site_subset	csdt	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-73	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-75	\N	\N	\N	ongoing_timeseries	LTER_site_subset	dsdt	f	f	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-76	\N	\N	\N	short_term_study	single_point	\N	\N	\N	t	\N	non_templated	\N	2019-08-02 14:14:40.677897
-77	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	\N	2019-08-02 14:14:40.677897
-78	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-79	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-80	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-81	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-82	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-83	\N	\N	\N	short_term_study	lab	\N	t	f	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-84	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	\N	2019-08-02 14:14:40.677897
-9	\N	\N	\N	non_temporal	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1200	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	templated	f	2019-08-02 14:14:40.677897
-3000	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	templated	f	2019-08-02 14:14:40.677897
-4000	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	templated	f	2019-08-02 14:14:40.677897
-5000	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	templated	f	2019-08-02 14:14:40.677897
-6000	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	templated	f	2019-08-02 14:14:40.677897
-100002	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-100003	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000032	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000034	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000035	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000036	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-1000057	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-1000058	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000066	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000077	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-100008	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-1000083	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000088	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000092	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	templated	\N	2019-08-02 14:14:40.677897
-1000098	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-1000099	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-109	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	non_templated	f	2019-08-02 14:14:40.677897
-91	\N	\N	\N	ongoing_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-89	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-118	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-38	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-110	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-92	\N	\N	\N	completed_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-103	\N	\N	\N	completed_timeseries	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-104	\N	\N	\N	short_term_study	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-107	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-2	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-99	\N	\N	\N	non_temporal	LTER_site_subset	\N	\N	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-1000	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	\N	\N	templated	f	2019-08-02 14:14:40.677897
-1100	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	\N	\N	templated	f	2019-08-02 14:14:40.677897
-112	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-21	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-97	\N	\N	\N	non_temporal	LTER_site_subset	\N	t	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-116	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-117	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-113	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-123	\N	\N	\N	short_term_study	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-85	\N	\N	\N	short_term_study	LTER_site_subset	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-86	\N	\N	\N	short_term_study	lab	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-87	\N	\N	\N	short_term_study	LTER_site_subset	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-88	\N	\N	\N	short_term_study	LTER_site_plus	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-90	\N	\N	\N	short_term_study	region	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-93	\N	\N	\N	completed_timeseries	LTER_site_subset	\N	t	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-54	\N	\N	\N	completed_timeseries	\N	\N	t	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-74	\N	\N	\N	ongoing_timeseries	\N	\N	t	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-96	\N	\N	\N	short_term_study	\N	\N	t	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-108	\N	\N	\N	short_term_study	\N	\N	t	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-111	\N	\N	\N	short_term_study	\N	\N	t	\N	f	\N	non_templated	\N	2019-08-02 14:14:40.677897
-114	\N	\N	\N	short_term_study	\N	\N	t	\N	\N	\N	non_templated	t	2019-08-02 14:14:40.677897
-115	\N	\N	\N	completed_timeseries	\N	\N	t	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-119	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-120	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-121	\N	\N	\N	ongoing_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
-122	\N	\N	\N	completed_timeseries	\N	\N	\N	\N	f	\N	non_templated	t	2019-08-02 14:14:40.677897
 99054	I	t	t	completed_timeseries	region	csct	t	f	f	multi_site	non_templated	f	2019-08-02 14:14:40.677897
 99013	I	t	t	ongoing_timeseries	LTER_site_subset	dsct	f	f	f	multi_site	non_templated	t	2019-08-02 14:14:40.677897
 99021	I	t	t	short_term_study	LTER_site_subset	dsdt	f	f	f	multi_site	non_templated	t	2019-08-02 14:14:40.677897
@@ -4935,271 +4445,10 @@ COPY pkg_mgmt.pkg_sort ("DataSetID", network_type, is_signature, is_core, tempor
 --
 
 COPY pkg_mgmt.pkg_state ("DataSetID", dataset_archive_id, rev, nickname, data_receipt_date, status, synth_readiness, staging_dir, eml_draft_path, notes, pub_notes, who2bug, dir_internal_final, dbupdatetime, update_date_catalog) FROM stdin;
-1	knb-lter-sbc.1	11	NCDC climate	2013-04-05	cataloged	metadata_only	watershed_NCDC_climate	watershed_NCDC_climate	Type 0 points to catalogs of outside data sources	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-12-04
-100	knb-lter-sbc.100	10	Marks, Assessing methods for controlling invasive S. horneri	2016-09-09	draft	\N	/marks_2016_sargassum_horneri_management	/marks_2016_sargassum_horneri_management	Lindsay needs this by 1 oct, for paper to have ds DOI.	\N	lmarks	\N	2019-08-02 14:14:40.664528	2017-04-28
-1001	knb-lter-sbc.1001	7	Profiling CTD from cruise LTER01	2013-04-05	cataloged	download	\N	\N	All cruise series were regenerated as EML 2.1 in 2013 (with submission to pasta). pub date remains 2010 however (original). if regenerating from template, upgrade that first, to 2.1.	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	2010-06-14
-1002	knb-lter-sbc.1002	6	Profiling CTD from cruise LTER02	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1003	knb-lter-sbc.1003	6	Profiling CTD from cruise LTER03	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1004	knb-lter-sbc.1004	6	Profiling CTD from cruise LTER04	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1005	knb-lter-sbc.1005	6	Profiling CTD from cruise LTER05	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1006	knb-lter-sbc.1006	8	Profiling CTD from cruise LTER06	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1007	knb-lter-sbc.1007	6	Profiling CTD from cruise LTER07	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1008	knb-lter-sbc.1008	6	Profiling CTD from cruise LTER08	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1009	knb-lter-sbc.1009	6	Profiling CTD from cruise LTER09	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-101	knb-lter-sbc.101	1	California giant kelp patch definitions 	2016-09-27	draft	\N	castorani_101_kelp_metapops_patch_definitions	castorani_101_kelp_metapops_patch_definitions	2 tables. draft0 in 2016	\N	mcastorani	research/Collaborative_Research/kelp_genetics_metapopulation/Final/Data/101_patch_definitions	2019-08-02 14:14:40.664528	2016-10-15
-1010	knb-lter-sbc.1010	6	Profiling CTD from cruise LTER10	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1011	knb-lter-sbc.1011	6	Profiling CTD from cruise LTER11	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1012	knb-lter-sbc.1012	6	Profiling CTD from cruise LTER12	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1013	knb-lter-sbc.1013	6	Profiling CTD from cruise LTER13	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1014	knb-lter-sbc.1014	6	Profiling CTD from cruise LTER14	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1015	knb-lter-sbc.1015	6	Profiling CTD from cruise LTER15	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1016	knb-lter-sbc.1016	7	Profiling CTD from cruise LTER16	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-102	knb-lter-sbc.102	1	Castorani 2016, So CA kelp patch biomass and fecundity	2016-09-27	draft	\N	castorani_102_kelp_metapops_biomass_fecundity	castorani_102_kelp_metapops_biomass_fecundity	1 table, draft in 2016	\N	mcastorani	research/Collaborative_Research/kelp_genetics_metapopulation/Final/Data/102_patch_biomass_and_fecundity_time_series	2019-08-02 14:14:40.664528	2016-10-15
-103	knb-lter-sbc.103	3	Castorani 2016, So. CA kelp patch connectivity matrix	2016-09-27	draft	\N	castorani_103_kelp_metapops_connectivity_mat_soCal	castorani_103_kelp_metapops_connectivity_mat_soCal	1 table, draft in 2016	\N	mcastorani	research/Collaborative_Research/kelp_genetics_metapopulation/Final/Data/103_connectivity_matrix	2019-08-02 14:14:40.664528	2016-10-15
-104	knb-lter-sbc.104	1	Alberto et al, collab 2016, microsatellite data 	2016-09-27	draft	\N	alberto_etal_104_kelp_metapops_genetics	alberto_etal_104_kelp_metapops_genetics	2 tables, genetics	\N	falberto	research/Collaborative_Research/kelp_genetics_metapopulation/Final/Data/104_genetics	2019-08-02 14:14:40.664528	2016-10-15
-105	knb-lter-sbc.105	1	Alberto et al, collab 2016, Pterygophora microsatellite data 	2016-09-27	draft	\N	kelp_metapops_alberto_105_pterygophora_genetics	kelp_metapops_alberto_105_pterygophora_genetics	1 table, Pt genetics	\N	falberto	research/Collaborative_Research/kelp_genetics_metapopulation/Final/Data/104_genetics	2019-08-02 14:14:40.664528	2016-10-15
-107	knb-lter-sbc.107	1	Miller isotopes	\N	draft	\N	miller_isotopes_2017	miller_isotopes_2017	emergency, link to bcodmo	\N	rmiller	\N	2019-08-02 14:14:40.664528	\N
-11	knb-lter-sbc.11	6	moorings, all monsters	\N	deprecated	\N	\N	\N	\N	non-public	\N	\N	2019-08-02 14:14:40.664528	\N
-1101	knb-lter-sbc.1101	6	Underway data from cruise LTER01	2013-04-05	cataloged	download	\N	\N	All cruise series were regenerated as EML 2.1 in 2013 (with submission to pasta). pub date remains 2010 however (original). if regenerating from template, upgrade that first, to 2.1.	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	2010-06-14
-1102	knb-lter-sbc.1102	6	Underway data from cruise LTER02	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1103	knb-lter-sbc.1103	6	Underway data from cruise LTER03	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1104	knb-lter-sbc.1104	6	Underway data from cruise LTER04	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1105	knb-lter-sbc.1105	6	Underway data from cruise LTER05	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1106	knb-lter-sbc.1106	6	Underway data from cruise LTER06	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1107	knb-lter-sbc.1107	6	Underway data from cruise LTER07	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1108	knb-lter-sbc.1108	6	Underway data from cruise LTER08	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1109	knb-lter-sbc.1109	5	Underway data from cruise LTER09	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1110	knb-lter-sbc.1110	5	Underway data from cruise LTER10	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1111	knb-lter-sbc.1111	5	Underway data from cruise LTER11	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1112	knb-lter-sbc.1112	5	Underway data from cruise LTER12	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1113	knb-lter-sbc.1113	5	Underway data from cruise LTER13	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1114	knb-lter-sbc.1114	5	Underway data from cruise LTER14	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1115	knb-lter-sbc.1115	5	Underway data from cruise LTER15	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1116	knb-lter-sbc.1116	5	Underway data from cruise LTER16	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-4006	knb-lter-sbc.4006	7	Precipitation: GV202	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-10	knb-lter-sbc.10	22	Monthly seawater chemistry	2014-04-29	cataloged	integration	ocean_nearshore_profiles	ocean_nearshore_profiles	\N	\N	cgotschalk	research/Ocean/Final/Data/Monthly_Water_Sampling	2019-08-02 14:14:40.664528	2018-01-17
-3003	knb-lter-sbc.3003	7	Stream Discharge: BC02	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-12	knb-lter-sbc.12	9	Stable Isotopes - natural abundance  N and C	2013-04-05	cataloged	download	foodweb_isotopes_2005	foodweb_isotopes_2005	1. Find new table in FINAL. update description.<br /> 2. set to download, a type I. <br /> 3.  EML 2.1.0 <br /> 4. goes with publication page et al, 2008	\N	hpage	\N	2019-08-02 14:14:40.664528	2010-06-14
-1201	knb-lter-sbc.1201	5	Towed vehicle data from cruise LTER01	2013-04-05	cataloged	download	\N	\N	All cruise series were regenerated as EML 2.1 in 2013 (with submission to pasta). pub date remains 2010 however (original). if regenerating from template, upgrade that first, to 2.1.	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	2010-06-14
-1202	knb-lter-sbc.1202	5	Towed vehicle data from cruise LTER02	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1203	knb-lter-sbc.1203	5	Towed vehicle data from cruise LTER03	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1204	knb-lter-sbc.1204	5	Towed vehicle data from cruise LTER04	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1205	knb-lter-sbc.1205	5	Towed vehicle data from cruise LTER05	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1206	knb-lter-sbc.1206	5	Towed vehicle data from cruise LTER06	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1207	knb-lter-sbc.1207	5	Towed vehicle data from cruise LTER07	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1208	knb-lter-sbc.1208	5	Towed vehicle data from cruise LTER08	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1209	knb-lter-sbc.1209	5	Towed vehicle data from cruise LTER09	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1210	knb-lter-sbc.1210	5	Towed vehicle data from cruise LTER10	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1211	knb-lter-sbc.1211	5	Towed vehicle data from cruise LTER11	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1212	knb-lter-sbc.1212	5	Towed vehicle data from cruise LTER12	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1213	knb-lter-sbc.1213	5	Towed vehicle data from cruise LTER13	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1214	knb-lter-sbc.1214	5	Towed vehicle data from cruise LTER14	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1215	knb-lter-sbc.1215	5	Towed vehicle data from cruise LTER15	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-1216	knb-lter-sbc.1216	5	Towed vehicle data from cruise LTER16	2013-04-05	cataloged	download	\N	\N	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2010-06-14
-2	knb-lter-sbc.2	\N	Precipitation SBC - DEPRECATED	2013-04-05	deprecated	\N	watershed_precip_sbc_deprecated	watershed_precip_sbc_deprecated	DEPRECATED and replaced with per-site data pkgs. see the 4000 series.	non-public	bgoodridge	\N	2019-08-02 14:14:40.664528	2000-01-01
-2001	knb-lter-sbc.2001	15	Mooring AQ inactive - AQM	2013-04-05	cataloged	integration	ocean_mooring_aqm_2000	ocean_mooring_aqm_2000	this is the old station, that was moved to arq. rev 10 removes refs to sbcdata	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	2010-11-18
-2002	knb-lter-sbc.2002	22	Moored CTD and ADCP: NAP	2014-02-25	cataloged	integration	ocean_mooring_nap	ocean_moorings_monster	removed refs to sbcdata.lternet for this and all other mooring pkgs.	\N	cgotschalk	research/Ocean/Final/Data/Moorings/Matlab_monster_files/nap	2019-08-02 14:14:40.664528	2014-02-25
-2003	knb-lter-sbc.2003	11	Mooring Arroyo Burro	2007-05-16	cataloged	integration	ocean_mooring_arb	ocean_moorings_arb	arroyo burro	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	2010-06-14
-2004	knb-lter-sbc.2004	18	Moored CTD and ADCP: CAR	2014-02-25	cataloged	integration	ocean_mooring_car	ocean_moorings_monster	carpinteria	\N	cgotschalk	research/Ocean/Final/Data/Moorings/Matlab_monster_files/car	2019-08-02 14:14:40.664528	2014-02-25
-2005	knb-lter-sbc.2005	15	Moored CTD and ADCP: ARQ	2014-02-25	cataloged	integration	ocean_mooring_aqr	ocean_moorings_monster	the new arroyo quemado mooring	\N	cgotschalk	research/Ocean/Final/Data/Moorings/Matlab_monster_files/arq	2019-08-02 14:14:40.664528	2014-02-25
-2007	knb-lter-sbc.2007	8	Moored CTD and ADCP: MKO	2014-02-25	cataloged	integration	ocean_mooring_mko	ocean_moorings_monster	fixed location!	\N	cgotschalk	research/Ocean/Final/Data/Moorings/Matlab_monster_files/mko	2019-08-02 14:14:40.664528	2014-02-25
-2008	knb-lter-sbc.2008	7	Moored CTD and ADCP: ALE	2013-11-19	cataloged	integration	ocean_mooring_ale	ocean_moorings_monster	\N	\N	cgotschalk	research/Ocean/Final/Data/Moorings/Matlab_monster_files/ale	2019-08-02 14:14:40.664528	2013-11-19
-23	knb-lter-sbc.23	11	Beach wrack and porewater 2003	2012-02-28	cataloged	download	beach_wrack_porewater_2003	beach_wrack_porewater_2003	table #1: wrack, 10 beaches, plus 5 or 4 others sampled intermittently.<br /> table #2: porewater, to be added<br /> There is a paper in prep which uses some of these data, at least the wrack. the plan will be to copy this dataset when the paper is done, and remove data that doesnt go with the paper.	\N	jdugan	\N	2019-08-02 14:14:40.664528	2013-02-06
-18	knb-lter-sbc.18	21	KFCD Reef giant kelp	2017-12-01	cataloged	download	reef_community_kelp_size_abundance	project.18	\N		lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Giant Kelp	2019-08-02 14:14:40.664528	2018-06-26
-19	knb-lter-sbc.19	24	KFCD Reef quad-swath counts	2017-12-01	cataloged	download	reef_community_quad_swath_counts	project.19	\N	\N	lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Invert and Algae Counts	2019-08-02 14:14:40.664528	2018-06-26
-17	knb-lter-sbc.17	32	KFCD Reef fish abundance	2017-12-01	cataloged	download	reef_community_fish_abundance	project.17			lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Fish Abundance	2019-08-02 14:14:40.664528	2018-08-14
-15	knb-lter-sbc.15	26	KFCD Reef benthic cover	2017-12-01	cataloged	download	reef_community_benthic_cover	project.15	\N		lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Invert and Algae cover	2019-08-02 14:14:40.664528	2018-06-26
-3	knb-lter-sbc.3	12	SBCounty PWD precipitation	2013-04-05	cataloged	download	watershed_SBCounty_PWD_precip_deprecated	watershed_SBCounty_PWD_precip_deprecated	consider redesign. <br />this pkg could be for historical data, and is for inactive loggers. Blair has created table for the active loggers, and these now have their own pkgs (5000 series). <br /> current contents: 2 tables, one each, active and inactive loggers.	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-3001	knb-lter-sbc.3001	7	Stream Discharge: AB00	2013-04-05	cataloged	download	\N	\N	Series needs upgrade to EML 2.1 (template)	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3002	knb-lter-sbc.3002	5	Stream Discharge: AT07	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-99013	knb-lter-sbc.13	21	Reef bottom water temperature	2017-12-01	cataloged	integration	reef_bottom_temperature	project.13		\N	lkui	research/Reef/Final/Data/Bottom_Temperature/	2019-08-02 14:14:40.664528	2017-12-07
-99024	knb-lter-sbc.24	17	Kelp - algal weights and CHN	2017-12-20	cataloged	integration	reef_kelp_algal_weight_CHN	project.24	replaced method, july 2013	\N	lkui	research/Reef/Final/Data/Kelp_NPP/CHN	2019-08-02 14:14:40.664528	2017-12-20
-3004	knb-lter-sbc.3004	5	Stream Discharge: CP00	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-3005	knb-lter-sbc.3005	5	Stream Discharge: DV01	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-3006	knb-lter-sbc.3006	6	Stream Discharge: FK00	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3007	knb-lter-sbc.3007	7	Stream Discharge: GV01	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3008	knb-lter-sbc.3008	7	Stream Discharge: HO00	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3009	knb-lter-sbc.3009	7	Stream Discharge: MC00	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3010	knb-lter-sbc.3010	7	Stream Discharge: ON02	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-12-18
-3011	knb-lter-sbc.3011	7	Stream Discharge: RG01	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3012	knb-lter-sbc.3012	5	Stream Discharge: RN01	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-3013	knb-lter-sbc.3013	7	Stream Discharge: RS02	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-05
-3014	knb-lter-sbc.3014	6	Stream Discharge: SM01	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-12-18
-3015	knb-lter-sbc.3015	5	Stream Discharge: SM04	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-3016	knb-lter-sbc.3016	5	Stream Discharge: TE03	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-3017	knb-lter-sbc.3017	3	Stream Discharge: MC06	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-22
-3018	knb-lter-sbc.3018	4	Stream Discharge: SP02	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-22
-32	knb-lter-sbc.32	12	SB harbor water temperature	2011-06-09	backlog	integration	reference_water_temperature_SBharbor	reference_water_temperature_SBharbor	pending new data from SCCOOS	\N	mobrien	research/Ocean/Final/Data/SantaBarbaraHarbor_manualLongTermTemperature	2019-08-02 14:14:40.664528	2010-06-14
-33	knb-lter-sbc.33	8	Daily precipitation at UCSB (SB County stn 200)	2013-04-05	cataloged	integration	reference_precipitation_UCSB200_daily	reference_precipitation_UCSB200_daily	2013 update, by mob, directly from county flood control website download.	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2013-06-05
-37	knb-lter-sbc.37	4	Turf algae primary production	2012-02-28	cataloged	download	miller_pprod_turf_foliose_structure_production	miller_pprod_turf_foliose_structure_production	\N	\N	rmiller	\N	2019-08-02 14:14:40.664528	2012-02-29
-4001	knb-lter-sbc.4001	7	Precipitation: CP201	2013-04-05	cataloged	download	\N	\N	Series needs upgrade to EML 2.1 (template)	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4002	knb-lter-sbc.4002	7	Precipitation: EL201	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4003	knb-lter-sbc.4003	6	Precipitation: EL202	2013-04-05	cataloged	download	\N	\N	collection appears to have stopped.	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-4004	knb-lter-sbc.4004	6	Precipitation: GB201	2013-04-05	cataloged	download	\N	\N	Gobernator doesn't appear in Blair's lists. stopped?	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-4005	knb-lter-sbc.4005	6	Precipitation: GV201	2013-04-05	cataloged	download	\N	\N	collection appears to have stopped.	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-31	knb-lter-sbc.31	\N	reef cryptic fish	2013-04-05	deprecated	\N	reef_community_fish_cryptic_DEPRECATED	reef_community_fish_cryptic_DEPRECATED	ARCHIVED. cataloged but non public as of 2009.	\N	lkui	\N	2019-08-02 14:14:40.664528	2000-01-01
-35	knb-lter-sbc.35	7	CDIP modeled swell	2013-05-27	cataloged	integration	reference_CDIP_modeled_swell	reference_CDIP_modeled_swell	package might be redesigned. grabbing data with cron	\N	jbyrnes	research/Ocean/Final/Data/CDIP_waveHeight	2019-08-02 14:14:40.664528	2018-01-18
-34	knb-lter-sbc.34	14	LTE KR - invert/algal density (quad-swath)	2017-12-19	cataloged	integration	lte_kr_quad_swath	project.34	available	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Invert\\ and\\ Algae\\ Counts	2019-08-02 14:14:40.664528	2018-06-26
-30	knb-lter-sbc.30	16	LTE KR - fish abundance	2017-12-19	cataloged	integration	lte_kr_fish_abundance	project.30	\N	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Fish Abundance	2019-08-02 14:14:40.664528	2018-06-26
-27	knb-lter-sbc.27	15	LTE KR - allometrics	2013-10-09	cataloged	integration	lte_kr_allometrics	lte_kr_allometrics	\N	no need for update	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Allometric Measurements	2019-08-02 14:14:40.664528	2015-01-15
-26	knb-lter-sbc.26	17	LTE KR - urchin size and distribution	2017-12-20	cataloged	integration	lte_kr_urchin_size_distribution	project.26	\N	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Urchin Counts	2019-08-02 14:14:40.664528	2018-06-26
-39	knb-lter-sbc.39	5	SCI surfperch and garibaldi	2012-02-07	draft	integration	SCI_selected_fish	SCI_selected_fish	available	consider swith to completed_timeseries category	lkui	research/Reef/Final/Data/SCI_Surfperch_and_Benthic_Biota	2019-08-02 14:14:40.664528	2012-02-28
-29	knb-lter-sbc.29	16	LTE KR - giant kelp abundance	2017-12-19	cataloged	integration	lte_kr_kelp_size_abundance	project.29	\N	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Giant Kelp	2019-08-02 14:14:40.664528	2018-06-26
-38	knb-lter-sbc.38	5	SCI benthic cover	2013-07-22	draft	integration	SCI_benthic_cover	SCI_benthic_cover	available	consider swith to completed_timeseries category	lkui	research/Reef/Final/Data/SCI_Surfperch_and_Benthic_Biota	2019-08-02 14:14:40.664528	2012-02-28
-28	knb-lter-sbc.28	24	LTE KR - benthic cover	2017-12-19	cataloged	integration	lte_kr_benthic_cover	project.28	\N	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Invert and Algae cover	2019-08-02 14:14:40.664528	2018-06-26
-25	knb-lter-sbc.25	19	LTE KR - biomass, detritus	2017-12-20	cataloged	integration	lte_kr_detritus_biomass	project.25	\N	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Detritus	2019-08-02 14:14:40.664528	2018-06-26
-4007	knb-lter-sbc.4007	7	Precipitation: HO201	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4008	knb-lter-sbc.4008	7	Precipitation: HO202	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4009	knb-lter-sbc.4009	7	Precipitation: RG201	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4010	knb-lter-sbc.4010	7	Precipitation: RG202	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4011	knb-lter-sbc.4011	7	Precipitation: RG203	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-4012	knb-lter-sbc.4012	7	Precipitation: RG204	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2012-03-29
-45	knb-lter-sbc.45	8	Cross-shelf campaign DOC CTD/Rosette profiles	2013-04-05	cataloged	integration	campaign_cross_shelf_DOC_CTD_profiles	campaign_cross_shelf_DOC_CTD_profiles/	\N	\N	ccarlson1, ewallner	\N	2019-08-02 14:14:40.664528	2012-11-13
-5	knb-lter-sbc.5	7	USGS Stream Discharge	2013-04-05	cataloged	metadata_only	watershed_USGS_stream_discharge_links	watershed_USGS_stream_discharge_links	catalog of USGS data sources	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-6001	knb-lter-sbc.6001	1	pH, 20-min SeaFET at ALE	2015-07-10	cataloged	integration	\N	pH_series_seafet_moored_20min	\N	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-5001	knb-lter-sbc.5001	5	County FCD Precipitation: BaronRanch262	2013-04-05	cataloged	download	\N	\N	series template upgraded to EML 2.1 in 2014	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5002	knb-lter-sbc.5002	5	County FCD Precipitation: Carpinteria208	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5003	knb-lter-sbc.5003	5	County FCD Precipitation: CaterWTP229	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5004	knb-lter-sbc.5004	5	County FCD Precipitation: ColdSprings210	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5005	knb-lter-sbc.5005	5	County FCD Precipitation: DosPueblos226	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5006	knb-lter-sbc.5006	5	County FCD Precipitation: DoultonTunnel231	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5007	knb-lter-sbc.5007	5	County FCD Precipitation: EdisonTrail252	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5008	knb-lter-sbc.5008	5	County FCD Precipitation: ElDeseo255	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5009	knb-lter-sbc.5009	5	County FCD Precipitation: GoletaRdYard211	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5010	knb-lter-sbc.5010	5	County FCD Precipitation: KTYD227	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5011	knb-lter-sbc.5011	5	County FCD Precipitation: Nojoqui236	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5012	knb-lter-sbc.5012	5	County FCD Precipitation: SanMarcosPass212	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5013	knb-lter-sbc.5013	5	County FCD Precipitation: SBEngBldg234	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5014	knb-lter-sbc.5014	5	County FCD Precipitation: StanwoodFS228	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5015	knb-lter-sbc.5015	5	County FCD Precipitation: TroutClub242	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5016	knb-lter-sbc.5016	5	County FCD Precipitation: UCSB200	2013-04-05	cataloged	download	\N	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-5017	knb-lter-sbc.5017	0	County FCD Precipitation: GaviotaSP301	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5018	knb-lter-sbc.5018	0	County FCD Precipitation: RefugioPass429	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5019	knb-lter-sbc.5019	0	County FCD Precipitation: TecoloteCanyon280	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5020	knb-lter-sbc.5020	0	County FCD Precipitation: GlenAnnieCanyon309	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5021	knb-lter-sbc.5021	0	County FCD Precipitation: GoletaFireStation440	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5022	knb-lter-sbc.5022	0	County FCD Precipitation: GoletaWaterDistrict334	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5023	knb-lter-sbc.5023	0	County FCD Precipitation: SBCaltrans335	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5024	knb-lter-sbc.5024	0	County FCD Precipitation: BotanicGarden321	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5025	knb-lter-sbc.5025	0	County FCD Precipitation: CarpinteriaUSFS383	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-41	knb-lter-sbc.41	6	Beach wrack CHN	2013-04-05	catd_meta_antic_data	metadata_only	beach_wrack_CHN	beach_wrack_CHN	on hold, samples are not analyzed yet,deny-pub-read		jdugan	\N	2019-08-02 14:14:40.664528	2000-01-01
-42	knb-lter-sbc.42	\N	LTE KR - cryptic fish 	2013-04-05	deprecated	\N	lte_kr_fish_abundance_DEPRECATED	lte_kr_fish_abundance_DEPRECATED	ARCHIVED. cataloged but non pubic as of 2009	\N	lkui	\N	2019-08-02 14:14:40.664528	2000-01-01
-44	knb-lter-sbc.44	6	LTE KR transects - depth	2010-10-06	cataloged	integration	transects_lte_kr_sites	transects_lte_kr_sites	reference, neds data for IV transects		lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Physical Properties	2019-08-02 14:14:40.664528	2018-06-26
-48	knb-lter-sbc.48	4	SCI kelp frond density	2013-07-22	draft	integration	SCI_kelp_frond_density	SCI_kelp_frond_density	\N	consider swith to completed_timeseries category	lkui	research/Reef/Final/Data/SCI_Surfperch_and_Benthic_Biota	2019-08-02 14:14:40.664528	2012-02-28
-43	knb-lter-sbc.43	6	Reef monitoring transects - depth	2010-10-06	cataloged	integration	transects_benthic_monitoring	transects_benthic_monitoring	reference	\N	lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Physical/Properties/Transect_Depths	2019-08-02 14:14:40.664528	2018-06-26
-46	knb-lter-sbc.46	4	SCI pycnopodia 	2012-02-07	draft	integration	SCI_pycnopodia	SCI_pycnopodia	protocols and data collection varied. 	consider swith to completed_timeseries category	lkui	research/Reef/Final/Data/SCI_Surfperch_and_Benthic_Biota	2019-08-02 14:14:40.664528	2012-02-28
-49	knb-lter-sbc.49	11	LTE KR - biomass, algae	2017-12-19	deprecated	integration	lte_kr_biomass_algae	project.49	the algae biomass data package get removed and add a data package for all species together. 	\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Biomass/Data	2019-08-02 14:14:40.664528	2018-06-26
-5026	knb-lter-sbc.5026	0	County FCD Precipitation: Montecito325	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5027	knb-lter-sbc.5027	0	County FCD Precipitation: RanchoSJ389	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-5028	knb-lter-sbc.5028	0	County FCD Precipitation: BuelltonFS233	2015-07-16	cataloged	download	\N	watershed_series_precip_county	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-53	knb-lter-sbc.53	4	Microsatellite markers	2013-04-05	cataloged	download	alberto_genetics_microsat_markers_2009	alberto_genetics_microsat_markers_2009	table from paper	\N	falberto	\N	2019-08-02 14:14:40.664528	2012-04-20
-55	knb-lter-sbc.55	3	Understory and phytoplankton NPP	2013-04-05	cataloged	download	miller_pprod_understory_phyto	miller_pprod_understory_phyto	problem child. what's with that jagged row?	\N	sharrer, cnelson	\N	2019-08-02 14:14:40.664528	2012-02-29
-56	knb-lter-sbc.56	3	Byrnes kelp forest foodweb	2013-04-05	cataloged	integration	byrnes_kelp_forest_foodweb	byrnes_kelp_forest_foodweb	TBA, may include code, is this 1 package or 2	\N	jbyrnes	\N	2019-08-02 14:14:40.664528	2012-02-27
-59	knb-lter-sbc.59	3	Byrnes urchin experiment	2013-04-05	draft	metadata_only	byrnes_urchin_exclusion_experiment	byrnes_urchin_exclusion_experiment	current data tables dummied after other reef entities	rev 3 is non-public	jbyrnes	\N	2019-08-02 14:14:40.664528	2000-01-01
-60	knb-lter-sbc.60	5	SCI aggregated black surfperch and prey	2012-09-17	cataloged	integration	okamoto_surfperch_sci_2012paper	okamoto_surfperch_sci_2012paper	finaized data publication by 26 sep	\N	dokamoto	\N	2019-08-02 14:14:40.664528	2012-09-25
-6002	knb-lter-sbc.6002	1	pH, 20-min SeaFET at AQR	2015-07-10	cataloged	integration	\N	pH_series_seafet_moored_20min	\N	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-6003	knb-lter-sbc.6003	1	pH, 20-min SeaFET at MKO	2015-07-10	cataloged	integration	\N	pH_series_seafet_moored_20min	\N	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-6004	knb-lter-sbc.6004	1	pH, 20-min SeaFET at SBH	2015-07-10	cataloged	integration	\N	pH_series_seafet_moored_20min	\N	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-62	knb-lter-sbc.62	0	Stream Chemistry - Rain Water Chem	\N	draft0	\N	watershed_stream_chemistry/2021_redesign/62_sbc_rain_water	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-63	knb-lter-sbc.63	0	Stream Chemistry - Channel Keepers	\N	draft0	\N	watershed_stream_chemistry/2012_redesign/63_channel_keepers	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-64	knb-lter-sbc.64	0	Stream Chemistry - SB city	\N	draft0	\N	watershed_stream_chemistry/2012_redesign/64_sb_city	\N	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-65	knb-lter-sbc.65	0	Stream Chemistry - Santa Rosa Island	\N	anticipated	\N	watershed_stream_chemistry/2012_redesign/65x_santa_rosa_island	\N	low priority	\N	bgoodridge, jmelack	\N	2019-08-02 14:14:40.664528	\N
-66	knb-lter-sbc.66	4	Klose et al - Ventura R nutrients and algae 2008	2013-04-05	cataloged	\N	klose_venturariver_2008	klose_venturariver_2008	data requested by DataONE semantics group. package could have more data added.	\N	kklose	\N	2019-08-02 14:14:40.664528	2013-01-15
-68	knb-lter-sbc.68	1	Gaviota fire, 2008, max perimeter	2013-04-24	cataloged	integration	watershed_fires_perimeter	watershed_fires_perimeter	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-69	knb-lter-sbc.69	1	Gap fire, 2008, max perimeter	2013-04-24	cataloged	integration	watershed_fires_perimeter	watershed_fires_perimeter	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-7	knb-lter-sbc.7	6	GIS Layers	2013-04-05	cataloged	metadata_only	watershed_GIS_layers_2002	watershed_GIS_layers_2002	our gis data is not described well enough 	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2010-06-14
-70	knb-lter-sbc.70	1	Tea fire, 2009, max perimeter	2013-04-24	cataloged	integration	watershed_fires_perimeter	watershed_fires_perimeter	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-7001	knb-lter-sbc.7001	0	TBD: Dar Roberts IDEAS, Coal Oil Point	2015-07-16	anticipated	\N	\N	tbd	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-7002	knb-lter-sbc.7002	0	TBD: Dar Roberts IDEAS, Mission Canyon	2015-07-16	anticipated	\N	\N	tbd	\N	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-71	knb-lter-sbc.71	1	Jesusita fire, 2009, max perimeter	2013-04-24	cataloged	integration	watershed_fires_perimeter	watershed_fires_perimeter	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-72	knb-lter-sbc.72	0	Climate -- NCDC from Santa Barbara Airport	2012-05-25	draft0	\N	reference_climate	reference_climate	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-73	knb-lter-sbc.73	5	Johansson Kelp Microsatellite Markers, Geospatial 2009	2013-07-10	cataloged	integration	johansson_genetics_microsat_markers_spatial_2013	johansson_genetics_microsat_markers_spatial_2013	see paper notes - this is a test for pasta's treatment of software urls.	d	mjohansson	\N	2019-08-02 14:14:40.664528	2013-10-13
-61	knb-lter-sbc.61	5	Otter sightings	2017-12-19	cataloged	integration	otter_sightings	project.61	\N	\N	lkui	research/Reef/Final/Data/Non-Core/Sea Otter Abundance	2019-08-02 14:14:40.664528	2017-12-19
-58	knb-lter-sbc.58	7	LTE KR - Macroalgal NPP	2015-09-25	draft	integration	lte_kr_algal_NPP	lte_kr_algal_NPP	this one used to be harrer_pprod_algal_NPP_2013. now is a time series.	waiting for Shannon's light data to complete	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/NPP/	2019-08-02 14:14:40.664528	2013-05-27
-57	knb-lter-sbc.57	7	Algal P vs. E and biomass	2013-04-05	cataloged	integration	harrer_PE_algal_biomass	harrer_PE_algal_biomass	public as of 2013. Might have new species update later. 	a few species needed to add in the next version but not in a hurry. 	lkui	\N	2019-08-02 14:14:40.664528	2013-05-14
-67	knb-lter-sbc.67	0	Algal biomass and diversity	2013-01-08	draft0	\N	\N	\N	krystal trained hannah on this one. needs abstract and entity descriptions from shan.	Shannon and working on it.	lkui	\N	2019-08-02 14:14:40.664528	\N
-51	knb-lter-sbc.51	7	Beach - birds and stranded kelp	2018-01-26	cataloged	download	beach_birds_stranded_kelp	project.51	update along with 40, wrack cover. note that birds is aggregated values table. stranded kelp, different dir in final. 	\N	lkui, jdugan	research/Beach/Final/Data/Shorebirds, Stranded_Kelp_Plants (2 dirs)	2019-08-02 14:14:40.664528	2018-01-26
-6	knb-lter-sbc.6	15	Stream Chemistry	2012-07-10	cataloged	integration	watershed_stream_chemistry/2012_redesign/6_sbc_stream_chem	watershed_stream_chemistry/	2013: split into several pkgs. see under drafts and in staging dir.	\N	mmeyerhoff	\N	2019-08-02 14:14:40.664528	2018-01-17
-75	knb-lter-sbc.75	3	pH time series, water samples	2014-08-29	cataloged	\N	pH_seafet_benchmark	pH_seafet_benchmark	number and locations tbd. water samples for calibration of seafet	\N	jlunden, cgotschalk 	look in the staging dir; its a pisco directory	2019-08-02 14:14:40.664528	2018-02-22
-76	knb-lter-sbc.76	0	pH study at Stearns Wharf	2014-08-29	draft0	\N	pH_passow_dickson_study_2013	pH_passow_dickson_study_2013	some data are also in 75, and used for calibration	abandoned?	upassow	\N	2019-08-02 14:14:40.664528	2014-10-01
-83	knb-lter-sbc.83	1	Foster et al, PeerJ, Diet Effects in the Purple Sea Urchin	2014-10-07	cataloged	\N	foster_urchins_peerj_2014	foster_urchins_peerj_2014	student sr thesis	4 tables, R code.	mfoster	\N	2019-08-02 14:14:40.664528	2014-12-10
-85	knb-lter-sbc.85	1	Blade turnover dynamics (Rodriguez, 2014)	2014-12-08	cataloged	\N	rodriguez_kelp_frond_turnover	rodriguez_kelp_frond_turnover	Gabe sent, 12/8	\N	grodriguez	Rodriguez_Gabe	2019-08-02 14:14:40.664528	2015-01-31
-86	knb-lter-sbc.86	10	Okamoto 2015 Urchin fertilization experiment	2015-01-08	cataloged	\N	okamoto_urchin_fertilization_2015	okamoto_urchin_fertilization_2015	Have data now. see notebook, paper. 2015-01-06	\N	dokamoto	research/grad_student_research/Rodriguez_Gabe	2019-08-02 14:14:40.664528	2015-12-31
-87	knb-lter-sbc.87	1	Goodridge, thesis porewater	2017-05-31	redesign_anticipated	\N	goodridge_beach_pore_water	goodridge_beach_pore_water	see staging dir, 20170531_incoming	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	2015-05-01
-88	knb-lter-sbc.88	1	kapsenberg curriculum, pH comparison	2015-04-10	cataloged	\N	kapsenberg_cirriculum_ecosystem_pH_comparison	kapsenberg_cirriculum_ecosystem_pH_comparison	waiting till paper is in press.	\N	lkapsenberg	\N	2019-08-02 14:14:40.664528	2015-06-01
-89	knb-lter-sbc.89	\N	LIDAR - Carp salt marsh	\N	anticipated	\N	\N	\N	data are available in Land/Data/Final. goes with Sadro 2007 paper	\N	gastil	\N	2019-08-02 14:14:40.664528	\N
-9	knb-lter-sbc.9	10	Local Area Imagery (seawifs)	2003-04-08	cataloged	metadata_only	satellite_local_area_imagery	satellite_local_area_imagery	points to other catalogs	\N	efields	\N	2019-08-02 14:14:40.664528	2010-06-14
-90	knb-lter-sbc.90	1	Marks, Sargassum horneri occurrence	2015-04-27	cataloged	\N	marks_2015_sargassum_horneri_sightings	marks_2015_sargassum_horneri_sightings	Lindsay needs this by 1 oct, for paper to have ds DOI.	\N	lmarks	\N	2019-08-02 14:14:40.664528	2015-10-01
-93	knb-lter-sbc.93	10	pH and O2 from Channel Islands (Kapsenberg, 2016)	2016-03-22	cataloged	\N	kapsenberg_CINP_pH_data	kapsenberg_CINP_pH_data	student dissertation	\N	lkapsenberg	\N	2019-08-02 14:14:40.664528	2016-03-29
-94	knb-lter-sbc.94	\N	Mission Cyn DTM	\N	anticipated	\N	bookhagen_lidar_dtm	\N	eager? supplement?	\N	bbookhagen	\N	2019-08-02 14:14:40.664528	\N
-95	knb-lter-sbc.95	\N	Mission Cyn classified point cloud	\N	anticipated	\N	bookhagen_lidar_classified_point_cloud	\N	eager? supplement?	\N	bbookhagen	\N	2019-08-02 14:14:40.664528	\N
-97	knb-lter-sbc.97	1	Okamoto surfperch survival, Ecol. Letters	2015-10-30	cataloged	\N	okamoto_surfperch_survival_elet2015	okamoto_surfperch_survival_elet2015	paper has a doi already.	\N	dokamoto	\N	2019-08-02 14:14:40.664528	2016-06-15
-98	knb-lter-sbc.98	\N	Hanan, thesis data (veg soil props)	\N	anticipated	\N	hanan_vegetation_soil_props	hanan_vegetation_soil_props	\N	\N	ehanan	\N	2019-08-02 14:14:40.664528	\N
-99	knb-lter-sbc.99	1	invertebrate biomass relationships	2016-02-28	cataloged	\N	reef_invert_biomass_relationships	reef_invert_biomass_relationships	no draft view till staging dir	\N	cnelson	\N	2019-08-02 14:14:40.664528	2016-04-01
 99054	knb-lter-sbc.99054	4	Satellite kelp canopy biomass	2013-10-25	deprecated	integration	satellite_kelp_canopy_1	cavanaugh_satellite_kelp_canopy_1/2014_update	test dataset for pasta.	metacat is at rev 3 and pasta at rev 2, docs are the same.	tbell, kcavanaugh	\N	2019-08-02 14:14:40.664528	2012-02-14
-1100	template_cruise.1100	8	underway data, SBCLTER_cruise-underway_TEMPLATE.1.7.xml	\N	redesign_anticipated	\N	ocean_series_cruises_2001_2006	00_im_assist/ocean_series_cruises_2001_2006	SBCLTER_cruise-underway_TEMPLATE.1.7.xml	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-1200	template_cruise.1200	7	towed ctd, SBCLTER_cruise-towed_TEMPLATE.1.6.xml	\N	redesign_anticipated	\N	ocean_series_cruises_2001_2006	00_im_assist/ocean_series_cruises_2001_2006	SBCLTER_cruise-towed_TEMPLATE.1.6.xml	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-3000	template_dischrg.3000	10	stream discharge, SBCLTER_streamDischarge_TEMPLATE.1.10.xml	\N	redesign_anticipated	\N	\N	watershed_series_stream_discharge	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-4000	template_precip.4000	7	SBC precipitation, SBCLTER_precipitation_TEMPLATE.1.7.xml	\N	redesign_anticipated	\N	\N	watershed_series_precip_SBC	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-5000	template_precip.5000	\N	template for county-collected precip	\N	redesign_anticipated	\N	\N	watershed_series_precip_county	\N	\N	mobrien	\N	2019-08-02 14:14:40.664528	\N
-100002	x.100002	\N	swell mohawk 	\N	anticipated	\N	TBD_swell_mohawk	TBD_swell_mohawk	hold off on this one. The undergrad-sensors are being used to validate the CDIP model first.	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-79	knb-lter-sbc.79	0	LTE KR biomass, fish	2016-03-13	deprecated	\N	lte_kr_biomass_fish	lte_kr_biomass_fish	fish biomass data package should be removed and add in one data package with all-species together	\N	sharrer	\N	2019-08-02 14:14:40.664528	2014-10-01
-81	knb-lter-sbc.81	0	KFCD biomass, invertebrates	\N	deprecated	\N	reef_community_biomass_inverts	reef_community_biomass_inverts	invert biomass data package should be removed and add in one data package with all-species together	\N	cnelson	\N	2019-08-02 14:14:40.664528	\N
-77	knb-lter-sbc.77	2	lobster abundance and fishing effort	2017-12-19	cataloged	integration	reef_lobsters	project.77	Clint will send latitudes for polygons (table 2). Shan wants to tweak the abstract	\N	lkui	research/Reef/Final/Data/Lobster_Abundance_and_Fishing_Pressure	2019-08-02 14:14:40.664528	2017-12-19
-82	knb-lter-sbc.82	0	KFCD biomass, fish	2014-09-04	deprecated	\N	reef_community_biomass_fish	reef_community_biomass_fish	fish biomass data package should be removed and add in one data package with all-species together	\N	sharrer	\N	2019-08-02 14:14:40.664528	2014-10-01
-1000	template_cruise.1000	5	ctd and rosette bottle, SBCLTER_cruise-rosette_TEMPLATE.1.4.xml	\N	redesign_anticipated	\N	ocean_series_cruises_2001_2006	00_im_assist/ocean_series_cruises_2001_2006	SBCLTER_cruise-rosette_TEMPLATE.1.4.xml	updating metadata to EML 2.1, 2013	mobrien	\N	2019-08-02 14:14:40.664528	2010-06-14
-84	knb-lter-sbc.84	\N	Seastar wasting disease	2014-01-01	anticipated	\N	reef_seastars	reef_seastars	Shan sent, 12/5	\N	sharrer	\N	2019-08-02 14:14:40.664528	2014-10-01
-96	knb-lter-sbc.96	1	Glider CTD data	2018-02-01	draft	\N	glider_fernanda	project.96	Fernanda's theses, also info from Dave/Stuart	\N	dseigel, ffreitas, shalewood	\N	2019-08-02 14:14:40.664528	2018-02-02
-78	knb-lter-sbc.78	0	Veg-e	2014-09-04	anticipated	\N	\N	\N	dataset for synthesis project	\N	sharrer	\N	2019-08-02 14:14:40.664528	2014-10-01
-92	knb-lter-sbc.92	2	isotope composition, sediments and consumers	2013-04-05	cataloged	\N	foodweb_isotopes_timeseries	foodweb_isotopes_timeseries	review keywords for this pkg, and for 12, enhance both	\N	hpage	 	2019-08-02 14:14:40.664528	2018-02-21
-6000	PH_INSERT_PLACE	1	pH Time Series	2014-10-27	template	\N	pH_series_seafet_moored_20min	project.6000	\N	This is a template	cgotschalk	\N	2019-08-02 14:14:40.664528	0001-01-01
-2000	TEMP_INSERT_PLACE	1	Mooring INSERT_PLACE	\N	template	\N	ocean_moorings_monster	project.2000	\N	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	0001-01-01
-100003	x.100003	\N	pH -  MOHK	\N	anticipated	\N	\N	\N	this was Paul Matson's data. might be incorporated into the larger timeseries.	\N	pmatson, erivest	\N	2019-08-02 14:14:40.664528	\N
-1000032	x.1000032	\N	Wind stress	\N	anticipated	\N	TBD_windstress	TBD_windstress	21 cols U and V	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-1000034	x.1000034	\N	Mooring Mohawk inner	\N	anticipated	\N	ocean_mooring_mki	ocean_mooring_mki	not sure - partner with mhk-out? other ceqi data from mohawk too.	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-1000035	x.1000035	\N	Biodiversity and productivity	\N	anticipated	\N	campaign_biodiversity_productivity	campaign_biodiversity_productivity	? is there mini grant data? or is this just a project	\N	bcardinale	\N	2019-08-02 14:14:40.664528	\N
-1000036	x.1000036	\N	Mooring Stearns Wharf	\N	anticipated	\N	TBD_ocean_mooring_stearnswharf 	TBD_ocean_mooring_stearnswharf 	planned. the ctd on the wharf, also supplies real time data.	\N	cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-1000057	x.1000057	\N	TBD stream flux - watershed	\N	anticipated	\N	watershed_stream_flux	watershed_stream_flux	?? need watershed area to calc from disch and chem, i think.	\N	bgoodridge	\N	2019-08-02 14:14:40.664528	\N
-1000058	x.1000058	\N	TBD SBC Taxonomy	\N	anticipated	\N	TBD_reef_taxonomy	TBD_reef_taxonomy	TBD, reference	\N	\N	\N	2019-08-02 14:14:40.664528	\N
-1000066	x.1000066	\N	Cross-shelf campaign bac OTU	\N	anticipated	\N	campaign_cross_shelf_bact_OTU	campaign_cross_shelf_bact_OTU	deprecated for now - not of value without dna sequence, and one table added to docid 45	\N	ewallner	\N	2019-08-02 14:14:40.664528	\N
-1000077	x.1000077	\N	CEQI NAS	\N	anticipated	\N	CEQI_mooring_NAS	CEQI_mooring_NAS	some material in pre-pub dir already	\N	\N	\N	2019-08-02 14:14:40.664528	\N
-100008	x.100008	\N	Offshore Primary Production 2001-2006	\N	anticipated	\N	cruises_pprod_analysis	cruises_pprod_analysis	value-added data from cruises. suggest including got's pngs   	\N	mbrzezinski, cgotschalk, lwashburn	\N	2019-08-02 14:14:40.664528	\N
-1000083	x.1000083	\N	Beach porewater	\N	anticipated	\N	beach_porewater	beach_porewater	have they started any ongoing porewater collection?	\N	jdugan	\N	2019-08-02 14:14:40.664528	\N
-1000088	x.1000088	\N	Beach wrack porewater gradient 2010	\N	anticipated	\N	beach_wrack_porewater_2010	beach_wrack_porewater_2010	\N	\N	jdugan	\N	2019-08-02 14:14:40.664528	\N
-1000092	x.1000092	\N	Plumes and Blooms CTD and rosette profiles	\N	anticipated	\N	plumes_blooms_ctd	plumes_blooms_ctd	talk to Dave Court in 2012. collection probably needs its own index page.	 	dsiegel	\N	2019-08-02 14:14:40.664528	\N
-1000098	x.1000098	\N	ROMS model output	\N	anticipated	\N	\N	\N	big files. maybe post code for a workflow instead	\N	dseigel, lromero	\N	2019-08-02 14:14:40.664528	\N
-1000099	x.1000099	\N	RAPID AVIRIS	\N	anticipated	\N	\N	\N	pre-post fire RAPID study	\N	droberts	\N	2019-08-02 14:14:40.664528	\N
-100101	x.100101	\N	Beneitez-Nelson sed trap data	\N	anticipated	\N	\N	\N	might be collab with cce? based on some equipment we bought, maybe shared.	\N	\N	\N	2019-08-02 14:14:40.664528	\N
-100103	x.100103	\N	O2 sensors paired with seafets. w moorings?	\N	anticipated	\N	\N	\N	possible redesign of 6000 series	\N	lwashburn, cgotschalk	\N	2019-08-02 14:14:40.664528	\N
-100104	x.100104	\N	pCO2 and TA from water samples, PnB, monthly sites, or both	\N	anticipated	\N	\N	\N	supp funds bought an instrument that is now in Craig's lab. NSF expects some sort of time series.	\N	ccarlson, diglasiasrodriguez	\N	2019-08-02 14:14:40.664528	\N
-14	knb-lter-sbc.14	13	Reef historical kelp	2007-05-03	cataloged	download	reef_historical_kelp	reef_historical_kelp	1) needs its sites located on google earth, so you can put in metadata. 2) protocol is located in data directory. in 2014, put a copy in /Protocols. too. 	\N	sharrer	research/Reef/Final/Data/Historical_Kelp/	2019-08-02 14:14:40.664528	2010-06-14
-109	knb-lter-sbc.109	2	kelp nitrogen uptake	2017-12-18	cataloged	\N	kelp_N_uptake	project.109	\N	\N	jsmith2	\N	2019-08-02 14:14:40.664528	2018-04-25
-108	knb-lter-sbc.108	1	reef kelp blade loss	2017-07-03	cataloged	\N	reef_kelp_blade_loss	project.108	\N	\N	lkui	\N	2019-08-02 14:14:40.664528	2017-09-25
-36	knb-lter-sbc.36	11	Reef PAR sfc and bottom	2017-12-27	cataloged	integration	PAR_sfc_seafloor	PAR_sfc_seafloor	available		lkui	research/Reef/Final/Data/Continuous/Light/Data/	2019-08-02 14:14:40.664528	2017-12-27
-74	knb-lter-sbc.74	10	Kelp biomass from landsat 5, 7, and 8	2017-03-27	cataloged	integration	ts_satellite_kelp_biomass_ongoing	project.74	was a redesign of 54 in 2013 (landsat data), but instead, that data went into a redisgn of 54. see 54's dir for notes.	\N	tom bell	\N	2019-08-02 14:14:40.664528	2017-11-13
-47	knb-lter-sbc.47	4	SCI benthic scraping	2013-07-02	draft	integration	SCI_algae_food_resources_scraped	SCI_algae_food_resources_scraped	tables being added, or split.	consider swith to completed_timeseries category	lkui	research/Reef/Final/Data/SCI_Surfperch_and_Benthic_Biota	2019-08-02 14:14:40.664528	2012-02-28
-52	knb-lter-sbc.52	6	Larval Settlement	2017-10-25	cataloged	integration	schroeter_larval_settlement	project.52	\N	\N	lkui, sschroeter	research/Reef/Final/Data/Urchin Settlement	2019-08-02 14:14:40.664528	2017-12-11
-50	knb-lter-sbc.50	6	Annual - all species biomass	2018-01-26	cataloged	\N	reef_community_biomass_by_taxon	reef_community_biomass_by_taxon	was in use briefly for one type of biomass data. now is id for all time series of biomass for all kelp forest species.	\N	lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Biomass/Data	2019-08-02 14:14:40.664528	2018-06-26
-111	knb-lter-sbc.111	1	Watersipora and offshore oil platforms	\N	cataloged	\N	project.111	project.111		\N	hpage		2019-08-02 14:14:40.664528	2018-01-04
-113	knb-lter-sbc.113	1	beach wrack consumer distribution	2018-01-18	cataloged	download	project.113	project.113		\N	jdugan		2019-08-02 14:14:40.664528	2018-01-18
-21	knb-lter-sbc.21	17	Kelp - NPP	2016-08-04	deprecated	integration	reef_pprod_kelp_NPP	00_im_assist/reef_pprod_kelp_NPP	shan is recoding all this - new tables?	shannon is working on it in	lkui,sharrer	research/Reef/Final/Data/Kelp_NPP	2019-08-02 14:14:40.664528	2016-09-08
-91	knb-lter-sbc.91	2	Biomass and counts for beach wrack macroinvertebrates	2018-01-25	cataloged	\N	beach_wrack_consumers	beach_wrack_consumers	add site for carp city beach w rev 2		jdugan	research/Beach/Final/Data/Wrack_consumers	2019-08-02 14:14:40.664528	2018-01-26
-114	knb-lter-sbc.114	1	DOC bagged kelp experment	2018-02-09	cataloged	\N	campaign_bagged_kelp	campaign_bagged_kelp	is this ellie or shan? some stu stuff  too.	\N	ewallner, sharrer	\N	2019-08-02 14:14:40.664528	2018-02-21
-40	knb-lter-sbc.40	13	Beach wrack cover	2017-12-01	draft	download	beach_wrack_cover	beach_wrack_cover	shan says what's in final not ready. ask in Dec/jan. needs enhancement -- add taxonomy	waiting for Sarah to finish cleaning	lkui, jdugan	research/Beach/Final/Data/Wrack measurements	2019-08-02 14:14:40.664528	2018-02-27
-112	knb-lter-sbc.112	2	Kelp - NPP	2018-01-29	cataloged	integration	reef_pprod_kelp_NPP	project.112			sharrer	research/Reef/Final/Data/Kelp_NPP	2019-08-02 14:14:40.664528	2018-05-22
-110	knb-lter-sbc.110	1	Annual kelp forest species biomass	\N	deprecated	\N	reef_community_biomass_by_taxon	project.110	similar as dataset 50 but it is a long-term data with 20 m quad resolution	\N	lkui	research/Reef/Final/Data/Kelp_Forest_Community_Dynamics/Biomass\\ Data	2019-08-02 14:14:40.664528	2018-01-10
-54	knb-lter-sbc.54	6	landsat5 kelp canopy biomass	2013-10-15	deprecated	integration	ts_satellite_kelp_biomass	ts_satellite_kelp_biomass	1) plans are to reinstate this as ongoing when calib of landsat 8 worked out. could be the same id, or new one. 2) ds has many large tables. could not get into pasta without custom help.	\N	tbell1	\N	2019-08-02 14:14:40.664528	2014-01-14
-115	knb-lter-sbc.115	1	frond lifespan	2018-02-26	cataloged	\N	project.115	project.115		\N	rass	\N	2019-08-02 14:14:40.664528	2018-02-26
-116	knb-lter-sbc.116	3	Rapid sediment temperature	2018-03-19	cataloged	\N	project.116	project.116		\N	jsmith2	\N	2019-08-02 14:14:40.664528	2018-03-22
-117	knb-lter-sbc.117	3	Rapid urea	2018-03-19	cataloged	\N	project.117	project.117		\N	jsmith2	\N	2019-08-02 14:14:40.664528	2018-03-22
-118	knb-lter-sbc.118	1	Rapid POM and grain size	2018-03-28	cataloged	\N	project.118	project.118		\N	hpage	\N	2019-08-02 14:14:40.664528	2018-03-29
-80	knb-lter-sbc.80	0	KFCD biomass, macroalgae	2014-09-04	deprecated	\N	reef_community_biomass_algae	reef_community_biomass_algae	algae biomass data package should be removed and add in one data package with all-species together	\N	sharrer	\N	2019-08-02 14:14:40.664528	2014-10-01
-119	knb-lter-sbc.119	1	LTE KR - all species biomass	2018-06-23	cataloged		project.119	project.119		\N	lkui	research/Reef/Final/Data/Long_Term_Kelp_Removal/Biomass Data	2019-08-02 14:14:40.664528	2018-06-29
-120	knb-lter-sbc.120	1	Master spp list	2018-06-28	cataloged		project.120	project.120		\N	lkui	research/Reef/Working/Species and Investigator Codes	2019-08-02 14:14:40.664528	2018-06-29
-121	knb-lter-sbc.121	1	Ocean chemistry data	2018-06-29	cataloged		project.121	project.121	Margaret is working on abstract and method	\N	lkui	research/Metadata/EML_2017/project.121	2019-08-02 14:14:40.664528	2018-07-19
-122	knb-lter-sbc.122	1	Life history traits of Sargassum horneri	2018-09-19	cataloged	\N	project.122	project.122	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2018-09-20
-123	knb-lter-sbc.123	1	kelp frond allometry	2018-10-15	draft	\N	project.123	project.123	\N	\N	\N	\N	2019-08-02 14:14:40.664528	2018-10-16
-99021	knb-lter-sbc.22	11	Beach wrack IV 2005-06	2013-04-05	cataloged	download	beach_wrack_IV	beach_wrack_IV	table #1: wrack, only macrocystis so far. may have other species added table #2 to be added: porewater.	\N	jdugan	\N	2019-08-02 14:14:40.664528	2010-06-14
+99013	knb-lter-sbc.99013	21	Reef bottom water temperature	2017-12-01	cataloged	integration	reef_bottom_temperature	project.13		\N	lkui	research/Reef/Final/Data/Bottom_Temperature/	2020-01-09 13:24:33.236161	2017-12-07
+99024	knb-lter-sbc.99024	17	Kelp - algal weights and CHN	2017-12-20	cataloged	integration	reef_kelp_algal_weight_CHN	project.24	replaced method, july 2013	\N	lkui	research/Reef/Final/Data/Kelp_NPP/CHN	2020-01-09 13:24:33.236161	2017-12-20
+99021	knb-lter-sbc.99022	11	Beach wrack IV 2005-06	2013-04-05	cataloged	download	beach_wrack_IV	beach_wrack_IV	table #1: wrack, only macrocystis so far. may have other species added table #2 to be added: porewater.	\N	jdugan	\N	2020-01-09 13:24:33.236161	2010-06-14
 \.
 
 
@@ -5216,15 +4465,12 @@ COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, dat
 0	9	30	2019-09-09 17:09:37.416947	apply 30_create_boilerplate.sql
 0	9	31	2019-09-19 16:35:59.432108	applied 31_add_cols_filesize_cksum.sql
 0	9	32	2019-09-19 16:35:59.432108	applied 32_add_position_licensed.sql
+1	0	35	2019-10-10 16:54:24.566056	applied 35_bug_fixes.sql
+1	0	38	2020-01-09 13:24:33.242279	applied 38_pkg_state_data_archive_id_correction_to_examples.sql
+1	0	39	2020-01-09 13:24:43.173911	apply 39_add_docbook_descriptiontype.sql
+1	0	40	2020-01-09 13:31:43.632442	applied 40_widen_altitude_unit_limit.sql
+1	0	41	2021-03-09 08:33:29.043446	applied 41_consolidate_missing_enumeration_codes.sql
 \.
-
-
---
--- Name: DataSet IX_DataSet_Accession; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
---
-
-ALTER TABLE ONLY lter_metabase."DataSet"
-    ADD CONSTRAINT "IX_DataSet_Accession" UNIQUE ("Revision");
 
 
 --
@@ -5241,6 +4487,14 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
 
 ALTER TABLE ONLY lter_metabase."DataSet"
     ADD CONSTRAINT "PK_DataSet" PRIMARY KEY ("DataSetID");
+
+
+--
+-- Name: DataSetAttributeEnumeration PK_DataSetAttributeEnumeration; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
+    ADD CONSTRAINT "PK_DataSetAttributeEnumeration" PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "CodeID");
 
 
 --
@@ -5284,10 +4538,10 @@ ALTER TABLE ONLY lter_metabase."DataSetMethodProvenance"
 
 
 --
--- Name: DataSetMethodSteps PK_DataSetMethodSteps; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetMethod PK_DataSetMethodSteps; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."DataSetMethodSteps"
+ALTER TABLE ONLY lter_metabase."DataSetMethod"
     ADD CONSTRAINT "PK_DataSetMethodSteps" PRIMARY KEY ("DataSetID", "MethodStepID");
 
 
@@ -5428,11 +4682,11 @@ ALTER TABLE ONLY lter_metabase."ListTaxonomicProviders"
 
 
 --
--- Name: ListMissingCodes PK_MissingCodesList_MissingValueCodeID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListCodes PK_MissingCodesList_MissingValueCodeID; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ListMissingCodes"
-    ADD CONSTRAINT "PK_MissingCodesList_MissingValueCodeID" PRIMARY KEY ("MissingValueCodeID");
+ALTER TABLE ONLY lter_metabase."ListCodes"
+    ADD CONSTRAINT "PK_MissingCodesList_MissingValueCodeID" PRIMARY KEY ("CodeID");
 
 
 --
@@ -5508,18 +4762,18 @@ ALTER TABLE ONLY lter_metabase."ListMethodInstruments"
 
 
 --
--- Name: ListMissingCodes UQ_ListMissingCodes_Code_Explanation; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: ListCodes UQ_ListMissingCodes_Code_Explanation; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."ListMissingCodes"
-    ADD CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" UNIQUE ("MissingValueCode", "MissingValueCodeExplanation");
+ALTER TABLE ONLY lter_metabase."ListCodes"
+    ADD CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" UNIQUE ("Code", "CodeExplanation");
 
 
 --
--- Name: CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON "ListMissingCodes"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON "ListCodes"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-COMMENT ON CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON lter_metabase."ListMissingCodes" IS 'Needed because the ID could be as simple as an integer and is not inherently connected to the code and explanation.';
+COMMENT ON CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON lter_metabase."ListCodes" IS 'Needed because the ID could be as simple as an integer and is not inherently connected to the code and explanation.';
 
 
 --
@@ -5544,14 +4798,6 @@ ALTER TABLE ONLY lter_metabase."ListMethodSoftware"
 
 ALTER TABLE ONLY lter_metabase."EMLMeasurementScaleDomains"
     ADD CONSTRAINT "pk_MeasurementScaleDomains" PRIMARY KEY ("MeasurementScaleDomainID");
-
-
---
--- Name: DataSetAttributeEnumeration pk_emlattributecodedefinition_pk; Type: CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
---
-
-ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
-    ADD CONSTRAINT pk_emlattributecodedefinition_pk PRIMARY KEY ("DataSetID", "EntitySortOrder", "ColumnName", "Code");
 
 
 --
@@ -5764,6 +5010,14 @@ ALTER TABLE ONLY lter_metabase."DataSetAttributes"
 
 
 --
+-- Name: DataSetAttributeEnumeration FK_DataSetAttributeEnumeration_ListCodes; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+--
+
+ALTER TABLE ONLY lter_metabase."DataSetAttributeEnumeration"
+    ADD CONSTRAINT "FK_DataSetAttributeEnumeration_ListCodes" FOREIGN KEY ("CodeID") REFERENCES lter_metabase."ListCodes"("CodeID");
+
+
+--
 -- Name: DataSetEntities FK_DataSetEntities_DataSet; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -5808,7 +5062,7 @@ ALTER TABLE ONLY lter_metabase."DataSetMethodInstruments"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetMethodInstruments"
-    ADD CONSTRAINT "FK_DataSetInstrument_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetInstrument_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethod"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
 
 
 --
@@ -5832,14 +5086,14 @@ ALTER TABLE ONLY lter_metabase."DataSetKeywords"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetMethodProvenance"
-    ADD CONSTRAINT "FK_DataSetMethodProvenance" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetMethodProvenance" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethod"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
 
 
 --
--- Name: DataSetMethodSteps FK_DataSetMethodSteps_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
+-- Name: DataSetMethod FK_DataSetMethodSteps_DataSetID; Type: FK CONSTRAINT; Schema: lter_metabase; Owner: %db_owner%
 --
 
-ALTER TABLE ONLY lter_metabase."DataSetMethodSteps"
+ALTER TABLE ONLY lter_metabase."DataSetMethod"
     ADD CONSTRAINT "FK_DataSetMethodSteps_DataSetID" FOREIGN KEY ("DataSetID") REFERENCES lter_metabase."DataSet"("DataSetID");
 
 
@@ -5872,7 +5126,7 @@ ALTER TABLE ONLY lter_metabase."DataSetMethodProtocols"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetMethodProtocols"
-    ADD CONSTRAINT "FK_DataSetProtocol_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetProtocol_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethod"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
 
 
 --
@@ -5904,7 +5158,7 @@ ALTER TABLE ONLY lter_metabase."DataSetMethodSoftware"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetMethodSoftware"
-    ADD CONSTRAINT "FK_DataSetSoftware_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethodSteps"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DataSetSoftware_MethodStepSet" FOREIGN KEY ("DataSetID", "MethodStepID") REFERENCES lter_metabase."DataSetMethod"("DataSetID", "MethodStepID") ON UPDATE CASCADE;
 
 
 --
@@ -5976,7 +5230,7 @@ ALTER TABLE ONLY lter_metabase."DataSet"
 --
 
 ALTER TABLE ONLY lter_metabase."DataSetAttributeMissingCodes"
-    ADD CONSTRAINT "FK_DatasetMissingCode_MissingValueCodeID" FOREIGN KEY ("MissingValueCodeID") REFERENCES lter_metabase."ListMissingCodes"("MissingValueCodeID") ON UPDATE CASCADE;
+    ADD CONSTRAINT "FK_DatasetMissingCode_MissingValueCodeID" FOREIGN KEY ("MissingValueCodeID") REFERENCES lter_metabase."ListCodes"("CodeID") ON UPDATE CASCADE;
 
 
 --
@@ -6227,6 +5481,14 @@ GRANT SELECT ON TABLE lter_metabase."DataSetKeywords" TO read_only_user;
 
 
 --
+-- Name: TABLE "DataSetMethod"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethod" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."DataSetMethod" TO read_only_user;
+
+
+--
 -- Name: TABLE "DataSetMethodInstruments"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6256,14 +5518,6 @@ GRANT SELECT ON TABLE lter_metabase."DataSetMethodProvenance" TO read_only_user;
 
 GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethodSoftware" TO read_write_user;
 GRANT SELECT ON TABLE lter_metabase."DataSetMethodSoftware" TO read_only_user;
-
-
---
--- Name: TABLE "DataSetMethodSteps"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."DataSetMethodSteps" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."DataSetMethodSteps" TO read_only_user;
 
 
 --
@@ -6363,6 +5617,14 @@ GRANT SELECT ON TABLE lter_metabase."EMLUnitTypes" TO read_only_user;
 
 
 --
+-- Name: TABLE "ListCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListCodes" TO read_write_user;
+GRANT SELECT ON TABLE lter_metabase."ListCodes" TO read_only_user;
+
+
+--
 -- Name: TABLE "ListKeywordThesauri"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6400,14 +5662,6 @@ GRANT SELECT ON TABLE lter_metabase."ListMethodProtocols" TO read_only_user;
 
 GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMethodSoftware" TO read_write_user;
 GRANT SELECT ON TABLE lter_metabase."ListMethodSoftware" TO read_only_user;
-
-
---
--- Name: TABLE "ListMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE lter_metabase."ListMissingCodes" TO read_write_user;
-GRANT SELECT ON TABLE lter_metabase."ListMissingCodes" TO read_only_user;
 
 
 --
@@ -6550,8 +5804,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_entities TO read_only_user;
 -- Name: TABLE vw_eml_geographiccoverage; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
-GRANT SELECT ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_only_user;
 GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_write_user;
+GRANT SELECT ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_only_user;
 
 
 --

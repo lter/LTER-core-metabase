@@ -6,7 +6,7 @@ Dir contains the install script for LTER-core-metabase. See also [Quick Start gu
   - a DB admin must run this script
     
 - **onebigfile.sql**
-  - set up three schemas and their tables. 
+  - creates three schemas and their tables. 
   - example:   `psql -U joesmith -h dbhostname -d lter_core_metabase < onebigfile.sql`
 
 
