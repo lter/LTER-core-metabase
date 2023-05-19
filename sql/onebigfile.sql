@@ -5,7 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2023-04-05 14:26:20
+-- Started on 2023-05-19 12:04:34
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -75,25 +75,6 @@ COMMENT ON SCHEMA pkg_mgmt IS 'Contains tables for internal data package invento
 
 
 --
--- TOC entry 3 (class 2615 OID 2200)
--- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
---
-
-CREATE SCHEMA public;
-
-
-ALTER SCHEMA public OWNER TO postgres;
-
---
--- TOC entry 3500 (class 0 OID 0)
--- Dependencies: 3
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
---
-
-COMMENT ON SCHEMA public IS 'standard public schema';
-
-
---
 -- TOC entry 285 (class 1255 OID 112009)
 -- Name: update_modified_column(); Type: FUNCTION; Schema: pkg_mgmt; Owner: %db_owner%
 --
@@ -138,7 +119,7 @@ CREATE TABLE lter_metabase."DataSet" (
 ALTER TABLE lter_metabase."DataSet" OWNER TO %db_owner%;
 
 --
--- TOC entry 3501 (class 0 OID 0)
+-- TOC entry 3500 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: COLUMN "DataSet"."ShortName"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -147,7 +128,7 @@ COMMENT ON COLUMN lter_metabase."DataSet"."ShortName" IS 'Goes into /dataset/sho
 
 
 --
--- TOC entry 3502 (class 0 OID 0)
+-- TOC entry 3501 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: COLUMN "DataSet"."UpdateFrequency"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -156,7 +137,7 @@ COMMENT ON COLUMN lter_metabase."DataSet"."UpdateFrequency" IS 'Use controlled v
 
 
 --
--- TOC entry 3503 (class 0 OID 0)
+-- TOC entry 3502 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: COLUMN "DataSet"."MaintenanceDescription"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -165,7 +146,7 @@ COMMENT ON COLUMN lter_metabase."DataSet"."MaintenanceDescription" IS 'Freeform 
 
 
 --
--- TOC entry 3504 (class 0 OID 0)
+-- TOC entry 3503 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: COLUMN "DataSet"."AbstractType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -174,7 +155,7 @@ COMMENT ON COLUMN lter_metabase."DataSet"."AbstractType" IS 'Indicates which typ
 
 
 --
--- TOC entry 278 (class 1259 OID 112809)
+-- TOC entry 277 (class 1259 OID 112809)
 -- Name: DataSetAnnotation; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -188,7 +169,7 @@ CREATE TABLE lter_metabase."DataSetAnnotation" (
 ALTER TABLE lter_metabase."DataSetAnnotation" OWNER TO %db_owner%;
 
 --
--- TOC entry 279 (class 1259 OID 112832)
+-- TOC entry 278 (class 1259 OID 112832)
 -- Name: DataSetAttributeAnnotation; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -293,7 +274,7 @@ CREATE TABLE lter_metabase."DataSetEntities" (
 ALTER TABLE lter_metabase."DataSetEntities" OWNER TO %db_owner%;
 
 --
--- TOC entry 3511 (class 0 OID 0)
+-- TOC entry 3510 (class 0 OID 0)
 -- Dependencies: 203
 -- Name: COLUMN "DataSetEntities"."EntityType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -302,7 +283,7 @@ COMMENT ON COLUMN lter_metabase."DataSetEntities"."EntityType" IS 'One of "dataT
 
 
 --
--- TOC entry 3512 (class 0 OID 0)
+-- TOC entry 3511 (class 0 OID 0)
 -- Dependencies: 203
 -- Name: COLUMN "DataSetEntities"."FileName"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -311,7 +292,7 @@ COMMENT ON COLUMN lter_metabase."DataSetEntities"."FileName" IS 'goes into physi
 
 
 --
--- TOC entry 3513 (class 0 OID 0)
+-- TOC entry 3512 (class 0 OID 0)
 -- Dependencies: 203
 -- Name: COLUMN "DataSetEntities"."Checksum"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -395,7 +376,7 @@ CREATE TABLE lter_metabase."DataSetMethodProvenance" (
 ALTER TABLE lter_metabase."DataSetMethodProvenance" OWNER TO %db_owner%;
 
 --
--- TOC entry 3519 (class 0 OID 0)
+-- TOC entry 3518 (class 0 OID 0)
 -- Dependencies: 208
 -- Name: COLUMN "DataSetMethodProvenance"."SourcePackageID"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -433,7 +414,7 @@ CREATE TABLE lter_metabase."DataSetPersonnel" (
 ALTER TABLE lter_metabase."DataSetPersonnel" OWNER TO %db_owner%;
 
 --
--- TOC entry 3522 (class 0 OID 0)
+-- TOC entry 3521 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: COLUMN "DataSetPersonnel"."AuthorshipOrder"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -442,7 +423,7 @@ COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipOrder" IS 'This is
 
 
 --
--- TOC entry 3523 (class 0 OID 0)
+-- TOC entry 3522 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: COLUMN "DataSetPersonnel"."AuthorshipRole"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -451,7 +432,7 @@ COMMENT ON COLUMN lter_metabase."DataSetPersonnel"."AuthorshipRole" IS 'if not c
 
 
 --
--- TOC entry 282 (class 1259 OID 112872)
+-- TOC entry 281 (class 1259 OID 112872)
 -- Name: DataSetPublications; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -482,7 +463,7 @@ CREATE TABLE lter_metabase."DataSetSites" (
 ALTER TABLE lter_metabase."DataSetSites" OWNER TO %db_owner%;
 
 --
--- TOC entry 3526 (class 0 OID 0)
+-- TOC entry 3525 (class 0 OID 0)
 -- Dependencies: 211
 -- Name: COLUMN "DataSetSites"."EntitySortOrder"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -521,7 +502,7 @@ CREATE TABLE lter_metabase."DataSetTemporal" (
 ALTER TABLE lter_metabase."DataSetTemporal" OWNER TO %db_owner%;
 
 --
--- TOC entry 3529 (class 0 OID 0)
+-- TOC entry 3528 (class 0 OID 0)
 -- Dependencies: 213
 -- Name: COLUMN "DataSetTemporal"."EntitySortOrder"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -613,7 +594,7 @@ CREATE TABLE lter_metabase."EMLNumberTypes" (
 ALTER TABLE lter_metabase."EMLNumberTypes" OWNER TO %db_owner%;
 
 --
--- TOC entry 277 (class 1259 OID 112798)
+-- TOC entry 276 (class 1259 OID 112798)
 -- Name: EMLObjectProperties; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -641,7 +622,7 @@ CREATE TABLE lter_metabase."EMLStorageTypes" (
 ALTER TABLE lter_metabase."EMLStorageTypes" OWNER TO %db_owner%;
 
 --
--- TOC entry 3537 (class 0 OID 0)
+-- TOC entry 3536 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: COLUMN "EMLStorageTypes"."typeSystem"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -817,7 +798,7 @@ CREATE TABLE lter_metabase."ListPeopleID" (
 ALTER TABLE lter_metabase."ListPeopleID" OWNER TO %db_owner%;
 
 --
--- TOC entry 3548 (class 0 OID 0)
+-- TOC entry 3547 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN "ListPeopleID"."IdentificationSystem"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -826,7 +807,7 @@ COMMENT ON COLUMN lter_metabase."ListPeopleID"."IdentificationSystem" IS 'ID Sys
 
 
 --
--- TOC entry 3549 (class 0 OID 0)
+-- TOC entry 3548 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: COLUMN "ListPeopleID"."IdentificationURL"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -835,7 +816,7 @@ COMMENT ON COLUMN lter_metabase."ListPeopleID"."IdentificationURL" IS 'Full URLs
 
 
 --
--- TOC entry 281 (class 1259 OID 112864)
+-- TOC entry 280 (class 1259 OID 112864)
 -- Name: ListPublications; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -848,7 +829,7 @@ CREATE TABLE lter_metabase."ListPublications" (
 ALTER TABLE lter_metabase."ListPublications" OWNER TO %db_owner%;
 
 --
--- TOC entry 276 (class 1259 OID 112787)
+-- TOC entry 275 (class 1259 OID 112787)
 -- Name: ListSemanticAnnotationTerms; Type: TABLE; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -863,8 +844,8 @@ CREATE TABLE lter_metabase."ListSemanticAnnotationTerms" (
 ALTER TABLE lter_metabase."ListSemanticAnnotationTerms" OWNER TO %db_owner%;
 
 --
--- TOC entry 3552 (class 0 OID 0)
--- Dependencies: 276
+-- TOC entry 3551 (class 0 OID 0)
+-- Dependencies: 275
 -- Name: CONSTRAINT ck_semantic_annotation_no_lead_trail_whitespace ON "ListSemanticAnnotationTerms"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -900,7 +881,7 @@ CREATE TABLE lter_metabase."ListSites" (
 ALTER TABLE lter_metabase."ListSites" OWNER TO %db_owner%;
 
 --
--- TOC entry 3554 (class 0 OID 0)
+-- TOC entry 3553 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN "ListSites"."SiteType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -909,7 +890,7 @@ COMMENT ON COLUMN lter_metabase."ListSites"."SiteType" IS 'does not go into EML.
 
 
 --
--- TOC entry 3555 (class 0 OID 0)
+-- TOC entry 3554 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN "ListSites"."SiteName"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -918,7 +899,7 @@ COMMENT ON COLUMN lter_metabase."ListSites"."SiteName" IS 'SiteName and SiteLoca
 
 
 --
--- TOC entry 3556 (class 0 OID 0)
+-- TOC entry 3555 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN "ListSites"."SiteLocation"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -927,7 +908,7 @@ COMMENT ON COLUMN lter_metabase."ListSites"."SiteLocation" IS 'does not go into 
 
 
 --
--- TOC entry 3557 (class 0 OID 0)
+-- TOC entry 3556 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN "ListSites"."SiteDescription"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -936,7 +917,7 @@ COMMENT ON COLUMN lter_metabase."ListSites"."SiteDescription" IS 'SiteName and S
 
 
 --
--- TOC entry 3558 (class 0 OID 0)
+-- TOC entry 3557 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: COLUMN "ListSites"."ShapeType"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -962,7 +943,7 @@ CREATE TABLE lter_metabase."ListTaxa" (
 ALTER TABLE lter_metabase."ListTaxa" OWNER TO %db_owner%;
 
 --
--- TOC entry 3560 (class 0 OID 0)
+-- TOC entry 3559 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: COLUMN "ListTaxa"."TaxonID"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -1007,7 +988,7 @@ CREATE TABLE mb2eml_r.boilerplate (
 ALTER TABLE mb2eml_r.boilerplate OWNER TO %db_owner%;
 
 --
--- TOC entry 3563 (class 0 OID 0)
+-- TOC entry 3562 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN boilerplate.intellectual_rights; Type: COMMENT; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -1016,7 +997,7 @@ COMMENT ON COLUMN mb2eml_r.boilerplate.intellectual_rights IS 'the old freeform 
 
 
 --
--- TOC entry 3564 (class 0 OID 0)
+-- TOC entry 3563 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN boilerplate.licensed; Type: COMMENT; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -1252,7 +1233,7 @@ CREATE TABLE pkg_mgmt.maintenance_changehistory (
 ALTER TABLE pkg_mgmt.maintenance_changehistory OWNER TO %db_owner%;
 
 --
--- TOC entry 3572 (class 0 OID 0)
+-- TOC entry 3571 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN maintenance_changehistory.change_scope; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
@@ -1340,7 +1321,7 @@ CREATE VIEW mb2eml_r.vw_eml_dataset AS
 ALTER TABLE mb2eml_r.vw_eml_dataset OWNER TO %db_owner%;
 
 --
--- TOC entry 244 (class 1259 OID 112234)
+-- TOC entry 284 (class 1259 OID 112906)
 -- Name: vw_eml_entities; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1362,6 +1343,7 @@ CREATE VIEW mb2eml_r.vw_eml_entities AS
     k."externallyDefinedFormat_formatName" AS formatname,
     k."QuoteCharacter" AS quotecharacter,
     k."CollapseDelimiters" AS collapsedelimiter,
+    k."CharacterEncoding" AS encoding,
     e."FileSize" AS filesize,
     e."FileSizeUnits" AS filesize_units,
     e."Checksum" AS checksum
@@ -1373,7 +1355,7 @@ CREATE VIEW mb2eml_r.vw_eml_entities AS
 ALTER TABLE mb2eml_r.vw_eml_entities OWNER TO %db_owner%;
 
 --
--- TOC entry 245 (class 1259 OID 112239)
+-- TOC entry 244 (class 1259 OID 112239)
 -- Name: vw_eml_geographiccoverage; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1398,7 +1380,7 @@ CREATE VIEW mb2eml_r.vw_eml_geographiccoverage AS
 ALTER TABLE mb2eml_r.vw_eml_geographiccoverage OWNER TO %db_owner%;
 
 --
--- TOC entry 246 (class 1259 OID 112244)
+-- TOC entry 245 (class 1259 OID 112244)
 -- Name: vw_eml_instruments; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1413,7 +1395,7 @@ CREATE VIEW mb2eml_r.vw_eml_instruments AS
 ALTER TABLE mb2eml_r.vw_eml_instruments OWNER TO %db_owner%;
 
 --
--- TOC entry 247 (class 1259 OID 112248)
+-- TOC entry 246 (class 1259 OID 112248)
 -- Name: vw_eml_keyword; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1433,7 +1415,7 @@ CREATE VIEW mb2eml_r.vw_eml_keyword AS
 ALTER TABLE mb2eml_r.vw_eml_keyword OWNER TO %db_owner%;
 
 --
--- TOC entry 248 (class 1259 OID 112253)
+-- TOC entry 247 (class 1259 OID 112253)
 -- Name: vw_eml_methodstep_description; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1448,7 +1430,7 @@ CREATE VIEW mb2eml_r.vw_eml_methodstep_description AS
 ALTER TABLE mb2eml_r.vw_eml_methodstep_description OWNER TO %db_owner%;
 
 --
--- TOC entry 249 (class 1259 OID 112257)
+-- TOC entry 248 (class 1259 OID 112257)
 -- Name: vw_eml_missingcodes; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1466,7 +1448,7 @@ CREATE VIEW mb2eml_r.vw_eml_missingcodes AS
 ALTER TABLE mb2eml_r.vw_eml_missingcodes OWNER TO %db_owner%;
 
 --
--- TOC entry 250 (class 1259 OID 112261)
+-- TOC entry 249 (class 1259 OID 112261)
 -- Name: vw_eml_protocols; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1486,7 +1468,7 @@ CREATE VIEW mb2eml_r.vw_eml_protocols AS
 ALTER TABLE mb2eml_r.vw_eml_protocols OWNER TO %db_owner%;
 
 --
--- TOC entry 251 (class 1259 OID 112266)
+-- TOC entry 250 (class 1259 OID 112266)
 -- Name: vw_eml_provenance; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1500,7 +1482,7 @@ CREATE VIEW mb2eml_r.vw_eml_provenance AS
 ALTER TABLE mb2eml_r.vw_eml_provenance OWNER TO %db_owner%;
 
 --
--- TOC entry 283 (class 1259 OID 112888)
+-- TOC entry 282 (class 1259 OID 112888)
 -- Name: vw_eml_publications; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1517,7 +1499,7 @@ CREATE VIEW mb2eml_r.vw_eml_publications AS
 ALTER TABLE mb2eml_r.vw_eml_publications OWNER TO %db_owner%;
 
 --
--- TOC entry 280 (class 1259 OID 112853)
+-- TOC entry 279 (class 1259 OID 112853)
 -- Name: vw_eml_semantic_annotation; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1552,7 +1534,7 @@ UNION
 ALTER TABLE mb2eml_r.vw_eml_semantic_annotation OWNER TO %db_owner%;
 
 --
--- TOC entry 252 (class 1259 OID 112270)
+-- TOC entry 251 (class 1259 OID 112270)
 -- Name: vw_eml_software; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1571,7 +1553,7 @@ CREATE VIEW mb2eml_r.vw_eml_software AS
 ALTER TABLE mb2eml_r.vw_eml_software OWNER TO %db_owner%;
 
 --
--- TOC entry 284 (class 1259 OID 112892)
+-- TOC entry 283 (class 1259 OID 112892)
 -- Name: vw_eml_taxonomy; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1593,7 +1575,7 @@ CREATE VIEW mb2eml_r.vw_eml_taxonomy AS
 ALTER TABLE mb2eml_r.vw_eml_taxonomy OWNER TO %db_owner%;
 
 --
--- TOC entry 253 (class 1259 OID 112279)
+-- TOC entry 252 (class 1259 OID 112279)
 -- Name: vw_eml_temporalcoverage; Type: VIEW; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -1615,7 +1597,7 @@ CREATE VIEW mb2eml_r.vw_eml_temporalcoverage AS
 ALTER TABLE mb2eml_r.vw_eml_temporalcoverage OWNER TO %db_owner%;
 
 --
--- TOC entry 254 (class 1259 OID 112283)
+-- TOC entry 253 (class 1259 OID 112283)
 -- Name: cv_cra; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1628,8 +1610,8 @@ CREATE TABLE pkg_mgmt.cv_cra (
 ALTER TABLE pkg_mgmt.cv_cra OWNER TO %db_owner%;
 
 --
--- TOC entry 3590 (class 0 OID 0)
--- Dependencies: 254
+-- TOC entry 3589 (class 0 OID 0)
+-- Dependencies: 253
 -- Name: TABLE cv_cra; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1637,7 +1619,7 @@ COMMENT ON TABLE pkg_mgmt.cv_cra IS 'core study area';
 
 
 --
--- TOC entry 255 (class 1259 OID 112286)
+-- TOC entry 254 (class 1259 OID 112286)
 -- Name: cv_maint_freq; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1649,7 +1631,7 @@ CREATE TABLE pkg_mgmt.cv_maint_freq (
 ALTER TABLE pkg_mgmt.cv_maint_freq OWNER TO %db_owner%;
 
 --
--- TOC entry 256 (class 1259 OID 112289)
+-- TOC entry 255 (class 1259 OID 112289)
 -- Name: cv_mgmt_type; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1662,7 +1644,7 @@ CREATE TABLE pkg_mgmt.cv_mgmt_type (
 ALTER TABLE pkg_mgmt.cv_mgmt_type OWNER TO %db_owner%;
 
 --
--- TOC entry 257 (class 1259 OID 112295)
+-- TOC entry 256 (class 1259 OID 112295)
 -- Name: cv_network_type; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1675,7 +1657,7 @@ CREATE TABLE pkg_mgmt.cv_network_type (
 ALTER TABLE pkg_mgmt.cv_network_type OWNER TO %db_owner%;
 
 --
--- TOC entry 258 (class 1259 OID 112301)
+-- TOC entry 257 (class 1259 OID 112301)
 -- Name: cv_spatial_extent; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1688,7 +1670,7 @@ CREATE TABLE pkg_mgmt.cv_spatial_extent (
 ALTER TABLE pkg_mgmt.cv_spatial_extent OWNER TO %db_owner%;
 
 --
--- TOC entry 259 (class 1259 OID 112307)
+-- TOC entry 258 (class 1259 OID 112307)
 -- Name: cv_spatial_type; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1701,7 +1683,7 @@ CREATE TABLE pkg_mgmt.cv_spatial_type (
 ALTER TABLE pkg_mgmt.cv_spatial_type OWNER TO %db_owner%;
 
 --
--- TOC entry 260 (class 1259 OID 112313)
+-- TOC entry 259 (class 1259 OID 112313)
 -- Name: cv_spatio_temporal; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1714,7 +1696,7 @@ CREATE TABLE pkg_mgmt.cv_spatio_temporal (
 ALTER TABLE pkg_mgmt.cv_spatio_temporal OWNER TO %db_owner%;
 
 --
--- TOC entry 261 (class 1259 OID 112319)
+-- TOC entry 260 (class 1259 OID 112319)
 -- Name: cv_status; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1726,7 +1708,7 @@ CREATE TABLE pkg_mgmt.cv_status (
 ALTER TABLE pkg_mgmt.cv_status OWNER TO %db_owner%;
 
 --
--- TOC entry 262 (class 1259 OID 112322)
+-- TOC entry 261 (class 1259 OID 112322)
 -- Name: cv_temporal_type; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1739,7 +1721,7 @@ CREATE TABLE pkg_mgmt.cv_temporal_type (
 ALTER TABLE pkg_mgmt.cv_temporal_type OWNER TO %db_owner%;
 
 --
--- TOC entry 263 (class 1259 OID 112328)
+-- TOC entry 262 (class 1259 OID 112328)
 -- Name: pkg_core_area; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1752,8 +1734,8 @@ CREATE TABLE pkg_mgmt.pkg_core_area (
 ALTER TABLE pkg_mgmt.pkg_core_area OWNER TO %db_owner%;
 
 --
--- TOC entry 3600 (class 0 OID 0)
--- Dependencies: 263
+-- TOC entry 3599 (class 0 OID 0)
+-- Dependencies: 262
 -- Name: TABLE pkg_core_area; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1761,7 +1743,7 @@ COMMENT ON TABLE pkg_mgmt.pkg_core_area IS 'core study area';
 
 
 --
--- TOC entry 264 (class 1259 OID 112331)
+-- TOC entry 263 (class 1259 OID 112331)
 -- Name: pkg_sort; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1786,8 +1768,8 @@ CREATE TABLE pkg_mgmt.pkg_sort (
 ALTER TABLE pkg_mgmt.pkg_sort OWNER TO %db_owner%;
 
 --
--- TOC entry 3602 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3601 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: TABLE pkg_sort; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1795,8 +1777,8 @@ COMMENT ON TABLE pkg_mgmt.pkg_sort IS 'pkg_state is wordy and pkg_sort is terse.
 
 
 --
--- TOC entry 3603 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3602 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: COLUMN pkg_sort.network_type; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1805,8 +1787,8 @@ if neither applies, NULL.';
 
 
 --
--- TOC entry 3604 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3603 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: COLUMN pkg_sort.is_signature; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1814,8 +1796,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_sort.is_signature IS 'defined at discretion of si
 
 
 --
--- TOC entry 3605 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3604 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: COLUMN pkg_sort.spatial_type; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1823,8 +1805,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_sort.spatial_type IS 'choices: multi-site, one si
 
 
 --
--- TOC entry 3606 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3605 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: COLUMN pkg_sort.management_type; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1832,8 +1814,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_sort.management_type IS 'template vs non_template
 
 
 --
--- TOC entry 3607 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3606 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: COLUMN pkg_sort.in_pasta; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1841,7 +1823,7 @@ COMMENT ON COLUMN pkg_mgmt.pkg_sort.in_pasta IS 'This package ID is in productio
 
 
 --
--- TOC entry 265 (class 1259 OID 112335)
+-- TOC entry 264 (class 1259 OID 112335)
 -- Name: pkg_state; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1867,8 +1849,8 @@ CREATE TABLE pkg_mgmt.pkg_state (
 ALTER TABLE pkg_mgmt.pkg_state OWNER TO %db_owner%;
 
 --
--- TOC entry 3609 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3608 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: TABLE pkg_state; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1876,8 +1858,8 @@ COMMENT ON TABLE pkg_mgmt.pkg_state IS 'aka wordy';
 
 
 --
--- TOC entry 3610 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3609 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.dataset_archive_id; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1885,8 +1867,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.dataset_archive_id IS 'ie knb-lter-mcr.1234
 
 
 --
--- TOC entry 3611 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3610 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.rev; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1894,8 +1876,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.rev IS 'revision is needed for showDraft. B
 
 
 --
--- TOC entry 3612 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3611 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.nickname; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1903,8 +1885,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.nickname IS 'ie fish_survey or flume or par
 
 
 --
--- TOC entry 3613 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3612 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.status; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1912,8 +1894,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.status IS 'anticipated, draft0, cataloged, 
 
 
 --
--- TOC entry 3614 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3613 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.synth_readiness; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1921,8 +1903,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.synth_readiness IS 'One of metadata_only, d
 
 
 --
--- TOC entry 3615 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3614 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.staging_dir; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1930,8 +1912,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.staging_dir IS 'The subdirectory where the 
 
 
 --
--- TOC entry 3616 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3615 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.eml_draft_path; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1939,8 +1921,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.eml_draft_path IS 'For most pkgs this is me
 
 
 --
--- TOC entry 3617 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3616 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.notes; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1948,8 +1930,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.notes IS 'what needs doing. what the holdup
 
 
 --
--- TOC entry 3618 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3617 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.pub_notes; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1957,8 +1939,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.pub_notes IS 'Reason for being in this stat
 
 
 --
--- TOC entry 3619 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3618 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.who2bug; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1966,8 +1948,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.who2bug IS 'often not the creator rather th
 
 
 --
--- TOC entry 3620 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3619 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.dir_internal_final; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1975,8 +1957,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.dir_internal_final IS 'directory where subm
 
 
 --
--- TOC entry 3621 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3620 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.dbupdatetime; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1984,8 +1966,8 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.dbupdatetime IS 'automatically updates itse
 
 
 --
--- TOC entry 3622 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3621 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: COLUMN pkg_state.update_date_catalog; Type: COMMENT; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -1993,7 +1975,7 @@ COMMENT ON COLUMN pkg_mgmt.pkg_state.update_date_catalog IS 'Date package last u
 
 
 --
--- TOC entry 266 (class 1259 OID 112341)
+-- TOC entry 265 (class 1259 OID 112341)
 -- Name: version_tracker_metabase; Type: TABLE; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2009,7 +1991,7 @@ CREATE TABLE pkg_mgmt.version_tracker_metabase (
 ALTER TABLE pkg_mgmt.version_tracker_metabase OWNER TO %db_owner%;
 
 --
--- TOC entry 267 (class 1259 OID 112347)
+-- TOC entry 266 (class 1259 OID 112347)
 -- Name: vw_backlog; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2042,7 +2024,7 @@ CREATE VIEW pkg_mgmt.vw_backlog AS
 ALTER TABLE pkg_mgmt.vw_backlog OWNER TO %db_owner%;
 
 --
--- TOC entry 268 (class 1259 OID 112352)
+-- TOC entry 267 (class 1259 OID 112352)
 -- Name: vw_cataloged; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2063,7 +2045,7 @@ CREATE VIEW pkg_mgmt.vw_cataloged AS
 ALTER TABLE pkg_mgmt.vw_cataloged OWNER TO %db_owner%;
 
 --
--- TOC entry 269 (class 1259 OID 112357)
+-- TOC entry 268 (class 1259 OID 112357)
 -- Name: vw_draft_anticipated; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2084,7 +2066,7 @@ CREATE VIEW pkg_mgmt.vw_draft_anticipated AS
 ALTER TABLE pkg_mgmt.vw_draft_anticipated OWNER TO %db_owner%;
 
 --
--- TOC entry 270 (class 1259 OID 112362)
+-- TOC entry 269 (class 1259 OID 112362)
 -- Name: vw_drafts_bak; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2117,7 +2099,7 @@ CREATE VIEW pkg_mgmt.vw_drafts_bak AS
 ALTER TABLE pkg_mgmt.vw_drafts_bak OWNER TO %db_owner%;
 
 --
--- TOC entry 271 (class 1259 OID 112367)
+-- TOC entry 270 (class 1259 OID 112367)
 -- Name: vw_dump; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2157,7 +2139,7 @@ CREATE VIEW pkg_mgmt.vw_dump AS
 ALTER TABLE pkg_mgmt.vw_dump OWNER TO %db_owner%;
 
 --
--- TOC entry 272 (class 1259 OID 112372)
+-- TOC entry 271 (class 1259 OID 112372)
 -- Name: vw_im_plan; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2180,7 +2162,7 @@ CREATE VIEW pkg_mgmt.vw_im_plan AS
 ALTER TABLE pkg_mgmt.vw_im_plan OWNER TO %db_owner%;
 
 --
--- TOC entry 273 (class 1259 OID 112377)
+-- TOC entry 272 (class 1259 OID 112377)
 -- Name: vw_pub; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2208,7 +2190,7 @@ CREATE VIEW pkg_mgmt.vw_pub AS
 ALTER TABLE pkg_mgmt.vw_pub OWNER TO %db_owner%;
 
 --
--- TOC entry 274 (class 1259 OID 112382)
+-- TOC entry 273 (class 1259 OID 112382)
 -- Name: vw_self; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2240,7 +2222,7 @@ CREATE VIEW pkg_mgmt.vw_self AS
 ALTER TABLE pkg_mgmt.vw_self OWNER TO %db_owner%;
 
 --
--- TOC entry 275 (class 1259 OID 112387)
+-- TOC entry 274 (class 1259 OID 112387)
 -- Name: vw_temporal; Type: VIEW; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -2287,7 +2269,7 @@ COPY lter_metabase."DataSet" ("DataSetID", "Revision", "Title", "PubDate", "Abst
 
 --
 -- TOC entry 3485 (class 0 OID 112809)
--- Dependencies: 278
+-- Dependencies: 277
 -- Data for Name: DataSetAnnotation; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -2297,7 +2279,7 @@ COPY lter_metabase."DataSetAnnotation" ("DataSetID", "TermID", "ObjectPropertyID
 
 --
 -- TOC entry 3486 (class 0 OID 112832)
--- Dependencies: 279
+-- Dependencies: 278
 -- Data for Name: DataSetAttributeAnnotation; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -2739,7 +2721,7 @@ COPY lter_metabase."DataSetPersonnel" ("DataSetID", "NameID", "AuthorshipOrder",
 
 --
 -- TOC entry 3488 (class 0 OID 112872)
--- Dependencies: 282
+-- Dependencies: 281
 -- Data for Name: DataSetPublications; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -2888,7 +2870,7 @@ whole
 
 --
 -- TOC entry 3484 (class 0 OID 112798)
--- Dependencies: 277
+-- Dependencies: 276
 -- Data for Name: EMLObjectProperties; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4193,7 +4175,7 @@ mobrien	1	ORCID	0000-0002-1693-8322
 
 --
 -- TOC entry 3487 (class 0 OID 112864)
--- Dependencies: 281
+-- Dependencies: 280
 -- Data for Name: ListPublications; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4203,7 +4185,7 @@ COPY lter_metabase."ListPublications" ("PublicationID", "Bibtex") FROM stdin;
 
 --
 -- TOC entry 3483 (class 0 OID 112787)
--- Dependencies: 276
+-- Dependencies: 275
 -- Data for Name: ListSemanticAnnotationTerms; Type: TABLE DATA; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -4767,7 +4749,7 @@ non-default	knb-lter-sbc	sbc	<access system="https://pasta.lternet.edu" scope="d
 
 --
 -- TOC entry 3470 (class 0 OID 112283)
--- Dependencies: 254
+-- Dependencies: 253
 -- Data for Name: cv_cra; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4782,7 +4764,7 @@ in	Movement of Inorganic Nutrients
 
 --
 -- TOC entry 3471 (class 0 OID 112286)
--- Dependencies: 255
+-- Dependencies: 254
 -- Data for Name: cv_maint_freq; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4803,7 +4785,7 @@ otherMaintenancePeriod
 
 --
 -- TOC entry 3472 (class 0 OID 112289)
--- Dependencies: 256
+-- Dependencies: 255
 -- Data for Name: cv_mgmt_type; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4815,7 +4797,7 @@ non_templated	\N
 
 --
 -- TOC entry 3473 (class 0 OID 112295)
--- Dependencies: 257
+-- Dependencies: 256
 -- Data for Name: cv_network_type; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4830,7 +4812,7 @@ NA	network types do not apply. this dataset (EML record) does not go to the netw
 
 --
 -- TOC entry 3474 (class 0 OID 112301)
--- Dependencies: 258
+-- Dependencies: 257
 -- Data for Name: cv_spatial_extent; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4846,7 +4828,7 @@ single_point	a single place such as one transect
 
 --
 -- TOC entry 3475 (class 0 OID 112307)
--- Dependencies: 259
+-- Dependencies: 258
 -- Data for Name: cv_spatial_type; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4860,7 +4842,7 @@ one_site_of_one	one site and not part of a series of sites
 
 --
 -- TOC entry 3476 (class 0 OID 112313)
--- Dependencies: 260
+-- Dependencies: 259
 -- Data for Name: cv_spatio_temporal; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4874,7 +4856,7 @@ dsdt	discrete spatial discrete temporal
 
 --
 -- TOC entry 3477 (class 0 OID 112319)
--- Dependencies: 261
+-- Dependencies: 260
 -- Data for Name: cv_status; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4894,7 +4876,7 @@ template
 
 --
 -- TOC entry 3478 (class 0 OID 112322)
--- Dependencies: 262
+-- Dependencies: 261
 -- Data for Name: cv_temporal_type; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4921,7 +4903,7 @@ COPY pkg_mgmt.maintenance_changehistory ("DataSetID", revision_number, revision_
 
 --
 -- TOC entry 3479 (class 0 OID 112328)
--- Dependencies: 263
+-- Dependencies: 262
 -- Data for Name: pkg_core_area; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4934,7 +4916,7 @@ COPY pkg_mgmt.pkg_core_area ("DataSetID", "Core_area") FROM stdin;
 
 --
 -- TOC entry 3480 (class 0 OID 112331)
--- Dependencies: 264
+-- Dependencies: 263
 -- Data for Name: pkg_sort; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4948,7 +4930,7 @@ COPY pkg_mgmt.pkg_sort ("DataSetID", network_type, is_signature, is_core, tempor
 
 --
 -- TOC entry 3481 (class 0 OID 112335)
--- Dependencies: 265
+-- Dependencies: 264
 -- Data for Name: pkg_state; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4962,7 +4944,7 @@ COPY pkg_mgmt.pkg_state ("DataSetID", dataset_archive_id, rev, nickname, data_re
 
 --
 -- TOC entry 3482 (class 0 OID 112341)
--- Dependencies: 266
+-- Dependencies: 265
 -- Data for Name: version_tracker_metabase; Type: TABLE DATA; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -4984,6 +4966,7 @@ COPY pkg_mgmt.version_tracker_metabase (major_version, minor_version, patch, dat
 1	0	42	2023-04-05 13:57:07.210529	apply 42_add_publications.sql
 1	0	43	2023-04-05 13:59:58.643168	apply 43_move_annotation_tables.sql
 1	0	44	2023-04-05 14:00:05.445701	apply 44_add_provider_id_taxonomy.sql
+1	0	45	2023-05-16 14:31:48.223161	apply 45_add_character_encoding_to_vw.sql
 \.
 
 
@@ -5330,7 +5313,7 @@ ALTER TABLE ONLY lter_metabase."ListCodes"
 
 
 --
--- TOC entry 3633 (class 0 OID 0)
+-- TOC entry 3632 (class 0 OID 0)
 -- Dependencies: 3138
 -- Name: CONSTRAINT "UQ_ListMissingCodes_Code_Explanation" ON "ListCodes"; Type: COMMENT; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6226,7 +6209,7 @@ GRANT USAGE ON SCHEMA pkg_mgmt TO read_only_user;
 
 
 --
--- TOC entry 3505 (class 0 OID 0)
+-- TOC entry 3504 (class 0 OID 0)
 -- Dependencies: 199
 -- Name: TABLE "DataSet"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6236,8 +6219,8 @@ GRANT SELECT ON TABLE lter_metabase."DataSet" TO read_only_user;
 
 
 --
--- TOC entry 3506 (class 0 OID 0)
--- Dependencies: 278
+-- TOC entry 3505 (class 0 OID 0)
+-- Dependencies: 277
 -- Name: TABLE "DataSetAnnotation"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6246,8 +6229,8 @@ GRANT SELECT ON TABLE lter_metabase."DataSetAnnotation" TO read_only_user;
 
 
 --
--- TOC entry 3507 (class 0 OID 0)
--- Dependencies: 279
+-- TOC entry 3506 (class 0 OID 0)
+-- Dependencies: 278
 -- Name: TABLE "DataSetAttributeAnnotation"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6256,7 +6239,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetAttributeAnnotation" TO read_only_us
 
 
 --
--- TOC entry 3508 (class 0 OID 0)
+-- TOC entry 3507 (class 0 OID 0)
 -- Dependencies: 200
 -- Name: TABLE "DataSetAttributeEnumeration"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6266,7 +6249,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetAttributeEnumeration" TO read_only_u
 
 
 --
--- TOC entry 3509 (class 0 OID 0)
+-- TOC entry 3508 (class 0 OID 0)
 -- Dependencies: 201
 -- Name: TABLE "DataSetAttributeMissingCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6275,7 +6258,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetAttributeMissingCodes" TO read_only_
 
 
 --
--- TOC entry 3510 (class 0 OID 0)
+-- TOC entry 3509 (class 0 OID 0)
 -- Dependencies: 202
 -- Name: TABLE "DataSetAttributes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6285,7 +6268,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetAttributes" TO read_only_user;
 
 
 --
--- TOC entry 3514 (class 0 OID 0)
+-- TOC entry 3513 (class 0 OID 0)
 -- Dependencies: 203
 -- Name: TABLE "DataSetEntities"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6295,7 +6278,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetEntities" TO read_only_user;
 
 
 --
--- TOC entry 3515 (class 0 OID 0)
+-- TOC entry 3514 (class 0 OID 0)
 -- Dependencies: 204
 -- Name: TABLE "DataSetKeywords"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6305,7 +6288,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetKeywords" TO read_only_user;
 
 
 --
--- TOC entry 3516 (class 0 OID 0)
+-- TOC entry 3515 (class 0 OID 0)
 -- Dependencies: 205
 -- Name: TABLE "DataSetMethod"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6315,7 +6298,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetMethod" TO read_only_user;
 
 
 --
--- TOC entry 3517 (class 0 OID 0)
+-- TOC entry 3516 (class 0 OID 0)
 -- Dependencies: 206
 -- Name: TABLE "DataSetMethodInstruments"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6325,7 +6308,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetMethodInstruments" TO read_only_user
 
 
 --
--- TOC entry 3518 (class 0 OID 0)
+-- TOC entry 3517 (class 0 OID 0)
 -- Dependencies: 207
 -- Name: TABLE "DataSetMethodProtocols"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6335,7 +6318,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetMethodProtocols" TO read_only_user;
 
 
 --
--- TOC entry 3520 (class 0 OID 0)
+-- TOC entry 3519 (class 0 OID 0)
 -- Dependencies: 208
 -- Name: TABLE "DataSetMethodProvenance"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6345,7 +6328,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetMethodProvenance" TO read_only_user;
 
 
 --
--- TOC entry 3521 (class 0 OID 0)
+-- TOC entry 3520 (class 0 OID 0)
 -- Dependencies: 209
 -- Name: TABLE "DataSetMethodSoftware"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6355,7 +6338,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetMethodSoftware" TO read_only_user;
 
 
 --
--- TOC entry 3524 (class 0 OID 0)
+-- TOC entry 3523 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: TABLE "DataSetPersonnel"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6365,8 +6348,8 @@ GRANT SELECT ON TABLE lter_metabase."DataSetPersonnel" TO read_only_user;
 
 
 --
--- TOC entry 3525 (class 0 OID 0)
--- Dependencies: 282
+-- TOC entry 3524 (class 0 OID 0)
+-- Dependencies: 281
 -- Name: TABLE "DataSetPublications"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6375,7 +6358,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetPublications" TO read_only_user;
 
 
 --
--- TOC entry 3527 (class 0 OID 0)
+-- TOC entry 3526 (class 0 OID 0)
 -- Dependencies: 211
 -- Name: TABLE "DataSetSites"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6385,7 +6368,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetSites" TO read_only_user;
 
 
 --
--- TOC entry 3528 (class 0 OID 0)
+-- TOC entry 3527 (class 0 OID 0)
 -- Dependencies: 212
 -- Name: TABLE "DataSetTaxa"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6395,7 +6378,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetTaxa" TO read_only_user;
 
 
 --
--- TOC entry 3530 (class 0 OID 0)
+-- TOC entry 3529 (class 0 OID 0)
 -- Dependencies: 213
 -- Name: TABLE "DataSetTemporal"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6405,7 +6388,7 @@ GRANT SELECT ON TABLE lter_metabase."DataSetTemporal" TO read_only_user;
 
 
 --
--- TOC entry 3531 (class 0 OID 0)
+-- TOC entry 3530 (class 0 OID 0)
 -- Dependencies: 214
 -- Name: TABLE "EMLFileTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6415,7 +6398,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLFileTypes" TO read_only_user;
 
 
 --
--- TOC entry 3532 (class 0 OID 0)
+-- TOC entry 3531 (class 0 OID 0)
 -- Dependencies: 215
 -- Name: TABLE "EMLKeywordTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6425,7 +6408,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLKeywordTypes" TO read_only_user;
 
 
 --
--- TOC entry 3533 (class 0 OID 0)
+-- TOC entry 3532 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: TABLE "EMLMeasurementScaleDomains"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6435,7 +6418,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLMeasurementScaleDomains" TO read_only_us
 
 
 --
--- TOC entry 3534 (class 0 OID 0)
+-- TOC entry 3533 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: TABLE "EMLMeasurementScales"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6445,7 +6428,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLMeasurementScales" TO read_only_user;
 
 
 --
--- TOC entry 3535 (class 0 OID 0)
+-- TOC entry 3534 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: TABLE "EMLNumberTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6455,8 +6438,8 @@ GRANT SELECT ON TABLE lter_metabase."EMLNumberTypes" TO read_only_user;
 
 
 --
--- TOC entry 3536 (class 0 OID 0)
--- Dependencies: 277
+-- TOC entry 3535 (class 0 OID 0)
+-- Dependencies: 276
 -- Name: TABLE "EMLObjectProperties"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6465,7 +6448,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLObjectProperties" TO read_only_user;
 
 
 --
--- TOC entry 3538 (class 0 OID 0)
+-- TOC entry 3537 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: TABLE "EMLStorageTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6475,7 +6458,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLStorageTypes" TO read_only_user;
 
 
 --
--- TOC entry 3539 (class 0 OID 0)
+-- TOC entry 3538 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: TABLE "EMLUnitDictionary"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6485,7 +6468,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLUnitDictionary" TO read_only_user;
 
 
 --
--- TOC entry 3540 (class 0 OID 0)
+-- TOC entry 3539 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: TABLE "EMLUnitTypes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6495,7 +6478,7 @@ GRANT SELECT ON TABLE lter_metabase."EMLUnitTypes" TO read_only_user;
 
 
 --
--- TOC entry 3541 (class 0 OID 0)
+-- TOC entry 3540 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: TABLE "ListCodes"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6505,7 +6488,7 @@ GRANT SELECT ON TABLE lter_metabase."ListCodes" TO read_only_user;
 
 
 --
--- TOC entry 3542 (class 0 OID 0)
+-- TOC entry 3541 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: TABLE "ListKeywordThesauri"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6515,7 +6498,7 @@ GRANT SELECT ON TABLE lter_metabase."ListKeywordThesauri" TO read_only_user;
 
 
 --
--- TOC entry 3543 (class 0 OID 0)
+-- TOC entry 3542 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: TABLE "ListKeywords"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6525,7 +6508,7 @@ GRANT SELECT ON TABLE lter_metabase."ListKeywords" TO read_only_user;
 
 
 --
--- TOC entry 3544 (class 0 OID 0)
+-- TOC entry 3543 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: TABLE "ListMethodInstruments"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6535,7 +6518,7 @@ GRANT SELECT ON TABLE lter_metabase."ListMethodInstruments" TO read_only_user;
 
 
 --
--- TOC entry 3545 (class 0 OID 0)
+-- TOC entry 3544 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: TABLE "ListMethodProtocols"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6545,7 +6528,7 @@ GRANT SELECT ON TABLE lter_metabase."ListMethodProtocols" TO read_only_user;
 
 
 --
--- TOC entry 3546 (class 0 OID 0)
+-- TOC entry 3545 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: TABLE "ListMethodSoftware"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6555,7 +6538,7 @@ GRANT SELECT ON TABLE lter_metabase."ListMethodSoftware" TO read_only_user;
 
 
 --
--- TOC entry 3547 (class 0 OID 0)
+-- TOC entry 3546 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: TABLE "ListPeople"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6565,7 +6548,7 @@ GRANT SELECT ON TABLE lter_metabase."ListPeople" TO read_only_user;
 
 
 --
--- TOC entry 3550 (class 0 OID 0)
+-- TOC entry 3549 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: TABLE "ListPeopleID"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6575,8 +6558,8 @@ GRANT SELECT ON TABLE lter_metabase."ListPeopleID" TO read_only_user;
 
 
 --
--- TOC entry 3551 (class 0 OID 0)
--- Dependencies: 281
+-- TOC entry 3550 (class 0 OID 0)
+-- Dependencies: 280
 -- Name: TABLE "ListPublications"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6585,8 +6568,8 @@ GRANT SELECT ON TABLE lter_metabase."ListPublications" TO read_only_user;
 
 
 --
--- TOC entry 3553 (class 0 OID 0)
--- Dependencies: 276
+-- TOC entry 3552 (class 0 OID 0)
+-- Dependencies: 275
 -- Name: TABLE "ListSemanticAnnotationTerms"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
 
@@ -6595,7 +6578,7 @@ GRANT SELECT ON TABLE lter_metabase."ListSemanticAnnotationTerms" TO read_only_u
 
 
 --
--- TOC entry 3559 (class 0 OID 0)
+-- TOC entry 3558 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: TABLE "ListSites"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6605,7 +6588,7 @@ GRANT SELECT ON TABLE lter_metabase."ListSites" TO read_only_user;
 
 
 --
--- TOC entry 3561 (class 0 OID 0)
+-- TOC entry 3560 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: TABLE "ListTaxa"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6615,7 +6598,7 @@ GRANT SELECT ON TABLE lter_metabase."ListTaxa" TO read_only_user;
 
 
 --
--- TOC entry 3562 (class 0 OID 0)
+-- TOC entry 3561 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: TABLE "ListTaxonomicProviders"; Type: ACL; Schema: lter_metabase; Owner: %db_owner%
 --
@@ -6625,7 +6608,7 @@ GRANT SELECT ON TABLE lter_metabase."ListTaxonomicProviders" TO read_only_user;
 
 
 --
--- TOC entry 3565 (class 0 OID 0)
+-- TOC entry 3564 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: TABLE boilerplate; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6635,7 +6618,7 @@ GRANT SELECT ON TABLE mb2eml_r.boilerplate TO read_only_user;
 
 
 --
--- TOC entry 3566 (class 0 OID 0)
+-- TOC entry 3565 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: TABLE vw_custom_units; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6645,7 +6628,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_custom_units TO read_only_user;
 
 
 --
--- TOC entry 3567 (class 0 OID 0)
+-- TOC entry 3566 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: TABLE vw_eml_associatedparty; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6655,7 +6638,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_associatedparty TO read_only_user;
 
 
 --
--- TOC entry 3568 (class 0 OID 0)
+-- TOC entry 3567 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: TABLE vw_eml_attributecodedefinition; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6665,7 +6648,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributecodedefinition TO read_only_user;
 
 
 --
--- TOC entry 3569 (class 0 OID 0)
+-- TOC entry 3568 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: TABLE vw_eml_attributes; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6675,7 +6658,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_attributes TO read_only_user;
 
 
 --
--- TOC entry 3570 (class 0 OID 0)
+-- TOC entry 3569 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: TABLE vw_eml_boilerplate; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6685,7 +6668,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_boilerplate TO read_only_user;
 
 
 --
--- TOC entry 3571 (class 0 OID 0)
+-- TOC entry 3570 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: TABLE vw_eml_bp_people; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6695,7 +6678,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_bp_people TO read_only_user;
 
 
 --
--- TOC entry 3573 (class 0 OID 0)
+-- TOC entry 3572 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: TABLE maintenance_changehistory; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
@@ -6705,7 +6688,7 @@ GRANT SELECT ON TABLE pkg_mgmt.maintenance_changehistory TO read_only_user;
 
 
 --
--- TOC entry 3574 (class 0 OID 0)
+-- TOC entry 3573 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: TABLE vw_eml_changehistory; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6715,7 +6698,7 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_changehistory TO read_only_user;
 
 
 --
--- TOC entry 3575 (class 0 OID 0)
+-- TOC entry 3574 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: TABLE vw_eml_creator; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6725,7 +6708,7 @@ GRANT SELECT,INSERT,UPDATE ON TABLE mb2eml_r.vw_eml_creator TO read_write_user;
 
 
 --
--- TOC entry 3576 (class 0 OID 0)
+-- TOC entry 3575 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: TABLE vw_eml_dataset; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
@@ -6735,8 +6718,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_dataset TO read_only_user;
 
 
 --
--- TOC entry 3577 (class 0 OID 0)
--- Dependencies: 244
+-- TOC entry 3576 (class 0 OID 0)
+-- Dependencies: 284
 -- Name: TABLE vw_eml_entities; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6745,8 +6728,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_entities TO read_only_user;
 
 
 --
--- TOC entry 3578 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 3577 (class 0 OID 0)
+-- Dependencies: 244
 -- Name: TABLE vw_eml_geographiccoverage; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6755,8 +6738,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_geographiccoverage TO read_only_user;
 
 
 --
--- TOC entry 3579 (class 0 OID 0)
--- Dependencies: 246
+-- TOC entry 3578 (class 0 OID 0)
+-- Dependencies: 245
 -- Name: TABLE vw_eml_instruments; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6765,8 +6748,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_instruments TO read_only_user;
 
 
 --
--- TOC entry 3580 (class 0 OID 0)
--- Dependencies: 247
+-- TOC entry 3579 (class 0 OID 0)
+-- Dependencies: 246
 -- Name: TABLE vw_eml_keyword; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6775,8 +6758,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_keyword TO read_only_user;
 
 
 --
--- TOC entry 3581 (class 0 OID 0)
--- Dependencies: 248
+-- TOC entry 3580 (class 0 OID 0)
+-- Dependencies: 247
 -- Name: TABLE vw_eml_methodstep_description; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6785,8 +6768,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_methodstep_description TO read_only_user;
 
 
 --
--- TOC entry 3582 (class 0 OID 0)
--- Dependencies: 249
+-- TOC entry 3581 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: TABLE vw_eml_missingcodes; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6795,8 +6778,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_missingcodes TO read_only_user;
 
 
 --
--- TOC entry 3583 (class 0 OID 0)
--- Dependencies: 250
+-- TOC entry 3582 (class 0 OID 0)
+-- Dependencies: 249
 -- Name: TABLE vw_eml_protocols; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6805,8 +6788,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_protocols TO read_only_user;
 
 
 --
--- TOC entry 3584 (class 0 OID 0)
--- Dependencies: 251
+-- TOC entry 3583 (class 0 OID 0)
+-- Dependencies: 250
 -- Name: TABLE vw_eml_provenance; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6815,8 +6798,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_provenance TO read_only_user;
 
 
 --
--- TOC entry 3585 (class 0 OID 0)
--- Dependencies: 283
+-- TOC entry 3584 (class 0 OID 0)
+-- Dependencies: 282
 -- Name: TABLE vw_eml_publications; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6825,8 +6808,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_publications TO read_only_user;
 
 
 --
--- TOC entry 3586 (class 0 OID 0)
--- Dependencies: 280
+-- TOC entry 3585 (class 0 OID 0)
+-- Dependencies: 279
 -- Name: TABLE vw_eml_semantic_annotation; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6835,8 +6818,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_semantic_annotation TO read_only_user;
 
 
 --
--- TOC entry 3587 (class 0 OID 0)
--- Dependencies: 252
+-- TOC entry 3586 (class 0 OID 0)
+-- Dependencies: 251
 -- Name: TABLE vw_eml_software; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6845,8 +6828,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_software TO read_only_user;
 
 
 --
--- TOC entry 3588 (class 0 OID 0)
--- Dependencies: 284
+-- TOC entry 3587 (class 0 OID 0)
+-- Dependencies: 283
 -- Name: TABLE vw_eml_taxonomy; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6855,8 +6838,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_taxonomy TO read_only_user;
 
 
 --
--- TOC entry 3589 (class 0 OID 0)
--- Dependencies: 253
+-- TOC entry 3588 (class 0 OID 0)
+-- Dependencies: 252
 -- Name: TABLE vw_eml_temporalcoverage; Type: ACL; Schema: mb2eml_r; Owner: %db_owner%
 --
 
@@ -6865,8 +6848,8 @@ GRANT SELECT ON TABLE mb2eml_r.vw_eml_temporalcoverage TO read_only_user;
 
 
 --
--- TOC entry 3591 (class 0 OID 0)
--- Dependencies: 254
+-- TOC entry 3590 (class 0 OID 0)
+-- Dependencies: 253
 -- Name: TABLE cv_cra; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6875,8 +6858,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_cra TO read_only_user;
 
 
 --
--- TOC entry 3592 (class 0 OID 0)
--- Dependencies: 255
+-- TOC entry 3591 (class 0 OID 0)
+-- Dependencies: 254
 -- Name: TABLE cv_maint_freq; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6885,8 +6868,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_maint_freq TO read_only_user;
 
 
 --
--- TOC entry 3593 (class 0 OID 0)
--- Dependencies: 256
+-- TOC entry 3592 (class 0 OID 0)
+-- Dependencies: 255
 -- Name: TABLE cv_mgmt_type; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6895,8 +6878,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_mgmt_type TO read_only_user;
 
 
 --
--- TOC entry 3594 (class 0 OID 0)
--- Dependencies: 257
+-- TOC entry 3593 (class 0 OID 0)
+-- Dependencies: 256
 -- Name: TABLE cv_network_type; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6905,8 +6888,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_network_type TO read_only_user;
 
 
 --
--- TOC entry 3595 (class 0 OID 0)
--- Dependencies: 258
+-- TOC entry 3594 (class 0 OID 0)
+-- Dependencies: 257
 -- Name: TABLE cv_spatial_extent; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6915,8 +6898,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_spatial_extent TO read_only_user;
 
 
 --
--- TOC entry 3596 (class 0 OID 0)
--- Dependencies: 259
+-- TOC entry 3595 (class 0 OID 0)
+-- Dependencies: 258
 -- Name: TABLE cv_spatial_type; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6925,8 +6908,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_spatial_type TO read_only_user;
 
 
 --
--- TOC entry 3597 (class 0 OID 0)
--- Dependencies: 260
+-- TOC entry 3596 (class 0 OID 0)
+-- Dependencies: 259
 -- Name: TABLE cv_spatio_temporal; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6935,8 +6918,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_spatio_temporal TO read_only_user;
 
 
 --
--- TOC entry 3598 (class 0 OID 0)
--- Dependencies: 261
+-- TOC entry 3597 (class 0 OID 0)
+-- Dependencies: 260
 -- Name: TABLE cv_status; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6945,8 +6928,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_status TO read_only_user;
 
 
 --
--- TOC entry 3599 (class 0 OID 0)
--- Dependencies: 262
+-- TOC entry 3598 (class 0 OID 0)
+-- Dependencies: 261
 -- Name: TABLE cv_temporal_type; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6955,8 +6938,8 @@ GRANT SELECT ON TABLE pkg_mgmt.cv_temporal_type TO read_only_user;
 
 
 --
--- TOC entry 3601 (class 0 OID 0)
--- Dependencies: 263
+-- TOC entry 3600 (class 0 OID 0)
+-- Dependencies: 262
 -- Name: TABLE pkg_core_area; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6965,8 +6948,8 @@ GRANT SELECT ON TABLE pkg_mgmt.pkg_core_area TO read_only_user;
 
 
 --
--- TOC entry 3608 (class 0 OID 0)
--- Dependencies: 264
+-- TOC entry 3607 (class 0 OID 0)
+-- Dependencies: 263
 -- Name: TABLE pkg_sort; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6975,8 +6958,8 @@ GRANT SELECT ON TABLE pkg_mgmt.pkg_sort TO read_only_user;
 
 
 --
--- TOC entry 3623 (class 0 OID 0)
--- Dependencies: 265
+-- TOC entry 3622 (class 0 OID 0)
+-- Dependencies: 264
 -- Name: TABLE pkg_state; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6985,8 +6968,8 @@ GRANT SELECT ON TABLE pkg_mgmt.pkg_state TO read_only_user;
 
 
 --
--- TOC entry 3624 (class 0 OID 0)
--- Dependencies: 266
+-- TOC entry 3623 (class 0 OID 0)
+-- Dependencies: 265
 -- Name: TABLE version_tracker_metabase; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -6995,8 +6978,8 @@ GRANT SELECT ON TABLE pkg_mgmt.version_tracker_metabase TO read_only_user;
 
 
 --
--- TOC entry 3625 (class 0 OID 0)
--- Dependencies: 267
+-- TOC entry 3624 (class 0 OID 0)
+-- Dependencies: 266
 -- Name: TABLE vw_backlog; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7005,8 +6988,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_backlog TO read_only_user;
 
 
 --
--- TOC entry 3626 (class 0 OID 0)
--- Dependencies: 268
+-- TOC entry 3625 (class 0 OID 0)
+-- Dependencies: 267
 -- Name: TABLE vw_cataloged; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7015,8 +6998,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_cataloged TO read_only_user;
 
 
 --
--- TOC entry 3627 (class 0 OID 0)
--- Dependencies: 269
+-- TOC entry 3626 (class 0 OID 0)
+-- Dependencies: 268
 -- Name: TABLE vw_draft_anticipated; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7025,8 +7008,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_draft_anticipated TO read_only_user;
 
 
 --
--- TOC entry 3628 (class 0 OID 0)
--- Dependencies: 270
+-- TOC entry 3627 (class 0 OID 0)
+-- Dependencies: 269
 -- Name: TABLE vw_drafts_bak; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7035,8 +7018,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_drafts_bak TO read_only_user;
 
 
 --
--- TOC entry 3629 (class 0 OID 0)
--- Dependencies: 272
+-- TOC entry 3628 (class 0 OID 0)
+-- Dependencies: 271
 -- Name: TABLE vw_im_plan; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7045,8 +7028,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_im_plan TO read_only_user;
 
 
 --
--- TOC entry 3630 (class 0 OID 0)
--- Dependencies: 273
+-- TOC entry 3629 (class 0 OID 0)
+-- Dependencies: 272
 -- Name: TABLE vw_pub; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7055,8 +7038,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_pub TO read_only_user;
 
 
 --
--- TOC entry 3631 (class 0 OID 0)
--- Dependencies: 274
+-- TOC entry 3630 (class 0 OID 0)
+-- Dependencies: 273
 -- Name: TABLE vw_self; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7065,8 +7048,8 @@ GRANT SELECT ON TABLE pkg_mgmt.vw_self TO read_only_user;
 
 
 --
--- TOC entry 3632 (class 0 OID 0)
--- Dependencies: 275
+-- TOC entry 3631 (class 0 OID 0)
+-- Dependencies: 274
 -- Name: TABLE vw_temporal; Type: ACL; Schema: pkg_mgmt; Owner: %db_owner%
 --
 
@@ -7074,7 +7057,7 @@ GRANT SELECT,INSERT,UPDATE ON TABLE pkg_mgmt.vw_temporal TO read_write_user;
 GRANT SELECT ON TABLE pkg_mgmt.vw_temporal TO read_only_user;
 
 
--- Completed on 2023-04-05 14:26:20
+-- Completed on 2023-05-19 12:04:35
 
 --
 -- PostgreSQL database dump complete
