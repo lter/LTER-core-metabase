@@ -1,6 +1,10 @@
 
 ## Contributing guide to LTER-core-metabase
 
+## Note
+
+Please don't be intimidated by the length of this guide :)
+
 ### Repo organization
 
 A collaborative database design project poses challenges when it comes to version-control and collaborative development. Developers must take care to make sure their development databases are up to date, for example. 
@@ -43,6 +47,9 @@ VALUES(0, 9, 22, now(), 'applied 22_version_tracker');
 ```
 pg_dump -d <DB name> -F p -b -h your_db_host -p 5432 -U your_username -f <file path to dump to>
 ```
+
+Note 2023-06-25: An user has run into trouble with the public schema regarding permissions. The public schema is often created automatically with the database and is owned by the superuser postgres. This can cause issues down the line. My stopgap measure has been to use DBeaver to make the database dump. In DBeaver, during the Backup dialogue, you can un-select the public schema to exclude it from the dump/backup. 
+
 11. Reverse find-and-replace in GRANT statements. Replace your role with `%db_owner%`. For example, 
 ```
 cat pg_dump_output.sql | sed 's/your_username/%db_owner%/g' > onebigfile.sql
